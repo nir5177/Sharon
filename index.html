@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="שורשים – מרחב בטוח, מכבד ודיסקרטי להורים החרדים המתמודדים עם פערים השקפתיים ונתק מול ילדיהם. מבית עמותת התקשרות." />
+  <title>שורשים | מבית עמותת התקשרות</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ========== HEADER ========== -->
+  <header id="header" class="site-header">
+    <div class="container header-inner">
+
+      <a href="#hero" class="logo" aria-label="שורשים - דף הבית">
+        <svg class="logo-icon" viewBox="0 0 48 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M24 2 C24 2, 14 12, 14 22 C14 30, 19 36, 24 38 C29 36, 34 30, 34 22 C34 12, 24 2, 24 2Z" fill="#C8973A" opacity="0.85"/>
+          <path d="M24 38 L24 50" stroke="#7A5C3E" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M24 44 C22 42, 16 40, 12 42" stroke="#7A5C3E" stroke-width="2" stroke-linecap="round"/>
+          <path d="M24 47 C26 45, 32 43, 36 45" stroke="#7A5C3E" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-text">שורשים</span>
+      </a>
+
+      <button class="hamburger" id="hamburger" aria-label="פתח תפריט" aria-expanded="false" aria-controls="nav-menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav id="nav-menu" class="nav-menu" aria-label="ניווט ראשי">
+        <ul>
+          <li><a href="#anchor" class="nav-link">הגישה שלנו</a></li>
+          <li><a href="#services" class="nav-link">השירותים</a></li>
+          <li><a href="#about" class="nav-link">מי אנחנו</a></li>
+          <li><a href="#contact" class="nav-link">יצירת קשר</a></li>
+          <li><a href="#donate" class="nav-link nav-link--donate">תרומות</a></li>
+        </ul>
+        <a href="#contact" class="btn btn-cta nav-cta">ליצירת קשר דיסקרטי</a>
+      </nav>
+
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ========== HERO ========== -->
+    <section id="hero" class="section-hero">
+      <div class="hero-bg-shape" aria-hidden="true"></div>
+      <div class="container hero-inner">
+
+        <div class="hero-content">
+          <span class="hero-tag">מרחב בטוח ודיסקרטי</span>
+          <h1 class="hero-title">
+            הבית הוא העוגן,<br>
+            גם כשהדרך&nbsp;משתנה
+          </h1>
+          <p class="hero-sub">
+            אנחנו מבינים את הכאב, את הבדידות ואת האהבה שלא נגמרת.
+            כאן תמצאו הדרכה מקצועית, ליווי אישי ומרחב שבו אפשר לדבר
+            — בלי שיפוטיות, בלי תיוגים, בלי שאיש יֵדַע.
+          </p>
+          <div class="hero-actions">
+            <a href="#contact" class="btn btn-primary">לקביעת פגישת היכרות</a>
+            <a href="#services" class="btn btn-outline">הכירו את השירותים</a>
+          </div>
+          <p class="hero-privacy">
+            <svg class="icon-lock" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            פרטיותך מובטחת לחלוטין — לא יועבר שום פרט לאף גורם
+          </p>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <svg class="tree-svg" viewBox="0 0 320 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Canopy -->
+            <ellipse cx="160" cy="120" rx="90" ry="75" fill="#6A8C4A" opacity="0.18"/>
+            <ellipse cx="110" cy="140" rx="60" ry="50" fill="#6A8C4A" opacity="0.15"/>
+            <ellipse cx="210" cy="140" rx="60" ry="50" fill="#6A8C4A" opacity="0.15"/>
+            <ellipse cx="160" cy="95" rx="75" ry="62" fill="#6A8C4A" opacity="0.22"/>
+            <!-- Branches -->
+            <path d="M160 185 C155 165, 130 150, 110 140" stroke="#7A5C3E" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M160 185 C165 160, 195 148, 215 138" stroke="#7A5C3E" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M160 185 C158 155, 155 130, 160 108" stroke="#7A5C3E" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+            <path d="M130 155 C120 145, 105 140, 95 135" stroke="#7A5C3E" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <path d="M190 153 C200 143, 215 140, 225 136" stroke="#7A5C3E" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <!-- Trunk -->
+            <path d="M152 185 C150 210, 148 230, 150 260" stroke="#7A5C3E" stroke-width="8" stroke-linecap="round" fill="none"/>
+            <path d="M168 185 C170 210, 172 230, 170 260" stroke="#7A5C3E" stroke-width="8" stroke-linecap="round" fill="none"/>
+            <path d="M150 260 Q160 265 170 260" stroke="#7A5C3E" stroke-width="6" stroke-linecap="round" fill="none"/>
+            <!-- Roots -->
+            <path d="M152 265 C145 278, 128 285, 108 295" stroke="#C8973A" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+            <path d="M160 268 C160 280, 160 295, 158 312" stroke="#C8973A" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+            <path d="M168 265 C178 278, 195 283, 215 292" stroke="#C8973A" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+            <path d="M142 278 C132 285, 118 288, 100 292" stroke="#C8973A" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+            <path d="M178 278 C188 285, 205 290, 222 296" stroke="#C8973A" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+            <path d="M108 295 C98 298, 88 300, 78 305" stroke="#C8973A" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.5"/>
+            <path d="M215 292 C225 295, 235 298, 245 304" stroke="#C8973A" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.5"/>
+            <!-- Ground line -->
+            <path d="M60 320 Q160 315 260 320" stroke="#E8D5A8" stroke-width="1.5" fill="none" opacity="0.6"/>
+            <!-- Leaves sparkle -->
+            <circle cx="145" cy="90" r="3" fill="#C8973A" opacity="0.6"/>
+            <circle cx="178" cy="78" r="2.5" fill="#C8973A" opacity="0.5"/>
+            <circle cx="122" cy="112" r="2" fill="#C8973A" opacity="0.4"/>
+            <circle cx="198" cy="105" r="2" fill="#C8973A" opacity="0.4"/>
+          </svg>
+        </div>
+
+      </div>
+      <div class="hero-wave" aria-hidden="true">
+        <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#FAF6EF"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ========== ANCHOR – Torah & Values ========== -->
+    <section id="anchor" class="section-anchor">
+      <div class="container">
+
+        <div class="anchor-intro">
+          <span class="section-tag">הגישה שלנו</span>
+          <h2>שורשים עמוקים מחזיקים את העץ בסערה</h2>
+          <p class="section-lead">
+            הפרויקט שלנו מושתת על ההכרה שהקשר בין הורים לילדיהם הוא קדוש ובלתי ניתן לניתוק —
+            גם כשהדרכים נפרדות, גם כשהעמדות שונות.
+          </p>
+        </div>
+
+        <div class="quotes-grid">
+          <blockquote class="quote-card">
+            <p class="quote-text">
+              "שמירת הקשר עם הילד — מכל מוצא שיהא — היא ערך בפני עצמו, ואפילו מצווה."
+            </p>
+            <footer class="quote-source">מגדולי ישראל בדורנו</footer>
+          </blockquote>
+          <blockquote class="quote-card quote-card--featured">
+            <p class="quote-text">
+              "כבד את אביך ואת אמך — הציווי הוא לדורות, ומחייב גם את הילד שהתרחק."
+            </p>
+            <footer class="quote-source">בסיס הלכתי לשמירת הקשר</footer>
+          </blockquote>
+          <blockquote class="quote-card">
+            <p class="quote-text">
+              "ההורה שמשמר אהבה בלתי מותנית — הוא החבל שיחזיר את הילד הביתה."
+            </p>
+            <footer class="quote-source">מניסיון שנות הליווי שלנו</footer>
+          </blockquote>
+        </div>
+
+        <div class="values-strip">
+          <div class="value-item">
+            <svg class="value-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="16" cy="16" r="13" stroke="#C8973A" stroke-width="1.5"/>
+              <path d="M10 16 L14 20 L22 12" stroke="#C8973A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>גישה ללא שיפוטיות</span>
+          </div>
+          <div class="value-item">
+            <svg class="value-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M16 4 L18.5 11.5 L26.5 11.5 L20 16.5 L22.5 24 L16 19 L9.5 24 L12 16.5 L5.5 11.5 L13.5 11.5 Z" stroke="#C8973A" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+            <span>דיסקרטיות מוחלטת</span>
+          </div>
+          <div class="value-item">
+            <svg class="value-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M16 6 C11 6, 7 9, 7 14 C7 19, 11 22, 16 26 C21 22, 25 19, 25 14 C25 9, 21 6, 16 6Z" stroke="#C8973A" stroke-width="1.5"/>
+            </svg>
+            <span>מבוסס על ערכי תורה</span>
+          </div>
+          <div class="value-item">
+            <svg class="value-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="11" cy="12" r="4" stroke="#C8973A" stroke-width="1.5"/>
+              <circle cx="21" cy="12" r="4" stroke="#C8973A" stroke-width="1.5"/>
+              <path d="M6 26 C6 21, 8.5 18, 11 18" stroke="#C8973A" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M16 26 C16 21, 18.5 18, 21 18" stroke="#C8973A" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M11 18 C14 16, 18 16, 21 18" stroke="#C8973A" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>ניסיון רב שנים</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========== SERVICES ========== -->
+    <section id="services" class="section-services">
+      <div class="container">
+
+        <div class="section-header">
+          <span class="section-tag">מה אנחנו מציעים</span>
+          <h2>ליווי מקצועי בכל שלב</h2>
+          <p class="section-lead">
+            שלושה מסלולים גמישים, מותאמים לצרכים שלכם — בצנעה ובפרטיות מלאה.
+          </p>
+        </div>
+
+        <div class="services-grid">
+
+          <article class="service-card">
+            <div class="service-icon-wrap">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="24" cy="24" r="20" fill="#F2EBE0"/>
+                <path d="M16 28 C16 22, 20 18, 24 18 C28 18, 32 22, 32 28" stroke="#6A8C4A" stroke-width="2" stroke-linecap="round" fill="none"/>
+                <circle cx="16" cy="28" r="3" fill="#6A8C4A" opacity="0.7"/>
+                <circle cx="32" cy="28" r="3" fill="#6A8C4A" opacity="0.7"/>
+                <circle cx="24" cy="16" r="3" fill="#6A8C4A" opacity="0.7"/>
+              </svg>
+            </div>
+            <h3>סדנאות קבוצתיות</h3>
+            <p>
+              מפגשים קבוצתיים בזום או פרונטלי, לקבוצות קטנות ואנונימיות.
+              שותפים לכאב, לומדים יחד, ומחזקים זה את זה — ללא חשיפה.
+            </p>
+            <ul class="service-features">
+              <li>אנונימיות מלאה — ניתן להשתתף ללא שם</li>
+              <li>זום / מפגשים פרונטליים בנפרד לנשים ולגברים</li>
+              <li>מנחים מקצועיים עם ניסיון רב שנים</li>
+            </ul>
+            <a href="#contact" class="service-cta">לפרטים נוספים</a>
+          </article>
+
+          <article class="service-card service-card--featured">
+            <div class="service-badge">הכי מבוקש</div>
+            <div class="service-icon-wrap">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="24" cy="24" r="20" fill="#F2EBE0"/>
+                <circle cx="24" cy="20" r="6" stroke="#C8973A" stroke-width="2" fill="none"/>
+                <path d="M14 36 C14 30, 18.5 26, 24 26 C29.5 26, 34 30, 34 36" stroke="#C8973A" stroke-width="2" stroke-linecap="round" fill="none"/>
+              </svg>
+            </div>
+            <h3>הדרכת הורים פרטנית</h3>
+            <p>
+              ליווי אישי ופרטי עם מנחה מקצועי — לפי קצב שלכם ובזמן שנוח לכם.
+              שיחות בטלפון, זום, או פגישה אישית — לפי בחירתכם.
+            </p>
+            <ul class="service-features">
+              <li>שיחה ראשונית ללא עלות</li>
+              <li>גמישות מלאה בזמן ובאופן הפגישה</li>
+              <li>מנחה קבוע שמכיר את המקרה שלכם</li>
+            </ul>
+            <a href="#contact" class="service-cta">לתיאום פגישה</a>
+          </article>
+
+          <article class="service-card">
+            <div class="service-icon-wrap">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="24" cy="24" r="20" fill="#F2EBE0"/>
+                <path d="M24 14 C24 14, 18 20, 18 26 C18 30, 20.5 33, 24 34 C27.5 33, 30 30, 30 26 C30 20, 24 14, 24 14Z" stroke="#6A8C4A" stroke-width="2" fill="none"/>
+                <path d="M24 34 L24 38" stroke="#6A8C4A" stroke-width="2" stroke-linecap="round"/>
+                <path d="M24 37 C22 35.5, 18 35, 15 36" stroke="#6A8C4A" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M24 37 C26 35.5, 30 35, 33 36" stroke="#6A8C4A" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <h3>חוסן משפחתי</h3>
+            <p>
+              כלים מעשיים לחיזוק הקשר, שמירת שאר ילדי הבית ובניית חסינות
+              רגשית לאורך זמן — כי כל המשפחה זקוקה לחיזוק.
+            </p>
+            <ul class="service-features">
+              <li>תכנית מובנית ל-8 שבועות</li>
+              <li>כולל כלים לניהול משברים</li>
+              <li>תמיכה בין-מפגשית בוואטסאפ</li>
+            </ul>
+            <a href="#contact" class="service-cta">לפרטים נוספים</a>
+          </article>
+
+        </div>
+
+        <div class="services-note">
+          <svg class="icon-lock" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          כל השירותים מתבצעים בדיסקרטיות מוחלטת. שמכם לא יועבר לאיש.
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========== ABOUT ========== -->
+    <section id="about" class="section-about">
+      <div class="container">
+
+        <div class="about-inner">
+
+          <div class="about-text">
+            <span class="section-tag">מי אנחנו</span>
+            <h2>צוות שמבין — מניסיון אמיתי</h2>
+            <p>
+              פרויקט <strong>שורשים</strong> הוקם מתוך הכרה בכאב הייחודי של הורים
+              חרדים המתמודדים עם פערים השקפתיים וניתוק מילדיהם. הצוות שלנו כולל
+              מנחים ועובדים סוציאליים בעלי שנות ניסיון רבות בליווי משפחות
+              במצבי משבר, ובפרט בסוגיות של פערי דת ואמונה.
+            </p>
+            <p>
+              הפרויקט מגובה על ידי <strong>עמותת התקשרות — מאמינים ב-יחד</strong>,
+              עמותה הפועלת שנים רבות לחיזוק הקשר בין הורים לילדיהם בכל
+              נסיבות, תוך שמירה על ערכי אמונה ומסורת ישראל.
+            </p>
+            <a href="#contact" class="btn btn-primary">צרו קשר עוד היום</a>
+          </div>
+
+          <div class="team-grid">
+
+            <div class="team-card">
+              <div class="team-avatar" aria-hidden="true">
+                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="40" cy="40" r="40" fill="#F2EBE0"/>
+                  <circle cx="40" cy="32" r="13" fill="#C8973A" opacity="0.4"/>
+                  <path d="M18 66 C18 52, 27 44, 40 44 C53 44, 62 52, 62 66" fill="#C8973A" opacity="0.4"/>
+                </svg>
+              </div>
+              <h4>צוות המנחות</h4>
+              <p class="team-role">מנחות קבוצה וסדנאות</p>
+              <p class="team-desc">עובדות סוציאליות ומנחות קבוצה בעלות הכשרה ייחודית בסוגיות משפחה וזהות בחברה החרדית.</p>
+            </div>
+
+            <div class="team-card">
+              <div class="team-avatar" aria-hidden="true">
+                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="40" cy="40" r="40" fill="#F2EBE0"/>
+                  <circle cx="40" cy="32" r="13" fill="#6A8C4A" opacity="0.4"/>
+                  <path d="M18 66 C18 52, 27 44, 40 44 C53 44, 62 52, 62 66" fill="#6A8C4A" opacity="0.4"/>
+                </svg>
+              </div>
+              <h4>צוות הייעוץ</h4>
+              <p class="team-role">יועצים פרטניים</p>
+              <p class="team-desc">מטפלים ויועצים עם התמחות בליווי הורים ובטיפול במשברי קשר משפחתי מתוך עמדה תורנית ומקצועית.</p>
+            </div>
+
+            <div class="team-card">
+              <div class="team-avatar" aria-hidden="true">
+                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="40" cy="40" r="40" fill="#F2EBE0"/>
+                  <circle cx="40" cy="32" r="13" fill="#7A5C3E" opacity="0.4"/>
+                  <path d="M18 66 C18 52, 27 44, 40 44 C53 44, 62 52, 62 66" fill="#7A5C3E" opacity="0.4"/>
+                </svg>
+              </div>
+              <h4>עמותת התקשרות</h4>
+              <p class="team-role">הגוף המפעיל</p>
+              <p class="team-desc">עמותת "התקשרות – מאמינים ב-יחד" מפעילה ומגבה את הפרויקט, ומביאה עמה שנות ניסיון וצבירת ידע ייחודי.</p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========== TESTIMONIALS ========== -->
+    <section class="section-testimonials">
+      <div class="container">
+
+        <div class="section-header">
+          <span class="section-tag">מה אומרים המשתתפים</span>
+          <h2>הורים שהיו במקומכם</h2>
+        </div>
+
+        <div class="testimonials-grid">
+
+          <blockquote class="testimonial-card">
+            <p>"הגעתי שבורה לחלוטין. הצוות של שורשים לא שפטו אותי לרגע. הם עזרו לי למצוא דרך לשמור על קשר עם הילד שלי בלי לוותר על הערכים שלי."</p>
+            <footer>
+              <strong>א.מ.</strong> — אם מירושלים
+            </footer>
+          </blockquote>
+
+          <blockquote class="testimonial-card testimonial-card--accent">
+            <p>"הסדנה בזום שינתה אותי. הייתי בודד לחלוטין עם הכאב הזה, ופתאום גיליתי שיש עוד הורים שחווים בדיוק את אותו הדבר. זה עצמו כבר ריפא משהו."</p>
+            <footer>
+              <strong>ב.כ.</strong> — אב מבני ברק
+            </footer>
+          </blockquote>
+
+          <blockquote class="testimonial-card">
+            <p>"הדיסקרטיות הייתה קריטית בשבילי. אף אחד לא צריך לדעת שפניתי לעזרה. הצוות כיבד את זה לחלוטין, ועכשיו אני יכול לנשום קצת."</p>
+            <footer>
+              <strong>ר.ש.</strong> — הורה מאשדוד
+            </footer>
+          </blockquote>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========== DONATIONS ========== -->
+    <section id="donate" class="section-donate">
+      <div class="container">
+        <div class="donate-inner">
+
+          <div class="donate-text">
+            <span class="section-tag">תמכו בנו</span>
+            <h2>כל תרומה — עוד משפחה שלא תישאר לבד</h2>
+            <p>
+              פרויקט שורשים פועל בזכות ליבם הגדול של תורמים שמבינים את הצורך.
+              תרומתכם מאפשרת לנו להגיע ליותר הורים, להרחיב את הצוות ולהציע שירותים
+              ללא תלות ביכולת הכלכלית של המשפחה.
+            </p>
+            <p class="donate-note">
+              התרומות מוכרות לצרכי מס (סעיף 46) דרך עמותת התקשרות.
+            </p>
+          </div>
+
+          <div class="donate-options">
+            <div class="donate-amounts">
+              <button class="donate-amount-btn" data-amount="50">₪50</button>
+              <button class="donate-amount-btn" data-amount="100">₪100</button>
+              <button class="donate-amount-btn donate-amount-btn--featured" data-amount="200">₪200</button>
+              <button class="donate-amount-btn" data-amount="500">₪500</button>
+              <button class="donate-amount-btn donate-amount-btn--custom" data-amount="custom">סכום אחר</button>
+            </div>
+            <div class="donate-custom-wrap" id="donate-custom-wrap" hidden>
+              <label for="custom-amount" class="sr-only">סכום תרומה</label>
+              <input type="number" id="custom-amount" name="custom-amount" min="10" placeholder="הכניסו סכום (₪)" dir="ltr"/>
+            </div>
+            <a href="#contact" class="btn btn-donate" id="donate-btn">
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M10 17C10 17 3 12.5 3 7.5A4 4 0 0110 5a4 4 0 017 2.5C17 12.5 10 17 10 17Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+              לתרומה מאובטחת
+            </a>
+            <p class="donate-secure">
+              <svg class="icon-lock" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              תשלום מאובטח · SSL · אישור תרומה בדוא"ל
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== CONTACT ========== -->
+    <section id="contact" class="section-contact">
+      <div class="container">
+        <div class="contact-inner">
+
+          <div class="contact-text">
+            <span class="section-tag">יצירת קשר</span>
+            <h2>צעד ראשון — בשקט ובפרטיות</h2>
+            <p>
+              מלאו את הטופס ונחזור אליכם בדרך שנוחה לכם.
+              אפשר להשאיר כינוי במקום שם מלא — אנחנו מבינים.
+            </p>
+            <div class="privacy-box">
+              <svg class="icon-lock" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="4" y="9" width="12" height="10" rx="2" stroke="#6A8C4A" stroke-width="1.5"/>
+                <path d="M7 9V7a3 3 0 016 0v2" stroke="#6A8C4A" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="10" cy="14" r="1.5" fill="#6A8C4A"/>
+              </svg>
+              <div>
+                <strong>הצהרת פרטיות</strong>
+                <p>הפרטים שתשאירו ישמשו אך ורק ליצירת קשר מצדנו אליכם.
+                לא יועברו לאף גורם שלישי, לעולם לא.</p>
+              </div>
+            </div>
+            <div class="contact-alt">
+              <p>מעדיפים וואטסאפ ישיר?</p>
+              <a href="https://wa.me/972500000000?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%9E%D7%90%D7%AA%D7%A8%20%D7%A9%D7%95%D7%A8%D7%A9%D7%99%D7%9D%20%D7%95%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A4%D7%A8%D7%98%D7%99%D7%9D%20%D7%91%D7%93%D7%99%D7%A1%D7%A7%D7%A8%D7%98%D7%99%D7%95%D7%AA" class="whatsapp-link" target="_blank" rel="noopener noreferrer">
+                <svg class="icon-wa" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.978-1.413A9.953 9.953 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2Z" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M8.5 9.5C8.5 9.5 9 10.5 10 11.5 11 12.5 12.5 13 12.5 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M8.5 9.5C8.5 8.5 9.5 8 10 8.5L11 10C11.5 10.5 11 11 10.5 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12.5 13C13 13.5 13.5 14 13.5 14.5 14 15 13.5 16 12.5 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                שלחו הודעה בוואטסאפ
+              </a>
+            </div>
+          </div>
+
+          <form class="contact-form" id="contact-form" novalidate>
+            <div class="form-group">
+              <label for="name">שם פרטי / כינוי <span class="required" aria-label="שדה חובה">*</span></label>
+              <input type="text" id="name" name="name" placeholder="אפשר גם כינוי בלבד" required autocomplete="off" />
+              <span class="form-error" aria-live="polite"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="phone">מספר טלפון <span class="required" aria-label="שדה חובה">*</span></label>
+              <input type="tel" id="phone" name="phone" placeholder="050-0000000" required autocomplete="off" dir="ltr" />
+              <span class="form-error" aria-live="polite"></span>
+            </div>
+
+            <div class="form-group">
+              <label for="contact-method">אופן יצירת קשר מועדף</label>
+              <div class="select-wrap">
+                <select id="contact-method" name="contact-method">
+                  <option value="whatsapp">וואטסאפ (מומלץ)</option>
+                  <option value="call">שיחת טלפון רגילה</option>
+                  <option value="either">לא משנה לי</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="time">זמן נוח לחזרה</label>
+              <div class="select-wrap">
+                <select id="time" name="time">
+                  <option value="">בחרו שעה מועדפת</option>
+                  <option value="morning">בוקר (08:00–12:00)</option>
+                  <option value="afternoon">אחה"צ (12:00–16:00)</option>
+                  <option value="evening">ערב (16:00–21:00)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="message">במה נוכל לעזור? (רשות)</label>
+              <textarea id="message" name="message" rows="4" placeholder="ספרו לנו בקצרה — הכל נשמר בסוד"></textarea>
+            </div>
+
+            <div class="form-group form-group--checkbox">
+              <label class="checkbox-label">
+                <input type="checkbox" name="privacy" id="privacy" required />
+                <span class="checkbox-custom" aria-hidden="true"></span>
+                קראתי והסכמתי להצהרת הפרטיות
+              </label>
+              <span class="form-error" aria-live="polite"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-submit" id="submit-btn">
+              <span class="btn-text">שלחו את הפרטים</span>
+              <span class="btn-loading" aria-hidden="true" hidden>שולח...</span>
+            </button>
+
+            <div class="form-success" id="form-success" hidden role="alert">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="#6A8C4A" stroke-width="1.5"/>
+                <path d="M8 12 L11 15 L16 9" stroke="#6A8C4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p>תודה! קיבלנו את פרטיכם ונחזור אליכם בהקדם, בדיסקרטיות מלאה.</p>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+
+      <div class="footer-brand">
+        <a href="#hero" class="logo logo--light" aria-label="שורשים - חזרה לדף הבית">
+          <svg class="logo-icon" viewBox="0 0 48 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M24 2 C24 2, 14 12, 14 22 C14 30, 19 36, 24 38 C29 36, 34 30, 34 22 C34 12, 24 2, 24 2Z" fill="#C8973A" opacity="0.9"/>
+            <path d="M24 38 L24 50" stroke="#E8D5A8" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M24 44 C22 42, 16 40, 12 42" stroke="#E8D5A8" stroke-width="2" stroke-linecap="round"/>
+            <path d="M24 47 C26 45, 32 43, 36 45" stroke="#E8D5A8" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="logo-text">שורשים</span>
+        </a>
+        <p class="footer-tagline">מבית עמותת התקשרות — מאמינים ב-יחד</p>
+      </div>
+
+      <nav class="footer-nav" aria-label="ניווט כותרת תחתונה">
+        <a href="#anchor">הגישה שלנו</a>
+        <a href="#services">השירותים</a>
+        <a href="#about">מי אנחנו</a>
+        <a href="#donate">תרומות</a>
+        <a href="#contact">יצירת קשר</a>
+      </nav>
+
+      <div class="footer-bottom">
+        <p>© 2024 שורשים | עמותת התקשרות. כל הזכויות שמורות.</p>
+        <p class="footer-privacy-note">
+          <svg class="icon-lock" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          אתר מאובטח SSL · פרטיות מוחלטת · אין העברת מידע לצד שלישי
+        </p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ========== FLOATING WHATSAPP ========== -->
+  <a
+    href="https://wa.me/972500000000?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%94%D7%92%D7%A2%D7%AA%D7%99%20%D7%9E%D7%90%D7%AA%D7%A8%20%D7%A9%D7%95%D7%A8%D7%A9%D7%99%D7%9D%20%D7%95%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A4%D7%A8%D7%98%D7%99%D7%9D%20%D7%91%D7%93%D7%99%D7%A1%D7%A7%D7%A8%D7%98%D7%99%D7%95%D7%AA"
+    class="whatsapp-float"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="פנו אלינו בוואטסאפ — דיסקרטי ומהיר"
+  >
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M20.52 3.48A11.94 11.94 0 0012 0C5.37 0 0 5.37 0 12c0 2.12.55 4.1 1.52 5.83L0 24l6.35-1.66A11.94 11.94 0 0012 24c6.63 0 12-5.37 12-12 0-3.2-1.25-6.22-3.48-8.52Z" fill="#25D366"/>
+      <path d="M17.47 14.38c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.48-1.75-1.65-2.05-.17-.3-.02-.46.13-.61.13-.13.3-.35.44-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.68-1.63-.93-2.23-.24-.59-.49-.51-.68-.52H7.8c-.2 0-.52.07-.79.37-.27.3-1.03 1.01-1.03 2.46s1.06 2.85 1.2 3.05c.15.2 2.08 3.17 5.04 4.45.7.3 1.25.48 1.68.62.7.22 1.34.19 1.84.12.56-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.08-.12-.27-.2-.57-.34Z" fill="white"/>
+    </svg>
+    <span class="whatsapp-tooltip">שלחו הודעה — בדיסקרטיות</span>
+  </a>
+
+  <!-- Back to top -->
+  <button class="back-to-top" id="back-to-top" aria-label="חזרה לראש הדף" hidden>
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M12 19V5M5 12L12 5L19 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <script src="script.js"></script>
+</body>
+</html>
