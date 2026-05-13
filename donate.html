@@ -27,7 +27,7 @@
       text-align: center;
       padding: 2rem 1.5rem 1.5rem;
       background: #fff;
-      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      border-radius: var(--r-lg) var(--r-lg) 0 0;
       border-bottom: 1.5px solid var(--border);
     }
     .matara-org-header .logo { justify-content: center; margin-bottom: .5rem; }
@@ -46,14 +46,14 @@
     .tier-card {
       background: #fff;
       border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
+      border-radius: var(--r-md);
       padding: 1.1rem 1.25rem;
       margin-bottom: .6rem;
       display: flex;
       align-items: flex-start;
       gap: 1rem;
       cursor: pointer;
-      transition: border-color var(--transition), box-shadow var(--transition);
+      transition: border-color var(--t), box-shadow var(--t);
     }
     .tier-card:hover, .tier-card.selected {
       border-color: var(--gold);
@@ -71,7 +71,7 @@
     .custom-amount-wrap {
       background: #fff;
       border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
+      border-radius: var(--r-md);
       padding: .9rem 1.25rem;
       margin-bottom: .6rem;
       display: flex; align-items: center; gap: .75rem;
@@ -89,7 +89,7 @@
     .payment-methods {
       background: #fff;
       border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
+      border-radius: var(--r-md);
       padding: 1.25rem;
       margin-top: .75rem; margin-bottom: 1.25rem;
     }
@@ -103,11 +103,11 @@
     }
     .payment-opt {
       border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
+      border-radius: var(--r-md);
       padding: .75rem .5rem;
       text-align: center;
       cursor: pointer;
-      transition: border-color var(--transition), background var(--transition);
+      transition: border-color var(--t), background var(--t);
       display: flex; flex-direction: column; align-items: center; gap: .4rem;
     }
     .payment-opt:hover, .payment-opt.selected {
@@ -129,19 +129,19 @@
     .donate-submit-btn {
       width: 100%; display: flex; align-items: center; justify-content: center;
       gap: .6rem;
-      background: var(--coral); color: #fff;
+      background: var(--orange); color: #fff;
       font-size: 1.1rem; font-weight: 700;
-      padding: 1em 2em; border-radius: var(--radius-pill);
+      padding: 1em 2em; border-radius: var(--r-pill);
       border: none; cursor: pointer;
       box-shadow: 0 6px 24px rgba(224,90,58,.35);
-      transition: filter var(--transition), transform var(--transition);
+      transition: filter var(--t), transform var(--t);
       margin-bottom: .75rem;
     }
     .donate-submit-btn:hover { filter: brightness(.92); transform: translateY(-2px); }
 
     .donate-submit-btn .amount-preview {
       background: rgba(255,255,255,.22);
-      padding: .15em .6em; border-radius: var(--radius-pill);
+      padding: .15em .6em; border-radius: var(--r-pill);
       font-size: .9em;
     }
 
