@@ -18,7 +18,7 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 /* ─── Login screen ─── */
 #login-screen{display:flex;align-items:center;justify-content:center;
   min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%)}
-.login-card{background:#fff;border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:380px;
+.login-card{background:#fff;border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:400px;
   box-shadow:0 20px 60px rgba(0,0,0,.35)}
 .login-logo{text-align:center;margin-bottom:1.5rem}
 .login-logo svg{width:52px;height:52px}
@@ -29,14 +29,14 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 .field-group input{width:100%;padding:.65rem .9rem;border:1.5px solid var(--border);
   border-radius:8px;font-size:.95rem;font-family:inherit;outline:none;direction:ltr}
 .field-group input:focus{border-color:var(--navy-mid)}
+.field-hint{font-size:.75rem;color:#888;margin-top:.4rem;line-height:1.5}
+.field-hint a{color:var(--navy-mid)}
 .login-btn{width:100%;padding:.8rem;background:var(--navy);color:#fff;border:none;
   border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:.5rem;
   font-family:inherit;transition:background .2s}
 .login-btn:hover{background:var(--navy-mid)}
 .login-error{background:#fdecea;color:var(--red);border-radius:6px;padding:.6rem .9rem;
   font-size:.85rem;margin-bottom:.75rem;display:none}
-.pat-help{font-size:.75rem;color:#888;margin-top:.4rem;line-height:1.5}
-.pat-help a{color:var(--navy-mid)}
 
 /* ─── Admin layout ─── */
 #admin-screen{display:none}
@@ -67,10 +67,11 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 @media(max-width:520px){.field-row{grid-template-columns:1fr}}
 .admin-field{display:flex;flex-direction:column;gap:.3rem}
 .admin-field label{font-size:.8rem;font-weight:600;color:#555}
-.admin-field input{padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:7px;
-  font-size:.95rem;font-family:inherit;outline:none;direction:ltr;text-align:right}
-.admin-field input:focus{border-color:var(--navy-mid);box-shadow:0 0 0 3px rgba(45,74,122,.1)}
+.admin-field input,.admin-field textarea{padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:7px;
+  font-size:.95rem;font-family:inherit;outline:none;direction:rtl}
+.admin-field input:focus,.admin-field textarea:focus{border-color:var(--navy-mid);box-shadow:0 0 0 3px rgba(45,74,122,.1)}
 .admin-field .hint{font-size:.73rem;color:#888;margin-top:.2rem}
+.admin-field textarea{resize:vertical;line-height:1.6}
 
 /* Stats row */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
@@ -79,6 +80,50 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 .stat-field input{width:100%;padding:.5rem .6rem;border:1.5px solid var(--border);border-radius:7px;
   font-size:1.1rem;font-weight:700;text-align:center;font-family:inherit;outline:none}
 .stat-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,83,.2)}
+
+/* Testimonial editor */
+.testimonial-editor-row{border:1.5px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:.75rem;
+  position:relative;background:#fafbfc}
+.testimonial-editor-row .t-num{font-size:.75rem;font-weight:700;color:var(--gold);margin-bottom:.6rem}
+.testimonial-editor-row .t-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+@media(max-width:520px){.testimonial-editor-row .t-grid{grid-template-columns:1fr}}
+.testimonial-editor-row .t-full{grid-column:1/-1}
+.btn-remove{position:absolute;top:.6rem;left:.6rem;background:#fdecea;color:var(--red);border:none;
+  border-radius:5px;padding:.25rem .55rem;font-size:.78rem;cursor:pointer;font-family:inherit}
+.btn-remove:hover{background:var(--red);color:#fff}
+.btn-add-testimonial{background:var(--navy);color:#fff;border:none;border-radius:7px;
+  padding:.55rem 1.2rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
+  margin-top:.25rem;transition:background .2s}
+.btn-add-testimonial:hover{background:var(--navy-mid)}
+
+/* TOTP section */
+.totp-status{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem}
+.totp-badge{padding:.25em .75em;border-radius:999px;font-size:.8rem;font-weight:700}
+.totp-badge.set{background:#e6f4ea;color:#1e7e3a}
+.totp-badge.unset{background:#f0f0f0;color:#888}
+.btn-setup-totp{background:var(--navy-mid);color:#fff;border:none;border-radius:7px;
+  padding:.5rem 1rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:background .2s}
+.btn-setup-totp:hover{background:var(--navy)}
+.totp-setup-box{margin-top:1rem;padding:1rem;background:#f0f4fb;border-radius:8px;
+  border:1.5px solid var(--border);display:none}
+.totp-secret-display{font-family:monospace;font-size:1.05rem;font-weight:700;
+  color:var(--navy);letter-spacing:.1em;word-break:break-all;
+  background:#fff;border:1.5px dashed var(--gold);border-radius:6px;
+  padding:.6rem .9rem;margin:.75rem 0;text-align:center}
+.totp-instructions{font-size:.83rem;color:#444;line-height:1.75;margin-bottom:.75rem}
+.totp-instructions li{margin-bottom:.2rem}
+.totp-verify-row{display:flex;gap:.6rem;align-items:flex-end;margin-top:.6rem}
+.totp-verify-row input{flex:1;padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:7px;
+  font-size:1rem;font-family:inherit;outline:none;direction:ltr;text-align:center;letter-spacing:.15em}
+.totp-verify-row input:focus{border-color:var(--navy-mid)}
+.btn-save-totp{background:var(--green);color:#fff;border:none;border-radius:7px;
+  padding:.55rem 1.1rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
+  white-space:nowrap;transition:opacity .2s}
+.btn-save-totp:hover{opacity:.85}
+.totp-msg{font-size:.82rem;margin-top:.5rem;display:none}
+.totp-msg.ok{color:var(--green)}
+.totp-msg.err{color:var(--red)}
 
 /* Status bar */
 #status-bar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
@@ -123,20 +168,21 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
     <h1 class="login-title">ממשק ניהול — שורשים</h1>
     <p class="login-sub">הזינו את פרטי הגישה לניהול האתר</p>
 
-    <div id="login-error" class="login-error">שם משתמש או סיסמה שגויים</div>
+    <div id="login-error" class="login-error"></div>
 
     <div class="field-group">
       <label for="login-pat">GitHub Token (PAT)</label>
       <input type="password" id="login-pat" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
-      <p class="pat-help">
+      <p class="field-hint">
         ראשונה? צרו Token ב-
         <a href="https://github.com/settings/tokens/new?scopes=repo&description=Sharon+Admin" target="_blank" rel="noopener">GitHub → Settings → Tokens</a>
         עם הרשאת <code>repo</code>
       </p>
     </div>
     <div class="field-group">
-      <label for="login-pass">סיסמת ניהול</label>
-      <input type="password" id="login-pass" placeholder="הזינו סיסמה">
+      <label for="login-otp">קוד TOTP (6 ספרות מהאפליקציה)</label>
+      <input type="text" id="login-otp" placeholder="123456" autocomplete="one-time-code" inputmode="numeric" maxlength="6">
+      <p class="field-hint">אם לא הגדרת — השאר ריק</p>
     </div>
     <button class="login-btn" id="login-btn" onclick="doLogin()">כניסה לניהול</button>
   </div>
@@ -177,7 +223,63 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
       </ol>
     </div>
 
-    <!-- Contact details -->
+    <!-- ── תוכן עמוד הבית ── -->
+    <div class="section-card">
+      <div class="section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        תוכן עמוד הבית
+      </div>
+      <div class="section-body">
+        <div class="field-row full">
+          <div class="admin-field">
+            <label for="cnt-hero-title">כותרת ראשית</label>
+            <input type="text" id="cnt-hero-title" placeholder="העוצמה, הידע והכח">
+          </div>
+        </div>
+        <div class="field-row full">
+          <div class="admin-field">
+            <label for="cnt-hero-accent">כותרת משנה / accent</label>
+            <input type="text" id="cnt-hero-accent" placeholder="להורים המתמודדים">
+          </div>
+        </div>
+        <div class="field-row full">
+          <div class="admin-field">
+            <label for="cnt-hero-subtitle">תיאור קצר</label>
+            <textarea id="cnt-hero-subtitle" rows="3" placeholder="המקום בו תמצאו..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── אודות ומשימה ── -->
+    <div class="section-card">
+      <div class="section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        אודות ומשימה
+      </div>
+      <div class="section-body">
+        <div class="field-row full">
+          <div class="admin-field">
+            <label for="cnt-about-body">גוף הטקסט</label>
+            <textarea id="cnt-about-body" rows="4" placeholder="ארגון שורשים..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── עדויות הורים ── -->
+    <div class="section-card">
+      <div class="section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        עדויות הורים
+      </div>
+      <div class="section-body">
+        <div id="testimonials-editor"></div>
+        <button class="btn-add-testimonial" onclick="addTestimonialRow()">הוסף עדות +</button>
+      </div>
+    </div>
+
+    <!-- ── פרטי התקשרות ── -->
     <div class="section-card">
       <div class="section-header">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2C7.16 21 3 16.84 3 6a2 2 0 012-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -253,6 +355,40 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
       </div>
     </div>
 
+    <!-- ── הגדרות אבטחה — TOTP ── -->
+    <div class="section-card">
+      <div class="section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        הגדרות אבטחה — קוד TOTP
+      </div>
+      <div class="section-body">
+        <div class="totp-status">
+          <span id="totp-status-badge" class="totp-badge unset">לא מוגדר</span>
+          <button class="btn-setup-totp" onclick="showTotpSetup()">הגדר / החלף קוד TOTP</button>
+        </div>
+        <p style="font-size:.83rem;color:#666;line-height:1.6">
+          קוד TOTP מוסיף שכבת אבטחה נוספת. לאחר הגדרה, בכל כניסה לממשק תידרשו להזין קוד 6 ספרות מ-Google Authenticator או Microsoft Authenticator.
+        </p>
+
+        <div id="totp-setup-box" class="totp-setup-box">
+          <p style="font-weight:700;color:var(--navy);margin-bottom:.5rem">מפתח TOTP חדש:</p>
+          <div class="totp-secret-display" id="totp-secret-display">—</div>
+          <ol class="totp-instructions">
+            <li>התקינו Google Authenticator / Microsoft Authenticator</li>
+            <li>הוסיפו חשבון → 'הזנה ידנית'</li>
+            <li>שם: <strong>שורשים ניהול</strong></li>
+            <li>מפתח: <strong id="totp-key-display">—</strong></li>
+            <li>לחצו על 'שמור TOTP' כדי לאשר</li>
+          </ol>
+          <div class="totp-verify-row">
+            <input type="text" id="totp-verify-input" placeholder="הזינו קוד מהאפליקציה" inputmode="numeric" maxlength="6">
+            <button class="btn-save-totp" onclick="saveTotpSecret()">שמור TOTP</button>
+          </div>
+          <p id="totp-msg" class="totp-msg"></p>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -263,58 +399,86 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 /* ══════════════════════════════════════
    Config
 ══════════════════════════════════════ */
-var REPO_OWNER = 'nir5177';
-var REPO_NAME  = 'Sharon';
+var REPO_OWNER  = 'nir5177';
+var REPO_NAME   = 'Sharon';
 var REPO_BRANCH = 'gh-pages';
-/* Set your own password hash here. Generate with: https://emn178.github.io/online-tools/sha256.html
-   Default is intentionally empty — admin login requires a valid GitHub PAT as the primary credential. */
-var ADMIN_PASS_HASH = localStorage.getItem('shoreshim_pass_hash') || '';
+
+/* ══════════════════════════════════════
+   TOTP helpers
+══════════════════════════════════════ */
+function base32decode(s) {
+  var alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  s = s.toUpperCase().replace(/\s/g,'').replace(/=+$/,'');
+  var out = [], bits = 0, val = 0;
+  for (var i = 0; i < s.length; i++) {
+    var idx = alpha.indexOf(s[i]);
+    if (idx < 0) continue;
+    val = (val << 5) | idx; bits += 5;
+    if (bits >= 8) { bits -= 8; out.push((val >> bits) & 255); }
+  }
+  return new Uint8Array(out);
+}
+
+async function totpCode(secret, timeOverride) {
+  var key = base32decode(secret);
+  var counter = Math.floor((timeOverride || Date.now() / 1000) / 30);
+  var buf = new ArrayBuffer(8);
+  new DataView(buf).setUint32(4, counter >>> 0, false);
+  var ck = await crypto.subtle.importKey('raw', key, {name:'HMAC',hash:'SHA-1'}, false, ['sign']);
+  var mac = new Uint8Array(await crypto.subtle.sign('HMAC', ck, buf));
+  var off = mac[19] & 15;
+  var code = ((mac[off]&127)<<24|(mac[off+1]&255)<<16|(mac[off+2]&255)<<8|(mac[off+3]&255)) % 1000000;
+  return String(code).padStart(6,'0');
+}
+
+async function verifyTOTP(secret, input) {
+  var now = Date.now() / 1000;
+  for (var d = -1; d <= 1; d++) {
+    if (await totpCode(secret, now + d*30) === input.trim()) return true;
+  }
+  return false;
+}
+
+function genSecret() {
+  var a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  var b = crypto.getRandomValues(new Uint8Array(20));
+  return Array.from(b, function(x){return a[x%32];}).join('').match(/.{4}/g).join(' ');
+}
 
 /* ══════════════════════════════════════
    Auth
 ══════════════════════════════════════ */
-function sha256(str) {
-  var msgBuffer = new TextEncoder().encode(str);
-  return crypto.subtle.digest('SHA-256', msgBuffer).then(function(buf) {
-    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
-  });
-}
-
 async function doLogin() {
-  var pat  = document.getElementById('login-pat').value.trim();
-  var pass = document.getElementById('login-pass').value;
-  var btn  = document.getElementById('login-btn');
+  var pat   = document.getElementById('login-pat').value.trim();
+  var otp   = document.getElementById('login-otp').value.trim();
+  var btn   = document.getElementById('login-btn');
   var errEl = document.getElementById('login-error');
+  if (!pat) { errEl.textContent='יש להזין GitHub Token'; errEl.style.display='block'; return; }
+  btn.textContent='מתחבר...'; btn.disabled=true; errEl.style.display='none';
 
-  if (!pat || !pass) { errEl.textContent = 'יש למלא את כל השדות'; errEl.style.display='block'; return; }
-
-  btn.textContent = 'מתחבר...';
-  btn.disabled = true;
-  errEl.style.display = 'none';
-
-  var hash = await sha256(pass);
-  var storedHash = localStorage.getItem('shoreshim_pass_hash') || ADMIN_PASS_HASH;
-
-  if (storedHash && hash !== storedHash) {
-    errEl.textContent = 'סיסמה שגויה';
-    errEl.style.display = 'block';
-    btn.textContent = 'כניסה לניהול';
-    btn.disabled = false;
-    return;
+  /* Verify PAT */
+  try {
+    var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME, {
+      headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
+    });
+    if (!r.ok) throw new Error();
+  } catch(e) {
+    errEl.textContent='ה-Token לא תקין'; errEl.style.display='block';
+    btn.textContent='כניסה לניהול'; btn.disabled=false; return;
   }
 
-  /* Verify PAT works */
-  try {
-    var r = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME, {
-      headers: { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json' }
-    });
-    if (!r.ok) throw new Error('GitHub token invalid');
-  } catch(e) {
-    errEl.textContent = 'ה-Token לא תקין או אין גישה ל-Repository';
-    errEl.style.display = 'block';
-    btn.textContent = 'כניסה לניהול';
-    btn.disabled = false;
-    return;
+  /* Verify TOTP if configured */
+  var totpSecret = localStorage.getItem('shoreshim_totp_secret');
+  if (totpSecret) {
+    if (!otp) {
+      errEl.textContent='יש להזין קוד מהאפליקציה'; errEl.style.display='block';
+      btn.textContent='כניסה לניהול'; btn.disabled=false; return;
+    }
+    var ok = await verifyTOTP(totpSecret, otp);
+    if (!ok) {
+      errEl.textContent='קוד לא תקין — בדקו שהשעון מסונכרן'; errEl.style.display='block';
+      btn.textContent='כניסה לניהול'; btn.disabled=false; return;
+    }
   }
 
   sessionStorage.setItem('shoreshim_pat', pat);
@@ -328,19 +492,72 @@ function doLogout() {
 }
 
 /* ══════════════════════════════════════
+   TOTP Setup UI
+══════════════════════════════════════ */
+var _pendingTotpSecret = null;
+
+function updateTotpStatusBadge() {
+  var badge = document.getElementById('totp-status-badge');
+  if (localStorage.getItem('shoreshim_totp_secret')) {
+    badge.textContent = '✓ מוגדר';
+    badge.className = 'totp-badge set';
+  } else {
+    badge.textContent = 'לא מוגדר';
+    badge.className = 'totp-badge unset';
+  }
+}
+
+function showTotpSetup() {
+  _pendingTotpSecret = genSecret();
+  var box = document.getElementById('totp-setup-box');
+  var display = document.getElementById('totp-secret-display');
+  var keyDisplay = document.getElementById('totp-key-display');
+  display.textContent = _pendingTotpSecret;
+  keyDisplay.textContent = _pendingTotpSecret;
+  box.style.display = 'block';
+  document.getElementById('totp-verify-input').value = '';
+  var msg = document.getElementById('totp-msg');
+  msg.style.display = 'none';
+  msg.textContent = '';
+}
+
+async function saveTotpSecret() {
+  var input = document.getElementById('totp-verify-input').value.trim();
+  var msg = document.getElementById('totp-msg');
+  if (!input || input.length !== 6) {
+    msg.textContent = 'יש להזין קוד 6 ספרות מהאפליקציה';
+    msg.className = 'totp-msg err'; msg.style.display = 'block'; return;
+  }
+  if (!_pendingTotpSecret) return;
+  var ok = await verifyTOTP(_pendingTotpSecret, input);
+  if (!ok) {
+    msg.textContent = 'קוד לא תקין — ודאו שהמפתח הוזן נכון באפליקציה';
+    msg.className = 'totp-msg err'; msg.style.display = 'block'; return;
+  }
+  localStorage.setItem('shoreshim_totp_secret', _pendingTotpSecret);
+  _pendingTotpSecret = null;
+  document.getElementById('totp-setup-box').style.display = 'none';
+  msg.textContent = 'קוד TOTP נשמר בהצלחה!';
+  msg.className = 'totp-msg ok'; msg.style.display = 'block';
+  updateTotpStatusBadge();
+}
+
+/* ══════════════════════════════════════
    Show admin + load config
 ══════════════════════════════════════ */
 async function showAdmin() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('admin-screen').style.display = 'block';
+  updateTotpStatusBadge();
   await loadConfig();
 }
 
 async function loadConfig() {
   var pat = sessionStorage.getItem('shoreshim_pat');
   try {
-    var r = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/config.json?ref=' + REPO_BRANCH, {
-      headers: { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json' }
+    /* Load config.json */
+    var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/config.json?ref='+REPO_BRANCH, {
+      headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
     });
     if (!r.ok) { showStatus('לא ניתן לטעון את ההגדרות', 'error'); return; }
     var data = await r.json();
@@ -348,6 +565,20 @@ async function loadConfig() {
     populateForm(cfg);
   } catch(e) {
     showStatus('שגיאה בטעינת ההגדרות: ' + e.message, 'error');
+  }
+
+  try {
+    /* Load content.json */
+    var rc = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/content.json?ref='+REPO_BRANCH, {
+      headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
+    });
+    if (rc.ok) {
+      var dc = await rc.json();
+      var cnt = JSON.parse(atob(dc.content.replace(/\n/g,'')));
+      populateContentForm(cnt);
+    }
+  } catch(e) {
+    /* content.json may not exist yet — that's ok */
   }
 }
 
@@ -362,8 +593,97 @@ function populateForm(cfg) {
   set('cfg-matara-in',      cfg.mataraUrl || '');
 }
 
+function populateContentForm(cnt) {
+  set('cnt-hero-title',    cnt['hero.title']    || '');
+  set('cnt-hero-accent',   cnt['hero.accent']   || '');
+  set('cnt-hero-subtitle', cnt['hero.subtitle'] || '');
+  set('cnt-about-body',    cnt['about.body']    || '');
+  renderTestimonialsList(cnt.testimonials || []);
+}
+
+/* ══════════════════════════════════════
+   Testimonials editor
+══════════════════════════════════════ */
+var _testimonialIdx = 0;
+
+function renderTestimonialsList(arr) {
+  var container = document.getElementById('testimonials-editor');
+  container.innerHTML = '';
+  _testimonialIdx = 0;
+  arr.forEach(function(t) { addTestimonialRow(t); });
+}
+
+function addTestimonialRow(data) {
+  var container = document.getElementById('testimonials-editor');
+  var rows = container.querySelectorAll('.testimonial-editor-row');
+  if (rows.length >= 8) { showStatus('מקסימום 8 עדויות', 'error'); return; }
+  var i = _testimonialIdx++;
+  var d = data || {};
+  var row = document.createElement('div');
+  row.className = 'testimonial-editor-row';
+  row.dataset.idx = i;
+  row.innerHTML =
+    '<div class="t-num">עדות ' + (container.querySelectorAll('.testimonial-editor-row').length + 1) + '</div>' +
+    '<button class="btn-remove" onclick="removeTestimonialRow(this)">הסר</button>' +
+    '<div class="t-grid">' +
+      '<div class="admin-field t-full">' +
+        '<label>ציטוט קצר</label>' +
+        '<input type="text" id="cnt-quote-'+i+'" value="'+esc(d.quote||'')+'" placeholder="ציטוט קצר...">'+
+      '</div>' +
+      '<div class="admin-field t-full">' +
+        '<label>תוכן מלא</label>' +
+        '<textarea id="cnt-body-'+i+'" rows="2" placeholder="תוכן מלא...">'+esc(d.body||'')+'</textarea>' +
+      '</div>' +
+      '<div class="admin-field">' +
+        '<label>שם</label>' +
+        '<input type="text" id="cnt-author-'+i+'" value="'+esc(d.author||'')+'" placeholder="שם">'+
+      '</div>' +
+      '<div class="admin-field">' +
+        '<label>תפקיד</label>' +
+        '<input type="text" id="cnt-role-'+i+'" value="'+esc(d.role||'')+'" placeholder="הורה מתמודד">'+
+      '</div>' +
+    '</div>';
+  container.appendChild(row);
+  renumberTestimonials();
+}
+
+function removeTestimonialRow(btn) {
+  btn.closest('.testimonial-editor-row').remove();
+  renumberTestimonials();
+}
+
+function renumberTestimonials() {
+  document.querySelectorAll('.testimonial-editor-row').forEach(function(row, idx) {
+    var num = row.querySelector('.t-num');
+    if (num) num.textContent = 'עדות ' + (idx + 1);
+  });
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ══════════════════════════════════════
+   Form helpers
+══════════════════════════════════════ */
 function set(id, val) { var el = document.getElementById(id); if (el) el.value = val; }
 function get(id)      { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+function getContentFromForm() {
+  var testimonials = [];
+  document.querySelectorAll('.testimonial-editor-row').forEach(function(row) {
+    var i = row.dataset.idx;
+    var q = get('cnt-quote-'+i), b = get('cnt-body-'+i), a = get('cnt-author-'+i), r = get('cnt-role-'+i);
+    if (q || b || a) testimonials.push({quote:q, body:b, author:a, role:r});
+  });
+  return {
+    'hero.title':   get('cnt-hero-title'),
+    'hero.accent':  get('cnt-hero-accent'),
+    'hero.subtitle':get('cnt-hero-subtitle'),
+    'about.body':   get('cnt-about-body'),
+    'testimonials': testimonials
+  };
+}
 
 /* ══════════════════════════════════════
    Save
@@ -387,15 +707,23 @@ async function saveChanges() {
     mataraUrl: get('cfg-matara-in')
   };
 
+  var cnt = getContentFromForm();
+
   try {
-    await Promise.all([
-      commitFile('config.json', makeConfigJson(cfg), pat),
-      commitFile('config.js',   makeConfigJs(cfg),   pat)
-    ]);
+    var tasks = [
+      commitFile('config.json',  makeConfigJson(cfg),  pat),
+      commitFile('config.js',    makeConfigJs(cfg),    pat),
+      commitFile('content.json', makeContentJson(cnt), pat),
+      commitFile('content.js',   makeContentJs(cnt),   pat)
+    ];
     if (cfg.mataraUrl) {
-      var donateHtml = await patchDonate(cfg.mataraUrl, pat);
-      if (donateHtml) await commitFile('donate.html', donateHtml, pat);
+      tasks.push(
+        patchDonate(cfg.mataraUrl, pat).then(function(donateHtml) {
+          if (donateHtml) return commitFile('donate.html', donateHtml, pat);
+        })
+      );
     }
+    await Promise.all(tasks);
     showStatus('האתר עודכן ויפורסם תוך כ-2 דקות ✓', 'success');
   } catch(e) {
     showStatus('שגיאה בשמירה: ' + e.message, 'error');
@@ -406,22 +734,21 @@ async function saveChanges() {
 }
 
 async function commitFile(path, content, pat) {
-  /* get current SHA if file exists */
   var sha = null;
   try {
-    var r = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path + '?ref=' + REPO_BRANCH, {
-      headers: { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json' }
+    var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path+'?ref='+REPO_BRANCH, {
+      headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
     });
     if (r.ok) { var d = await r.json(); sha = d.sha; }
   } catch(e) {}
 
-  var body = { message: 'Update ' + path + ' via admin panel', content: btoa(unescape(encodeURIComponent(content))), branch: REPO_BRANCH };
+  var body = {message:'Update '+path+' via admin panel', content:btoa(unescape(encodeURIComponent(content))), branch:REPO_BRANCH};
   if (sha) body.sha = sha;
 
-  var res = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path, {
-    method: 'PUT',
-    headers: { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
+  var res = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path, {
+    method:'PUT',
+    headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+    body:JSON.stringify(body)
   });
   if (!res.ok) { var err = await res.json(); throw new Error(err.message || res.status); }
 }
@@ -429,13 +756,13 @@ async function commitFile(path, content, pat) {
 async function patchDonate(mataraUrl, pat) {
   try { new URL(mataraUrl); } catch(e) { throw new Error('כתובת URL לא תקינה'); }
   if (!/^https:\/\//.test(mataraUrl)) throw new Error('URL חייב להתחיל ב-https://');
-  var r = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/donate.html?ref=' + REPO_BRANCH, {
-    headers: { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json' }
+  var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/donate.html?ref='+REPO_BRANCH, {
+    headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
   });
   if (!r.ok) return null;
   var d    = await r.json();
   var html = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
-  var safeUrl = mataraUrl.replace(/'/g, '%27');
+  var safeUrl = mataraUrl.replace(/'/g,'%27');
   html = html.replace(/var MATARA_URL\s*=\s*'[^']*'/, "var MATARA_URL = '" + safeUrl + "'");
   return html;
 }
@@ -479,6 +806,42 @@ function makeConfigJs(cfg) {
     "}(SHORESHIM));\n";
 }
 
+function makeContentJson(cnt) {
+  return JSON.stringify(cnt, null, 2) + '\n';
+}
+
+function makeContentJs(cnt) {
+  return '/* שורשים — content.js  (edit via /admin/) */\n' +
+    'var SHORESHIM_CONTENT = ' + JSON.stringify(cnt) + ';\n\n' +
+    "(function (c) {\n" +
+    "  function setText(id, val) {\n" +
+    "    var el = document.getElementById(id);\n" +
+    "    if (el && val != null) el.textContent = String(val);\n" +
+    "  }\n" +
+    "  function esc(s) {\n" +
+    "    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');\n" +
+    "  }\n" +
+    "  setText('content-hero-title',    c['hero.title']);\n" +
+    "  setText('content-hero-accent',   c['hero.accent']);\n" +
+    "  setText('content-hero-subtitle', c['hero.subtitle']);\n" +
+    "  setText('content-mission-body',  c['about.body']);\n" +
+    "  if (Array.isArray(c.testimonials) && c.testimonials.length) {\n" +
+    "    var slider = document.getElementById('testimonials-slider');\n" +
+    "    if (slider) {\n" +
+    "      slider.innerHTML = c.testimonials.map(function (t, i) {\n" +
+    "        return '<div class=\"testimonial-slide' + (i===0?' active':'') + '\">' +\n" +
+    "          '<blockquote class=\"testimonial-quote\">\\u201c' + esc(t.quote) + '\\u201d</blockquote>' +\n" +
+    "          '<p class=\"testimonial-body\">' + esc(t.body) + '</p>' +\n" +
+    "          '<div class=\"testimonial-author\">' +\n" +
+    "          '<div class=\"testimonial-avatar\">' + esc((t.author||'?').charAt(0)) + '</div>' +\n" +
+    "          '<div><strong>' + esc(t.author) + '</strong><span>' + esc(t.role) + '</span></div>' +\n" +
+    "          '</div></div>';\n" +
+    "      }).join('');\n" +
+    "    }\n" +
+    "  }\n" +
+    "}(SHORESHIM_CONTENT));\n";
+}
+
 /* ══════════════════════════════════════
    Status
 ══════════════════════════════════════ */
@@ -499,7 +862,7 @@ function showStatus(msg, type) {
   if (pat) showAdmin();
 
   /* Enter key on login form */
-  ['login-pat','login-pass'].forEach(function(id) {
+  ['login-pat','login-otp'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
   });
