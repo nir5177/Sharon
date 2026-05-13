@@ -230,8 +230,8 @@ input, textarea, select { font-family: inherit; }
 
 .nav-drawer {
   position: fixed; top: 0; right: 0; bottom: 0;
-  width: min(320px, 90vw);
-  z-index: 300; background: #fff;
+  width: min(260px, 82vw);
+  z-index: 300; background: #fff; direction: rtl;
   transform: translateX(100%);
   transition: transform .35s cubic-bezier(.4,0,.2,1);
   box-shadow: -6px 0 40px rgba(0,0,0,.25);
@@ -241,7 +241,7 @@ input, textarea, select { font-family: inherit; }
 
 .nav-drawer-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: .75rem 1.25rem; height: var(--header-h);
+  padding: .75rem 1rem; height: var(--header-h);
   border-bottom: 1px solid #e8e0d4;
   background: #fff; position: sticky; top: 0; z-index: 1;
 }
@@ -249,30 +249,31 @@ input, textarea, select { font-family: inherit; }
 
 .nav-close {
   font-size: 1.3rem; color: #5A4030;
-  padding: .4rem .7rem; border-radius: 8px;
-  transition: background var(--t);
+  padding: .4rem .6rem; border-radius: 8px;
+  transition: background var(--t); flex-shrink: 0;
 }
 .nav-close:hover { background: #f0ede8; }
 
-.nav-list { padding: .5rem 0 2rem; }
+.nav-list { padding: .25rem 0 2rem; }
 
 .nav-item a,
 .nav-item.nav-item--category {
-  display: block; padding: 1rem 1.25rem;
-  font-size: 1.2rem; font-weight: 700;
+  display: block; padding: .9rem 1rem;
+  font-size: 1.1rem; font-weight: 700;
   color: var(--navy); border-bottom: 1px solid #f0ede8;
-  text-align: end; transition: background var(--t), color var(--t);
+  text-align: right; direction: rtl;
+  transition: background var(--t), color var(--t);
 }
 .nav-item a:hover { background: #f8f5f0; color: var(--gold); }
 .nav-item--active > a { background: var(--navy); color: #fff; }
 .nav-item--active > a:hover { color: #fff; background: #2e3a72; }
 .nav-item--category {
   background: var(--navy); color: #fff !important;
-  font-size: 1.1rem; cursor: default; border-color: #2e3a72;
+  font-size: 1rem; cursor: default; border-color: #2e3a72;
 }
 .nav-item--sub > a {
-  padding-inline-start: calc(1.25rem + 1.5rem);
-  font-size: 1.05rem; font-weight: 600; color: #5A4030;
+  padding-right: calc(1rem + 1.2rem);
+  font-size: 1rem; font-weight: 600; color: #5A4030;
 }
 
 /* ============================================================
