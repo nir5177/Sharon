@@ -17,17 +17,20 @@
 ══════════════════════════════════════════ -->
 <header class="site-header" id="site-header">
   <div class="header-inner container">
-
-    <a href="#hero" class="logo" aria-label="שורשים – דף הבית">
-      <svg class="logo-icon" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M22 2C22 2 12 11 12 20c0 7 5 12 10 14 5-2 10-7 10-14C32 11 22 2 22 2Z" fill="#D4A853"/>
-        <path d="M22 34v12" stroke="#E8E8E3" stroke-width="2.5" stroke-linecap="round"/>
-        <path d="M22 40c-2-2-7-3.5-11-2" stroke="#E8E8E3" stroke-width="2" stroke-linecap="round"/>
-        <path d="M22 43c2-2 7-3.5 11-2" stroke="#E8E8E3" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-      <span class="logo-text">שורשים</span>
-    </a>
-
+    <div class="header-brand">
+      <button class="hamburger" id="hamburger" aria-label="פתח תפריט" aria-expanded="false" aria-controls="nav-drawer">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="#hero" class="logo" aria-label="שורשים – דף הבית">
+        <svg class="logo-icon" viewBox="0 0 44 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M22 2C22 2 12 11 12 20c0 7 5 12 10 14 5-2 10-7 10-14C32 11 22 2 22 2Z" fill="#D4A853"/>
+          <path d="M22 34v12" stroke="#E8E8E3" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M22 40c-2-2-7-3.5-11-2" stroke="#E8E8E3" stroke-width="2" stroke-linecap="round"/>
+          <path d="M22 43c2-2 7-3.5 11-2" stroke="#E8E8E3" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-text">שורשים</span>
+      </a>
+    </div>
     <nav class="nav-desktop" aria-label="ניווט ראשי">
       <a href="#about" class="nav-link">מי אנחנו</a>
       <a href="#services" class="nav-link">השירותים</a>
@@ -36,14 +39,7 @@
       <a href="donate.html" class="nav-link">לתרומות</a>
       <a href="#contact" class="nav-link">יצירת קשר</a>
     </nav>
-
-    <div class="header-actions">
-      <a href="#contact" class="btn-join">ליצירת קשר דיסקרטי ←</a>
-      <button class="hamburger" id="hamburger" aria-label="פתח תפריט" aria-expanded="false" aria-controls="nav-drawer">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-
+    <a href="#contact" class="btn-join">ליצירת קשר דיסקרטי ←</a>
   </div>
 </header>
 
@@ -83,10 +79,10 @@
   <div class="container hero-inner">
     <div class="hero-text fade-in-up">
       <h1 class="hero-title">
-        העוצמה, הידע והכח<br>
-        <span class="hero-title-accent">להורים המתמודדים</span>
+        <span id="content-hero-title">העוצמה, הידע והכח</span><br>
+        <span class="hero-title-accent" id="content-hero-accent">להורים המתמודדים</span>
       </h1>
-      <p class="hero-subtitle">
+      <p class="hero-subtitle" id="content-hero-subtitle">
         המקום בו תמצאו את כל ההדרכה המקצועית, התמיכה וההבנה —
         באהבה ובלי שיפוטיות, בדיסקרטיות מוחלטת.
       </p>
@@ -265,7 +261,7 @@
       <span class="section-label section-label--light">מי אנחנו</span>
       <p class="mission-eyebrow">פרויקט שורשים | עמותת התקשרות</p>
       <h2 class="mission-title">שורשים —<br>להחזיר את<br><span class="text-coral">הילדים הביתה</span></h2>
-      <p class="mission-body">ארגון שורשים, מבית עמותת התקשרות, מספק תמיכה, ידע וכלים מעשיים להורים חרדים המתמודדים עם פערים השקפתיים ונתק מול ילדיהם. אנחנו מאמינים שהקשר בין הורים לילדיהם קדוש ובלתי ניתן לניתוק — גם כשהדרכים נפרדות.</p>
+      <p class="mission-body" id="content-mission-body">ארגון שורשים, מבית עמותת התקשרות, מספק תמיכה, ידע וכלים מעשיים להורים חרדים המתמודדים עם פערים השקפתיים ונתק מול ילדיהם. אנחנו מאמינים שהקשר בין הורים לילדיהם קדוש ובלתי ניתן לניתוק — גם כשהדרכים נפרדות.</p>
       <a href="#team" class="btn btn-gold">עוד עלינו ←</a>
     </div>
     <div class="mission-visual fade-in-up" aria-hidden="true">
@@ -706,6 +702,7 @@
   </svg>
 </a>
 
+<script src="content.js"></script>
 <script src="config.js"></script>
 <script src="script.js"></script>
 </body>
