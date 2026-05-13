@@ -1,8 +1,9 @@
 /* שורשים — config.js  (edit via /admin/) */
 var SHORESHIM = {
-  phone:    "055-0000000",
-  whatsapp: "972500000000",
-  email:    "contact@shoreshim.org.il",
+  phone:        "055-0000000",
+  whatsapp:     "972500000000",
+  email:        "contact@shoreshim.org.il",
+  formEndpoint: "",
   stats: {
     families:    320,
     workshops:   48,

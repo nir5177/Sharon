@@ -357,6 +357,28 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
       </div>
     </div>
 
+    <!-- ── טופס יצירת קשר ── -->
+    <div class="section-card">
+      <div class="section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z" stroke="currentColor" stroke-width="1.8"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.8"/></svg>
+        טופס יצירת קשר — קבלת פניות במייל
+      </div>
+      <div class="section-body">
+        <div class="field-row full">
+          <div class="admin-field">
+            <label for="cfg-form-endpoint">Formspree Endpoint</label>
+            <input type="url" id="cfg-form-endpoint" placeholder="https://formspree.io/f/xxxxxxxx" dir="ltr">
+            <span class="hint">
+              כל פנייה שתגיע מהאתר תישלח למייל שלכם דרך Formspree.<br>
+              לחיבור: <strong>1.</strong> היכנסו ל-<a href="https://formspree.io" target="_blank" rel="noopener">formspree.io</a>
+              → New Form → הזינו את כתובת המייל שלכם →
+              העתיקו את ה-endpoint (נראה כך: https://formspree.io/f/xxxxxxxx) והדביקו כאן.
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── קישור תרומות ── -->
     <div class="section-card">
       <div class="section-header">
@@ -720,14 +742,15 @@ async function loadConfig() {
 }
 
 function populateForm(cfg) {
-  set('cfg-phone-in',     cfg.phone     || '');
-  set('cfg-wa-in',        cfg.whatsapp  || '');
-  set('cfg-email-in',     cfg.email     || '');
-  set('cfg-families',     cfg.stats ? cfg.stats.families     : '');
-  set('cfg-workshops',    cfg.stats ? cfg.stats.workshops    : '');
-  set('cfg-facilitators', cfg.stats ? cfg.stats.facilitators : '');
-  set('cfg-cities',       cfg.stats ? cfg.stats.cities       : '');
-  set('cfg-matara-in',    cfg.mataraUrl || '');
+  set('cfg-phone-in',       cfg.phone         || '');
+  set('cfg-wa-in',          cfg.whatsapp      || '');
+  set('cfg-email-in',       cfg.email         || '');
+  set('cfg-form-endpoint',  cfg.formEndpoint  || '');
+  set('cfg-families',       cfg.stats ? cfg.stats.families     : '');
+  set('cfg-workshops',      cfg.stats ? cfg.stats.workshops    : '');
+  set('cfg-facilitators',   cfg.stats ? cfg.stats.facilitators : '');
+  set('cfg-cities',         cfg.stats ? cfg.stats.cities       : '');
+  set('cfg-matara-in',      cfg.mataraUrl || '');
 }
 
 function populateContentForm(cnt) {
@@ -822,9 +845,10 @@ async function saveChanges() {
   btn.innerHTML = '<div class="spinner"></div> שומר...';
 
   var cfg = {
-    phone:    get('cfg-phone-in'),
-    whatsapp: get('cfg-wa-in').replace(/\D/g,''),
-    email:    get('cfg-email-in'),
+    phone:        get('cfg-phone-in'),
+    whatsapp:     get('cfg-wa-in').replace(/\D/g,''),
+    email:        get('cfg-email-in'),
+    formEndpoint: get('cfg-form-endpoint'),
     stats: {
       families:     parseInt(get('cfg-families'),10)    || 0,
       workshops:    parseInt(get('cfg-workshops'),10)   || 0,
@@ -899,7 +923,7 @@ async function patchDonate(mataraUrl, pat) {
 function makeConfigJson(cfg) { return JSON.stringify(cfg, null, 2) + '\n'; }
 
 function makeConfigJs(cfg) {
-  var data = { phone:cfg.phone, whatsapp:cfg.whatsapp, email:cfg.email, stats:cfg.stats };
+  var data = { phone:cfg.phone, whatsapp:cfg.whatsapp, email:cfg.email, formEndpoint:cfg.formEndpoint||'', stats:cfg.stats };
   return '/* שורשים — config.js  (edit via /admin/) */\n'+
     'var SHORESHIM = '+JSON.stringify(data, null, 2)+';\n\n'+
     "(function (cfg) {\n"+

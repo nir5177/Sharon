@@ -765,6 +765,11 @@ input, textarea, select { font-family: inherit; }
   border-radius: var(--r-lg); margin-top: 1rem;
 }
 .form-success p { color: #3A7A3A; font-weight: 600; font-size: 1.05rem; }
+.form-error {
+  padding: 1rem 1.25rem; border-radius: var(--r-md); margin-top: .75rem;
+  background: rgba(192,57,43,.08); border: 1.5px solid rgba(192,57,43,.25);
+}
+.form-error p { color: #c0392b; font-weight: 600; font-size: .95rem; }
 
 /* ============================================================
    FOOTER

@@ -222,18 +222,43 @@
       e.preventDefault();
       if (!validateForm()) return;
 
+      var endpoint = (window.SHORESHIM && window.SHORESHIM.formEndpoint) || '';
+      var errMsg   = document.getElementById('form-error');
+
       submitBtn.disabled = true;
       submitBtn.querySelector('.btn-label').hidden  = true;
       submitBtn.querySelector('.btn-loading').hidden = false;
+      if (errMsg) errMsg.hidden = true;
 
-      setTimeout(function () {
+      function onSuccess() {
         form.querySelectorAll('.form-field input, .form-field textarea').forEach(function (el) {
           el.value = '';
         });
         submitBtn.hidden  = true;
         successMsg.hidden = false;
         successMsg.focus();
-      }, 900);
+      }
+
+      function onError() {
+        submitBtn.disabled = false;
+        submitBtn.querySelector('.btn-label').hidden  = false;
+        submitBtn.querySelector('.btn-loading').hidden = true;
+        if (errMsg) { errMsg.hidden = false; errMsg.focus(); }
+      }
+
+      if (!endpoint) {
+        /* No endpoint configured yet — fail gracefully */
+        onError();
+        return;
+      }
+
+      fetch(endpoint, {
+        method:  'POST',
+        body:    new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      }).then(function (r) {
+        if (r.ok) { onSuccess(); } else { onError(); }
+      }).catch(function () { onError(); });
     });
 
     form.querySelectorAll('input[required]').forEach(function (field) {
