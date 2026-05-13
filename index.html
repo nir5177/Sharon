@@ -128,22 +128,22 @@
 <section class="section-stats" id="stats" aria-label="נתוני פעילות">
   <div class="container stats-grid">
     <div class="stat-item fade-in-up">
-      <span class="stat-number" data-target="320">0</span>
+      <span class="stat-number" id="cfg-stat-families" data-target="320">0</span>
       <div class="gold-divider" aria-hidden="true"></div>
       <span class="stat-label">הורים קיבלו ליווי</span>
     </div>
     <div class="stat-item fade-in-up">
-      <span class="stat-number" data-target="48">0</span>
+      <span class="stat-number" id="cfg-stat-workshops" data-target="48">0</span>
       <div class="gold-divider" aria-hidden="true"></div>
       <span class="stat-label">סדנאות התקיימו</span>
     </div>
     <div class="stat-item fade-in-up">
-      <span class="stat-number" data-target="12">0</span>
+      <span class="stat-number" id="cfg-stat-facilitators" data-target="12">0</span>
       <div class="gold-divider" aria-hidden="true"></div>
       <span class="stat-label">מנחים מוסמכים</span>
     </div>
     <div class="stat-item fade-in-up">
-      <span class="stat-number" data-target="8">0</span>
+      <span class="stat-number" id="cfg-stat-cities" data-target="8">0</span>
       <div class="gold-divider" aria-hidden="true"></div>
       <span class="stat-label">ערים ויישובים</span>
     </div>
@@ -655,11 +655,11 @@
       <p class="footer-tagline">מבית עמותת התקשרות — מאמינים ב-יחד</p>
       <p class="footer-contact-item">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M2 8l10 6 10-6" stroke="currentColor" stroke-width="1.5"/></svg>
-        contact@shoreshim.org.il
+        <span id="cfg-email">contact@shoreshim.org.il</span>
       </p>
       <p class="footer-contact-item">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2C7.16 21 3 16.84 3 6a2 2 0 012-2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        055-0000000
+        <span id="cfg-phone">055-0000000</span>
       </p>
     </div>
 
@@ -706,6 +706,7 @@
   </svg>
 </a>
 
+<script src="config.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

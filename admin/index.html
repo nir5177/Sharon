@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ממשק ניהול — שורשים</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1B2A4A;--navy-mid:#2D4A7A;--navy-dark:#0F1B33;
+  --gold:#D4A853;--orange:#E8934A;--cream:#F8F5EE;
+  --green:#2d8a4e;--red:#c0392b;--border:#d0d7e3;
+}
+body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
+  background:var(--cream);color:var(--navy-dark);direction:rtl;min-height:100vh}
+
+/* ─── Login screen ─── */
+#login-screen{display:flex;align-items:center;justify-content:center;
+  min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%)}
+.login-card{background:#fff;border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:380px;
+  box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.login-logo{text-align:center;margin-bottom:1.5rem}
+.login-logo svg{width:52px;height:52px}
+.login-title{text-align:center;font-size:1.4rem;font-weight:700;color:var(--navy);margin-bottom:.25rem}
+.login-sub{text-align:center;font-size:.85rem;color:#666;margin-bottom:1.75rem}
+.field-group{margin-bottom:1rem}
+.field-group label{display:block;font-size:.82rem;font-weight:600;color:var(--navy);margin-bottom:.35rem}
+.field-group input{width:100%;padding:.65rem .9rem;border:1.5px solid var(--border);
+  border-radius:8px;font-size:.95rem;font-family:inherit;outline:none;direction:ltr}
+.field-group input:focus{border-color:var(--navy-mid)}
+.login-btn{width:100%;padding:.8rem;background:var(--navy);color:#fff;border:none;
+  border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:.5rem;
+  font-family:inherit;transition:background .2s}
+.login-btn:hover{background:var(--navy-mid)}
+.login-error{background:#fdecea;color:var(--red);border-radius:6px;padding:.6rem .9rem;
+  font-size:.85rem;margin-bottom:.75rem;display:none}
+.pat-help{font-size:.75rem;color:#888;margin-top:.4rem;line-height:1.5}
+.pat-help a{color:var(--navy-mid)}
+
+/* ─── Admin layout ─── */
+#admin-screen{display:none}
+.admin-header{background:var(--navy-dark);color:#fff;padding:0 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;height:56px;
+  position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.admin-header-title{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
+.admin-header-title svg{flex-shrink:0}
+.admin-actions{display:flex;gap:.5rem;align-items:center}
+.btn-save{background:var(--gold);color:var(--navy-dark);border:none;border-radius:6px;
+  padding:.45rem 1.1rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:opacity .2s;display:flex;align-items:center;gap:.4rem}
+.btn-save:hover{opacity:.85}
+.btn-save:disabled{opacity:.5;cursor:not-allowed}
+.btn-logout{background:transparent;color:#aab;border:1px solid #445;border-radius:6px;
+  padding:.4rem .8rem;font-size:.82rem;cursor:pointer;font-family:inherit}
+.btn-logout:hover{background:#1a2840}
+
+.admin-body{max-width:800px;margin:0 auto;padding:1.5rem 1rem 4rem}
+
+.section-card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06);
+  margin-bottom:1.25rem;overflow:hidden}
+.section-header{background:var(--navy);color:#fff;padding:.75rem 1.25rem;
+  font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
+.section-body{padding:1.25rem}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.field-row.full{grid-template-columns:1fr}
+@media(max-width:520px){.field-row{grid-template-columns:1fr}}
+.admin-field{display:flex;flex-direction:column;gap:.3rem}
+.admin-field label{font-size:.8rem;font-weight:600;color:#555}
+.admin-field input{padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:7px;
+  font-size:.95rem;font-family:inherit;outline:none;direction:ltr;text-align:right}
+.admin-field input:focus{border-color:var(--navy-mid);box-shadow:0 0 0 3px rgba(45,74,122,.1)}
+.admin-field .hint{font-size:.73rem;color:#888;margin-top:.2rem}
+
+/* Stats row */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
+@media(max-width:520px){.stats-grid{grid-template-columns:1fr 1fr}}
+.stat-field label{font-size:.78rem;font-weight:600;color:#555;margin-bottom:.25rem;display:block}
+.stat-field input{width:100%;padding:.5rem .6rem;border:1.5px solid var(--border);border-radius:7px;
+  font-size:1.1rem;font-weight:700;text-align:center;font-family:inherit;outline:none}
+.stat-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,83,.2)}
+
+/* Status bar */
+#status-bar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
+  background:var(--navy-dark);color:#fff;padding:.7rem 1.4rem;border-radius:30px;
+  font-size:.88rem;font-weight:600;display:none;align-items:center;gap:.5rem;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:200}
+#status-bar.visible{display:flex}
+#status-bar.success{background:var(--green)}
+#status-bar.error{background:var(--red)}
+
+/* Setup guide */
+.guide-card{background:var(--navy);color:#fff;border-radius:12px;padding:1.25rem 1.5rem;
+  margin-bottom:1.25rem;font-size:.88rem;line-height:1.7}
+.guide-card h3{font-size:1rem;margin-bottom:.6rem;color:var(--gold)}
+.guide-card ol{padding-right:1.2rem}
+.guide-card a{color:var(--gold)}
+.guide-card code{background:rgba(255,255,255,.15);padding:.1em .35em;border-radius:4px;font-size:.85em}
+
+/* Spinner */
+.spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.preview-link{display:inline-flex;align-items:center;gap:.4rem;
+  font-size:.82rem;color:var(--gold);text-decoration:none}
+.preview-link:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════
+     LOGIN
+════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="30" cy="30" r="30" fill="#1B2A4A"/>
+        <path d="M30 48V28M30 28C30 20 22 14 14 18M30 28C30 20 38 14 46 18M30 28C30 22 26 18 22 20M30 28C30 22 34 18 38 20" stroke="#D4A853" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <h1 class="login-title">ממשק ניהול — שורשים</h1>
+    <p class="login-sub">הזינו את פרטי הגישה לניהול האתר</p>
+
+    <div id="login-error" class="login-error">שם משתמש או סיסמה שגויים</div>
+
+    <div class="field-group">
+      <label for="login-pat">GitHub Token (PAT)</label>
+      <input type="password" id="login-pat" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off">
+      <p class="pat-help">
+        ראשונה? צרו Token ב-
+        <a href="https://github.com/settings/tokens/new?scopes=repo&description=Sharon+Admin" target="_blank" rel="noopener">GitHub → Settings → Tokens</a>
+        עם הרשאת <code>repo</code>
+      </p>
+    </div>
+    <div class="field-group">
+      <label for="login-pass">סיסמת ניהול</label>
+      <input type="password" id="login-pass" placeholder="הזינו סיסמה">
+    </div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">כניסה לניהול</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════
+     ADMIN
+════════════════════════════════ -->
+<div id="admin-screen">
+  <header class="admin-header">
+    <div class="admin-header-title">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7v10l10 5 10-5V7L12 2Z" stroke="#D4A853" stroke-width="1.8"/><path d="M12 22V12M2 7l10 5 10-5" stroke="#D4A853" stroke-width="1.8"/></svg>
+      ממשק ניהול — שורשים
+    </div>
+    <div class="admin-actions">
+      <a href="https://nir5177.github.io/Sharon/" target="_blank" class="preview-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        צפייה באתר
+      </a>
+      <button class="btn-save" id="save-btn" onclick="saveChanges()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg>
+        שמירה ופרסום
+      </button>
+      <button class="btn-logout" onclick="doLogout()">יציאה</button>
+    </div>
+  </header>
+
+  <main class="admin-body">
+
+    <!-- Setup guide (shown only on first use) -->
+    <div class="guide-card" id="setup-guide" style="display:none">
+      <h3>הגדרה ראשונה</h3>
+      <p style="margin-bottom:.6rem">כדי שהאתר יתעדכן אוטומטית אחרי כל שמירה, ודאו ש-GitHub Actions פעיל:</p>
+      <ol>
+        <li>היכנסו ל-<a href="https://github.com/nir5177/Sharon/actions" target="_blank">github.com/nir5177/Sharon → Actions</a></li>
+        <li>אם מופיעה הודעה "Workflows aren't being run on this fork" — לחצו <strong>I understand my workflows, go ahead and enable them</strong></li>
+        <li>זהו! מכאן כל שמירה בממשק הניהול תפרסם את האתר תוך כ-2 דקות</li>
+      </ol>
+    </div>
+
+    <!-- Contact details -->
+    <div class="section-card">
+      <div class="section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2C7.16 21 3 16.84 3 6a2 2 0 012-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        פרטי התקשרות
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="admin-field">
+            <label for="cfg-phone-in">מספר טלפון (מוצג באתר)</label>
+            <input type="tel" id="cfg-phone-in" placeholder="055-0000000" dir="ltr">
+            <span class="hint">מוצג בכותרת תחתונה ובדף יצירת קשר</span>
+          </div>
+          <div class="admin-field">
+            <label for="cfg-wa-in">מספר WhatsApp (ספרות בלבד, כולל קידומת 972)</label>
+            <input type="text" id="cfg-wa-in" placeholder="972501234567" dir="ltr">
+            <span class="hint">לדוגמה: 972501234567</span>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="admin-field">
+            <label for="cfg-email-in">כתובת אימייל</label>
+            <input type="email" id="cfg-email-in" placeholder="contact@shoreshim.org.il" dir="ltr">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="section-card">
+      <div class="section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        נתוני פעילות (המספרים הגדולים)
+      </div>
+      <div class="section-body">
+        <div class="stats-grid">
+          <div class="stat-field">
+            <label>הורים קיבלו ליווי</label>
+            <input type="number" id="cfg-families" min="0" placeholder="320">
+          </div>
+          <div class="stat-field">
+            <label>סדנאות התקיימו</label>
+            <input type="number" id="cfg-workshops" min="0" placeholder="48">
+          </div>
+          <div class="stat-field">
+            <label>מנחים מוסמכים</label>
+            <input type="number" id="cfg-facilitators" min="0" placeholder="12">
+          </div>
+          <div class="stat-field">
+            <label>ערים ויישובים</label>
+            <input type="number" id="cfg-cities" min="0" placeholder="8">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donations -->
+    <div class="section-card">
+      <div class="section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.403 4.068 2 6.5 2c1.626 0 3.376.557 5.5 2.811C14.124 2.557 15.874 2 17.5 2 19.932 2 23 3.403 23 7.191c0 4.105-5.369 8.863-11 14.402Z" stroke="currentColor" stroke-width="1.8"/></svg>
+        קישור עמוד תרומות (Matara.pro / Nedarim Plus)
+      </div>
+      <div class="section-body">
+        <div class="field-row full">
+          <div class="admin-field">
+            <label for="cfg-matara-in">כתובת URL של עמוד התרומות</label>
+            <input type="url" id="cfg-matara-in" placeholder="https://matara.pro/nedarimpl/XXXXXX" dir="ltr">
+            <span class="hint">
+              מקבלים מ-Matara.pro או Nedarim Plus — עמוד התרומות של הארגון.
+              ניתן לקבל מנציג Matara.pro.
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Status bar -->
+<div id="status-bar"></div>
+
+<script>
+/* ══════════════════════════════════════
+   Config
+══════════════════════════════════════ */
+var REPO_OWNER = 'nir5177';
+var REPO_NAME  = 'Sharon';
+var REPO_BRANCH = 'gh-pages';
+var ADMIN_PASS_HASH = '5e884898da28047151d0e56f8dc6292773603d0d56f86021d60e1a7f5b12a8e'; // "password" — change this!
+
+/* ══════════════════════════════════════
+   Auth
+══════════════════════════════════════ */
+function sha256(str) {
+  var msgBuffer = new TextEncoder().encode(str);
+  return crypto.subtle.digest('SHA-256', msgBuffer).then(function(buf) {
+    return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+  });
+}
+
+async function doLogin() {
+  var pat  = document.getElementById('login-pat').value.trim();
+  var pass = document.getElementById('login-pass').value;
+  var btn  = document.getElementById('login-btn');
+  var errEl = document.getElementById('login-error');
+
+  if (!pat || !pass) { errEl.textContent = 'יש למלא את כל השדות'; errEl.style.display='block'; return; }
+
+  btn.textContent = 'מתחבר...';
+  btn.disabled = true;
+  errEl.style.display = 'none';
+
+  var hash = await sha256(pass);
+  var storedHash = localStorage.getItem('shoreshim_pass_hash') || ADMIN_PASS_HASH;
+
+  if (hash !== storedHash) {
+    errEl.textContent = 'סיסמה שגויה';
+    errEl.style.display = 'block';
+    btn.textContent = 'כניסה לניהול';
+    btn.disabled = false;
+    return;
+  }
+
+  /* Verify PAT works */
+  try {
+    var r = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME, {
+      headers: { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (!r.ok) throw new Error('GitHub token invalid');
+  } catch(e) {
+    errEl.textContent = 'ה-Token לא תקין או אין גישה ל-Repository';
+    errEl.style.display = 'block';
+    btn.textContent = 'כניסה לניהול';
+    btn.disabled = false;
+    return;
+  }
+
+  sessionStorage.setItem('shoreshim_pat', pat);
+  showAdmin();
+}
+
+function doLogout() {
+  sessionStorage.removeItem('shoreshim_pat');
+  document.getElementById('admin-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+/* ══════════════════════════════════════
+   Show admin + load config
+══════════════════════════════════════ */
+async function showAdmin() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'block';
+  await loadConfig();
+}
+
+async function loadConfig() {
+  var pat = sessionStorage.getItem('shoreshim_pat');
+  try {
+    var r = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/config.json?ref=' + REPO_BRANCH, {
+      headers: { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (!r.ok) { showStatus('לא ניתן לטעון את ההגדרות', 'error'); return; }
+    var data = await r.json();
+    var cfg  = JSON.parse(atob(data.content.replace(/\n/g,'')));
+    populateForm(cfg);
+  } catch(e) {
+    showStatus('שגיאה בטעינת ההגדרות: ' + e.message, 'error');
+  }
+}
+
+function populateForm(cfg) {
+  set('cfg-phone-in',       cfg.phone     || '');
+  set('cfg-wa-in',          cfg.whatsapp  || '');
+  set('cfg-email-in',       cfg.email     || '');
+  set('cfg-families',       cfg.stats && cfg.stats.families    || '');
+  set('cfg-workshops',      cfg.stats && cfg.stats.workshops   || '');
+  set('cfg-facilitators',   cfg.stats && cfg.stats.facilitators|| '');
+  set('cfg-cities',         cfg.stats && cfg.stats.cities      || '');
+  set('cfg-matara-in',      cfg.mataraUrl || '');
+}
+
+function set(id, val) { var el = document.getElementById(id); if (el) el.value = val; }
+function get(id)      { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+/* ══════════════════════════════════════
+   Save
+══════════════════════════════════════ */
+async function saveChanges() {
+  var pat = sessionStorage.getItem('shoreshim_pat');
+  var btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> שומר...';
+
+  var cfg = {
+    phone:    get('cfg-phone-in'),
+    whatsapp: get('cfg-wa-in').replace(/\D/g,''),
+    email:    get('cfg-email-in'),
+    stats: {
+      families:     parseInt(get('cfg-families'),10)    || 0,
+      workshops:    parseInt(get('cfg-workshops'),10)   || 0,
+      facilitators: parseInt(get('cfg-facilitators'),10)|| 0,
+      cities:       parseInt(get('cfg-cities'),10)      || 0
+    },
+    mataraUrl: get('cfg-matara-in')
+  };
+
+  try {
+    await commitFile('config.json',    makeConfigJson(cfg), pat);
+    await commitFile('config.js',      makeConfigJs(cfg),   pat);
+    if (cfg.mataraUrl) await commitFile('donate.html', await patchDonate(cfg.mataraUrl, pat), pat);
+    showStatus('האתר עודכן ויפורסם תוך כ-2 דקות ✓', 'success');
+  } catch(e) {
+    showStatus('שגיאה בשמירה: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg> שמירה ופרסום';
+  }
+}
+
+async function commitFile(path, content, pat) {
+  /* get current SHA if file exists */
+  var sha = null;
+  try {
+    var r = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path + '?ref=' + REPO_BRANCH, {
+      headers: { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (r.ok) { var d = await r.json(); sha = d.sha; }
+  } catch(e) {}
+
+  var body = { message: 'Update ' + path + ' via admin panel', content: btoa(unescape(encodeURIComponent(content))), branch: REPO_BRANCH };
+  if (sha) body.sha = sha;
+
+  var res = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/' + path, {
+    method: 'PUT',
+    headers: { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) { var err = await res.json(); throw new Error(err.message || res.status); }
+}
+
+async function patchDonate(mataraUrl, pat) {
+  /* read current donate.html and replace the placeholder URL */
+  var r = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/donate.html?ref=' + REPO_BRANCH, {
+    headers: { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json' }
+  });
+  if (!r.ok) return null;
+  var d    = await r.json();
+  var html = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+  /* replace the MATARA_URL line */
+  html = html.replace(/var MATARA_URL\s*=\s*'[^']*'/, "var MATARA_URL = '" + mataraUrl + "'");
+  return html;
+}
+
+/* ══════════════════════════════════════
+   Templates
+══════════════════════════════════════ */
+function makeConfigJson(cfg) {
+  return JSON.stringify(cfg, null, 2) + '\n';
+}
+
+function makeConfigJs(cfg) {
+  var wa  = cfg.whatsapp;
+  var msg = encodeURIComponent('שלום, הגעתי מאתר שורשים ואשמח לפרטים בדיסקרטיות');
+  return '/* שורשים — config.js  (edit via /admin/) */\n' +
+    'var SHORESHIM = {\n' +
+    '  phone:    "' + cfg.phone    + '",\n' +
+    '  whatsapp: "' + wa           + '",\n' +
+    '  email:    "' + cfg.email    + '",\n' +
+    '  stats: {\n' +
+    '    families:    ' + cfg.stats.families     + ',\n' +
+    '    workshops:   ' + cfg.stats.workshops    + ',\n' +
+    '    facilitators:' + cfg.stats.facilitators + ',\n' +
+    '    cities:      ' + cfg.stats.cities       + '\n' +
+    '  }\n' +
+    '};\n\n' +
+    "(function (cfg) {\n" +
+    "  var p = document.getElementById('cfg-phone');\n" +
+    "  if (p) p.textContent = cfg.phone;\n\n" +
+    "  var em = document.getElementById('cfg-email');\n" +
+    "  if (em) em.textContent = cfg.email;\n\n" +
+    "  ['cfg-stat-families','cfg-stat-workshops','cfg-stat-facilitators','cfg-stat-cities'].forEach(function (id, i) {\n" +
+    "    var vals = [cfg.stats.families, cfg.stats.workshops, cfg.stats.facilitators, cfg.stats.cities];\n" +
+    "    var el = document.getElementById(id);\n" +
+    "    if (el) el.setAttribute('data-target', vals[i]);\n" +
+    "  });\n\n" +
+    "  var waMsg = encodeURIComponent('שלום, הגעתי מאתר שורשים ואשמח לפרטים בדיסקרטיות');\n" +
+    "  document.querySelectorAll('a[href^=\"https://wa.me/\"]').forEach(function (a) {\n" +
+    "    var hasText = a.getAttribute('href').indexOf('?text=') !== -1;\n" +
+    "    a.href = 'https://wa.me/' + cfg.whatsapp + (hasText ? '?text=' + waMsg : '');\n" +
+    "  });\n" +
+    "}(SHORESHIM));\n";
+}
+
+/* ══════════════════════════════════════
+   Status
+══════════════════════════════════════ */
+var _statusTimer;
+function showStatus(msg, type) {
+  var bar = document.getElementById('status-bar');
+  bar.textContent = msg;
+  bar.className   = 'visible ' + (type || '');
+  clearTimeout(_statusTimer);
+  _statusTimer = setTimeout(function(){ bar.className = ''; }, 4000);
+}
+
+/* ══════════════════════════════════════
+   Boot
+══════════════════════════════════════ */
+(function() {
+  var pat = sessionStorage.getItem('shoreshim_pat');
+  if (pat) showAdmin();
+
+  /* Enter key on login form */
+  ['login-pat','login-pass'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+  });
+})();
+</script>
+</body>
+</html>
