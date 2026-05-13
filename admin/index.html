@@ -545,29 +545,36 @@ function renderTestimonialsList(arr) {
 }
 
 function addTestimonialRow(data) {
-  var container = document.getElementById('testimonials-editor');
-  if (container.querySelectorAll('.testimonial-editor-row').length >= 8) {
-    showStatus('מקסימום 8 עדויות', 'error'); return;
+  try {
+    var container = document.getElementById('testimonials-editor');
+    if (!container) { alert('שגיאה: לא נמצא אזור העדויות'); return; }
+    if (container.querySelectorAll('.testimonial-editor-row').length >= 8) {
+      showStatus('מקסימום 8 עדויות', 'error'); return;
+    }
+    var i = _testimonialIdx++;
+    var d = (data && typeof data === 'object') ? data : {};
+    var row = document.createElement('div');
+    row.className = 'testimonial-editor-row';
+    row.dataset.idx = i;
+    row.innerHTML =
+      '<div class="t-num">עדות 1</div>'+
+      '<button class="btn-remove" onclick="removeTestimonialRow(this)">הסר</button>'+
+      '<div class="t-grid">'+
+        '<div class="admin-field t-full"><label>ציטוט קצר</label>'+
+          '<input type="text" id="cnt-quote-'+i+'" value="'+esc(d.quote||'')+'" placeholder="ציטוט קצר..."></div>'+
+        '<div class="admin-field t-full"><label>תוכן מלא</label>'+
+          '<textarea id="cnt-body-'+i+'" rows="2" placeholder="תוכן מלא...">'+esc(d.body||'')+'</textarea></div>'+
+        '<div class="admin-field"><label>שם</label>'+
+          '<input type="text" id="cnt-author-'+i+'" value="'+esc(d.author||'')+'" placeholder="שם"></div>'+
+        '<div class="admin-field"><label>תפקיד</label>'+
+          '<input type="text" id="cnt-role-'+i+'" value="'+esc(d.role||'')+'" placeholder="הורה מתמודד"></div>'+
+      '</div>';
+    container.appendChild(row);
+    renumberTestimonials();
+    row.scrollIntoView({behavior:'smooth', block:'nearest'});
+  } catch(err) {
+    alert('שגיאה בהוספת עדות: ' + err.message);
   }
-  var i = _testimonialIdx++;
-  var d = data || {};
-  var row = document.createElement('div');
-  row.className = 'testimonial-editor-row'; row.dataset.idx = i;
-  row.innerHTML =
-    '<div class="t-num">עדות '+(container.querySelectorAll('.testimonial-editor-row').length+1)+'</div>'+
-    '<button class="btn-remove" onclick="removeTestimonialRow(this)">הסר</button>'+
-    '<div class="t-grid">'+
-      '<div class="admin-field t-full"><label>ציטוט קצר</label>'+
-        '<input type="text" id="cnt-quote-'+i+'" value="'+esc(d.quote||'')+'" placeholder="ציטוט קצר..."></div>'+
-      '<div class="admin-field t-full"><label>תוכן מלא</label>'+
-        '<textarea id="cnt-body-'+i+'" rows="2" placeholder="תוכן מלא...">'+esc(d.body||'')+'</textarea></div>'+
-      '<div class="admin-field"><label>שם</label>'+
-        '<input type="text" id="cnt-author-'+i+'" value="'+esc(d.author||'')+'" placeholder="שם"></div>'+
-      '<div class="admin-field"><label>תפקיד</label>'+
-        '<input type="text" id="cnt-role-'+i+'" value="'+esc(d.role||'')+'" placeholder="הורה מתמודד"></div>'+
-    '</div>';
-  container.appendChild(row);
-  renumberTestimonials();
 }
 
 function removeTestimonialRow(btn) {
