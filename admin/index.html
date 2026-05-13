@@ -167,28 +167,12 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
       <p class="login-sub">הגדרה ראשונה — שני שלבים בלבד</p>
 
       <div class="setup-step">
-        <div class="setup-step-label">
-          <span class="setup-step-num">1</span> קבעו סיסמת כניסה
-        </div>
+        <div class="setup-step-label">קבעו סיסמת כניסה לממשק</div>
         <div class="field-group">
           <input type="password" id="setup-pass" placeholder="סיסמה (לפחות 6 תווים)" autocomplete="new-password">
         </div>
         <div class="field-group" style="margin-bottom:0">
           <input type="password" id="setup-pass2" placeholder="הזינו שוב לאישור" autocomplete="new-password">
-        </div>
-      </div>
-
-      <div class="setup-step">
-        <div class="setup-step-label">
-          <span class="setup-step-num">2</span> חיבור GitHub לפרסום שינויים
-        </div>
-        <div class="field-group" style="margin-bottom:0">
-          <input type="password" id="setup-pat" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off" style="direction:ltr">
-          <p class="field-hint">
-            נדרש כדי לשמור שינויים לאתר. צרו ב-
-            <a href="https://github.com/settings/tokens/new?scopes=repo&description=Sharon+Admin" target="_blank" rel="noopener">GitHub → Settings → Tokens</a>
-            עם הרשאת <code>repo</code>. נשמר רק במכשיר זה.
-          </p>
         </div>
       </div>
 
@@ -400,16 +384,6 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
           <p id="chg-msg" class="inline-msg"></p>
         </div>
 
-        <!-- Update PAT -->
-        <div class="account-row">
-          <div class="account-row-label">עדכון GitHub Token (PAT)</div>
-          <div class="inline-form">
-            <input type="password" id="upd-pat" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off" style="direction:ltr">
-            <button class="btn-action" onclick="updatePAT()">עדכן</button>
-          </div>
-          <p id="pat-msg" class="inline-msg"></p>
-        </div>
-
       </div>
     </div>
 
@@ -460,32 +434,20 @@ async function doLogin() {
 
 /* ── First-time setup ── */
 async function doSetup() {
-  var pat   = document.getElementById('setup-pat').value.trim();
   var pass  = document.getElementById('setup-pass').value;
   var pass2 = document.getElementById('setup-pass2').value;
   var btn   = document.getElementById('setup-btn');
 
-  if (!pat || !pass || !pass2) { showLoginError('יש למלא את כל השדות'); return; }
-  if (pass !== pass2)           { showLoginError('הסיסמאות אינן תואמות'); return; }
-  if (pass.length < 6)          { showLoginError('הסיסמה חייבת להכיל לפחות 6 תווים'); return; }
+  if (!pass || !pass2)  { showLoginError('יש למלא את כל השדות'); return; }
+  if (pass !== pass2)   { showLoginError('הסיסמאות אינן תואמות'); return; }
+  if (pass.length < 6)  { showLoginError('הסיסמה חייבת להכיל לפחות 6 תווים'); return; }
 
-  btn.textContent = 'מוודא...'; btn.disabled = true;
+  btn.textContent = 'שומר...'; btn.disabled = true;
   document.getElementById('login-error').style.display = 'none';
 
-  try {
-    var r = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME, {
-      headers: {'Authorization':'token '+pat, 'Accept':'application/vnd.github.v3+json'}
-    });
-    if (!r.ok) throw new Error();
-  } catch(e) {
-    showLoginError('GitHub Token לא תקין — ודאו שיש הרשאת repo');
-    btn.textContent = 'שמור והתחבר'; btn.disabled = false; return;
-  }
-
   var hash = await sha256(pass);
-  localStorage.setItem('shoreshim_pat',       pat);
   localStorage.setItem('shoreshim_pass_hash', hash);
-  sessionStorage.setItem('shoreshim_authed',  '1');
+  sessionStorage.setItem('shoreshim_authed', '1');
   showAdmin();
 }
 
@@ -523,24 +485,6 @@ async function changePassword() {
   showInlineMsg(msg, 'הסיסמה שונתה בהצלחה ✓', true);
 }
 
-async function updatePAT() {
-  var pat = document.getElementById('upd-pat').value.trim();
-  var msg = document.getElementById('pat-msg');
-  if (!pat) return showInlineMsg(msg, 'יש להזין Token', false);
-
-  try {
-    var r = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME, {
-      headers: {'Authorization':'token '+pat, 'Accept':'application/vnd.github.v3+json'}
-    });
-    if (!r.ok) throw new Error();
-  } catch(e) {
-    return showInlineMsg(msg, 'Token לא תקין', false);
-  }
-  localStorage.setItem('shoreshim_pat', pat);
-  document.getElementById('upd-pat').value = '';
-  showInlineMsg(msg, 'Token עודכן בהצלחה ✓', true);
-}
-
 function showInlineMsg(el, msg, ok) {
   el.textContent = msg;
   el.className   = 'inline-msg ' + (ok ? 'ok' : 'err');
@@ -558,27 +502,14 @@ async function showAdmin() {
 }
 
 async function loadConfig() {
-  var pat = localStorage.getItem('shoreshim_pat');
+  var base = 'https://raw.githubusercontent.com/'+REPO_OWNER+'/'+REPO_NAME+'/'+REPO_BRANCH+'/';
   try {
-    var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/config.json?ref='+REPO_BRANCH, {
-      headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
-    });
-    if (r.ok) {
-      var data = await r.json();
-      var cfg  = JSON.parse(atob(data.content.replace(/\n/g,'')));
-      populateForm(cfg);
-    }
+    var r = await fetch(base + 'config.json?_=' + Date.now());
+    if (r.ok) { populateForm(await r.json()); }
   } catch(e) { /* ignore */ }
-
   try {
-    var rc = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/content.json?ref='+REPO_BRANCH, {
-      headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
-    });
-    if (rc.ok) {
-      var dc  = await rc.json();
-      var cnt = JSON.parse(atob(dc.content.replace(/\n/g,'')));
-      populateContentForm(cnt);
-    }
+    var rc = await fetch(base + 'content.json?_=' + Date.now());
+    if (rc.ok) { populateContentForm(await rc.json()); }
   } catch(e) { /* ignore */ }
 }
 
@@ -681,6 +612,7 @@ function getContentFromForm() {
 ══════════════════════════════════════ */
 async function saveChanges() {
   var pat = localStorage.getItem('shoreshim_pat');
+  if (!pat) { showStatus('אין Token — פנה למנהל המערכת לחיבור', 'error'); return; }
   var btn = document.getElementById('save-btn');
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner"></div> שומר...';
@@ -830,28 +762,25 @@ function showStatus(msg, type) {
    Boot
 ══════════════════════════════════════ */
 (function() {
-  /* If already authenticated in this session */
+  /* Capture token from URL param ?token=ghp_xxx (one-time setup) */
+  var urlToken = new URLSearchParams(location.search).get('token');
+  if (urlToken) {
+    localStorage.setItem('shoreshim_pat', urlToken);
+    history.replaceState(null, '', location.pathname);
+  }
+
   if (sessionStorage.getItem('shoreshim_authed') === '1') { showAdmin(); return; }
 
-  var hasPat  = !!localStorage.getItem('shoreshim_pat');
   var hasPass = !!localStorage.getItem('shoreshim_pass_hash');
 
-  if (!hasPat || !hasPass) {
-    /* First-time setup */
+  if (!hasPass) {
     document.getElementById('setup-form').style.display = 'block';
-    ['setup-pat','setup-pass','setup-pass2'].forEach(function(id){
+    ['setup-pass','setup-pass2'].forEach(function(id){
       document.getElementById(id).addEventListener('keydown', function(e){ if(e.key==='Enter') doSetup(); });
     });
   } else {
-    /* Regular login */
     document.getElementById('login-form').style.display = 'block';
-    if (localStorage.getItem('shoreshim_totp_secret')) {
-      document.getElementById('totp-login-group').style.display = 'block';
-    }
-    ['login-pass','login-otp'].forEach(function(id){
-      var el = document.getElementById(id);
-      if (el) el.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
-    });
+    document.getElementById('login-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
   }
 })();
 </script>
