@@ -271,7 +271,7 @@ input, textarea, select { font-family: inherit; }
   font-size: 1.1rem; cursor: default; border-color: #2e3a72;
 }
 .nav-item--sub > a {
-  padding-inline-end: calc(1.25rem + 1.5rem);
+  padding-inline-start: calc(1.25rem + 1.5rem);
   font-size: 1.05rem; font-weight: 600; color: #5A4030;
 }
 
