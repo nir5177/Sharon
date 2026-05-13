@@ -117,34 +117,14 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 .account-row:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
 .account-row-label{font-size:.82rem;font-weight:600;color:#444;margin-bottom:.5rem}
 
-/* TOTP section */
-.totp-status{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem}
-.totp-badge{padding:.25em .75em;border-radius:999px;font-size:.8rem;font-weight:700}
-.totp-badge.set{background:#e6f4ea;color:#1e7e3a}
-.totp-badge.unset{background:#f0f0f0;color:#888}
-.btn-setup-totp{background:var(--navy-mid);color:#fff;border:none;border-radius:7px;
-  padding:.5rem 1rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
-  transition:background .2s}
-.btn-setup-totp:hover{background:var(--navy)}
-.totp-setup-box{margin-top:1rem;padding:1rem;background:#f0f4fb;border-radius:8px;
-  border:1.5px solid var(--border);display:none}
-.totp-secret-display{font-family:monospace;font-size:1.05rem;font-weight:700;
-  color:var(--navy);letter-spacing:.1em;word-break:break-all;
-  background:#fff;border:1.5px dashed var(--gold);border-radius:6px;
-  padding:.6rem .9rem;margin:.75rem 0;text-align:center}
-.totp-instructions{font-size:.83rem;color:#444;line-height:1.75;margin-bottom:.75rem}
-.totp-instructions li{margin-bottom:.2rem}
-.totp-verify-row{display:flex;gap:.6rem;align-items:flex-end;margin-top:.6rem}
-.totp-verify-row input{flex:1;padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:7px;
-  font-size:1rem;font-family:inherit;outline:none;direction:ltr;text-align:center;letter-spacing:.15em}
-.totp-verify-row input:focus{border-color:var(--navy-mid)}
-.btn-save-totp{background:var(--green);color:#fff;border:none;border-radius:7px;
-  padding:.55rem 1.1rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
-  white-space:nowrap;transition:opacity .2s}
-.btn-save-totp:hover{opacity:.85}
-.totp-msg{font-size:.82rem;margin-top:.5rem;display:none}
-.totp-msg.ok{color:var(--green)}
-.totp-msg.err{color:var(--red)}
+/* Setup steps */
+.setup-step{margin-bottom:1.1rem;padding:.9rem 1rem;background:#f8f7f4;
+  border-radius:9px;border:1.5px solid #e4ddd4}
+.setup-step-label{font-size:.82rem;font-weight:700;color:var(--navy);
+  margin-bottom:.65rem;display:flex;align-items:center;gap:.4rem}
+.setup-step-num{width:20px;height:20px;border-radius:50%;background:var(--navy);
+  color:#fff;font-size:.72rem;font-weight:800;display:inline-flex;
+  align-items:center;justify-content:center;flex-shrink:0}
 
 /* Status bar */
 #status-bar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
@@ -184,38 +164,42 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 
     <!-- ── First-time setup ── -->
     <div id="setup-form" style="display:none">
-      <div class="setup-badge">הגדרה ראשונה — קבעו סיסמת ניהול</div>
-      <div class="field-group">
-        <label for="setup-pat">GitHub Token (PAT)</label>
-        <input type="password" id="setup-pat" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off" style="direction:ltr">
-        <p class="field-hint">
-          נדרש פעם אחת ויישמר במכשיר זה. צרו ב-
-          <a href="https://github.com/settings/tokens/new?scopes=repo&description=Sharon+Admin" target="_blank" rel="noopener">GitHub → Settings → Tokens</a>
-          עם הרשאת <code>repo</code>.
-        </p>
+      <p class="login-sub">הגדרה ראשונה — שני שלבים בלבד</p>
+
+      <div class="setup-step">
+        <div class="setup-step-label">
+          <span class="setup-step-num">1</span> קבעו סיסמת כניסה
+        </div>
+        <div class="field-group">
+          <input type="password" id="setup-pass" placeholder="סיסמה (לפחות 6 תווים)" autocomplete="new-password">
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <input type="password" id="setup-pass2" placeholder="הזינו שוב לאישור" autocomplete="new-password">
+        </div>
       </div>
-      <div class="field-group">
-        <label for="setup-pass">סיסמת ניהול</label>
-        <input type="password" id="setup-pass" placeholder="לפחות 6 תווים" autocomplete="new-password">
+
+      <div class="setup-step">
+        <div class="setup-step-label">
+          <span class="setup-step-num">2</span> חיבור GitHub לפרסום שינויים
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <input type="password" id="setup-pat" placeholder="ghp_xxxxxxxxxxxx" autocomplete="off" style="direction:ltr">
+          <p class="field-hint">
+            נדרש כדי לשמור שינויים לאתר. צרו ב-
+            <a href="https://github.com/settings/tokens/new?scopes=repo&description=Sharon+Admin" target="_blank" rel="noopener">GitHub → Settings → Tokens</a>
+            עם הרשאת <code>repo</code>. נשמר רק במכשיר זה.
+          </p>
+        </div>
       </div>
-      <div class="field-group">
-        <label for="setup-pass2">אימות סיסמה</label>
-        <input type="password" id="setup-pass2" placeholder="הזינו שוב" autocomplete="new-password">
-      </div>
-      <button class="login-btn" id="setup-btn" onclick="doSetup()">שמור והתחבר</button>
+
+      <button class="login-btn" id="setup-btn" onclick="doSetup()">צור חשבון וכנס ←</button>
     </div>
 
     <!-- ── Regular login ── -->
     <div id="login-form" style="display:none">
       <p class="login-sub">הזינו את סיסמת הניהול</p>
       <div class="field-group">
-        <label for="login-pass">סיסמה</label>
         <input type="password" id="login-pass" placeholder="סיסמה" autocomplete="current-password">
-      </div>
-      <div class="field-group" id="totp-login-group" style="display:none">
-        <label for="login-otp">קוד TOTP (6 ספרות)</label>
-        <input type="text" id="login-otp" placeholder="123456" autocomplete="one-time-code"
-               inputmode="numeric" maxlength="6" style="direction:ltr;text-align:center;letter-spacing:.2em">
       </div>
       <button class="login-btn" id="login-btn" onclick="doLogin()">כניסה</button>
     </div>
@@ -426,36 +410,6 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
           <p id="pat-msg" class="inline-msg"></p>
         </div>
 
-        <!-- TOTP -->
-        <div class="account-row">
-          <div class="account-row-label">אימות דו-שלבי (TOTP) — אופציונלי</div>
-          <div class="totp-status">
-            <span id="totp-status-badge" class="totp-badge unset">לא מוגדר</span>
-            <button class="btn-setup-totp" onclick="showTotpSetup()">הגדר / החלף</button>
-            <button class="btn-action danger" id="totp-remove-btn" onclick="removeTOTP()" style="display:none">הסר</button>
-          </div>
-          <p style="font-size:.83rem;color:#666;line-height:1.6;margin-bottom:.5rem">
-            לאחר הגדרה, בכל כניסה תידרש קוד מ-Google Authenticator או Microsoft Authenticator.
-          </p>
-          <div id="totp-setup-box" class="totp-setup-box">
-            <p style="font-weight:700;color:var(--navy);margin-bottom:.5rem">מפתח TOTP חדש:</p>
-            <div class="totp-secret-display" id="totp-secret-display">—</div>
-            <ol class="totp-instructions">
-              <li>התקינו Google Authenticator / Microsoft Authenticator</li>
-              <li>הוסיפו חשבון ← הזנה ידנית</li>
-              <li>שם: <strong>שורשים ניהול</strong></li>
-              <li>מפתח: <strong id="totp-key-display">—</strong></li>
-              <li>לחצו "שמור" לאישור הקוד</li>
-            </ol>
-            <div class="totp-verify-row">
-              <input type="text" id="totp-verify-input" placeholder="הזינו קוד מהאפליקציה"
-                     inputmode="numeric" maxlength="6">
-              <button class="btn-save-totp" onclick="saveTotpSecret()">שמור</button>
-            </div>
-            <p id="totp-msg" class="totp-msg"></p>
-          </div>
-        </div>
-
       </div>
     </div>
 
@@ -482,48 +436,6 @@ async function sha256(str) {
 }
 
 /* ══════════════════════════════════════
-   TOTP helpers
-══════════════════════════════════════ */
-function base32decode(s) {
-  var alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  s = s.toUpperCase().replace(/\s/g,'').replace(/=+$/,'');
-  var out = [], bits = 0, val = 0;
-  for (var i = 0; i < s.length; i++) {
-    var idx = alpha.indexOf(s[i]);
-    if (idx < 0) continue;
-    val = (val << 5) | idx; bits += 5;
-    if (bits >= 8) { bits -= 8; out.push((val >> bits) & 255); }
-  }
-  return new Uint8Array(out);
-}
-
-async function totpCode(secret, timeOverride) {
-  var key = base32decode(secret);
-  var counter = Math.floor((timeOverride || Date.now() / 1000) / 30);
-  var buf = new ArrayBuffer(8);
-  new DataView(buf).setUint32(4, counter >>> 0, false);
-  var ck = await crypto.subtle.importKey('raw', key, {name:'HMAC',hash:'SHA-1'}, false, ['sign']);
-  var mac = new Uint8Array(await crypto.subtle.sign('HMAC', ck, buf));
-  var off = mac[19] & 15;
-  var code = ((mac[off]&127)<<24|(mac[off+1]&255)<<16|(mac[off+2]&255)<<8|(mac[off+3]&255)) % 1000000;
-  return String(code).padStart(6,'0');
-}
-
-async function verifyTOTP(secret, input) {
-  var now = Date.now() / 1000;
-  for (var d = -1; d <= 1; d++) {
-    if (await totpCode(secret, now + d*30) === input.trim()) return true;
-  }
-  return false;
-}
-
-function genSecret() {
-  var a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-  var b = crypto.getRandomValues(new Uint8Array(20));
-  return Array.from(b, function(x){return a[x%32];}).join('').match(/.{4}/g).join(' ');
-}
-
-/* ══════════════════════════════════════
    Auth — Login
 ══════════════════════════════════════ */
 async function doLogin() {
@@ -540,20 +452,6 @@ async function doLogin() {
   if (hash !== stored) {
     showLoginError('סיסמה שגויה');
     btn.textContent = 'כניסה'; btn.disabled = false; return;
-  }
-
-  var totpSecret = localStorage.getItem('shoreshim_totp_secret');
-  if (totpSecret) {
-    var otp = document.getElementById('login-otp').value.trim();
-    if (!otp) {
-      showLoginError('יש להזין קוד מהאפליקציה');
-      btn.textContent = 'כניסה'; btn.disabled = false; return;
-    }
-    var ok = await verifyTOTP(totpSecret, otp);
-    if (!ok) {
-      showLoginError('קוד TOTP לא תקין');
-      btn.textContent = 'כניסה'; btn.disabled = false; return;
-    }
   }
 
   sessionStorage.setItem('shoreshim_authed', '1');
@@ -651,68 +549,11 @@ function showInlineMsg(el, msg, ok) {
 }
 
 /* ══════════════════════════════════════
-   TOTP Setup UI
-══════════════════════════════════════ */
-var _pendingTotpSecret = null;
-
-function updateTotpStatusBadge() {
-  var badge   = document.getElementById('totp-status-badge');
-  var removeBtn = document.getElementById('totp-remove-btn');
-  if (localStorage.getItem('shoreshim_totp_secret')) {
-    badge.textContent = '✓ מוגדר'; badge.className = 'totp-badge set';
-    removeBtn.style.display = 'inline-block';
-  } else {
-    badge.textContent = 'לא מוגדר'; badge.className = 'totp-badge unset';
-    removeBtn.style.display = 'none';
-  }
-}
-
-function showTotpSetup() {
-  _pendingTotpSecret = genSecret();
-  document.getElementById('totp-secret-display').textContent = _pendingTotpSecret;
-  document.getElementById('totp-key-display').textContent    = _pendingTotpSecret;
-  document.getElementById('totp-setup-box').style.display    = 'block';
-  document.getElementById('totp-verify-input').value = '';
-  var msg = document.getElementById('totp-msg');
-  msg.style.display = 'none'; msg.textContent = '';
-}
-
-async function saveTotpSecret() {
-  var input = document.getElementById('totp-verify-input').value.trim();
-  var msg   = document.getElementById('totp-msg');
-  if (!input || input.length !== 6) {
-    msg.textContent = 'יש להזין קוד 6 ספרות';
-    msg.className = 'totp-msg err'; msg.style.display = 'block'; return;
-  }
-  if (!_pendingTotpSecret) return;
-  var ok = await verifyTOTP(_pendingTotpSecret, input);
-  if (!ok) {
-    msg.textContent = 'קוד לא תקין — ודאו שהמפתח הוזן נכון באפליקציה';
-    msg.className = 'totp-msg err'; msg.style.display = 'block'; return;
-  }
-  localStorage.setItem('shoreshim_totp_secret', _pendingTotpSecret);
-  _pendingTotpSecret = null;
-  document.getElementById('totp-setup-box').style.display = 'none';
-  msg.textContent = 'TOTP נשמר בהצלחה ✓';
-  msg.className = 'totp-msg ok'; msg.style.display = 'block';
-  updateTotpStatusBadge();
-}
-
-function removeTOTP() {
-  if (!confirm('הסרת TOTP תחייב רק סיסמה לכניסה. להמשיך?')) return;
-  localStorage.removeItem('shoreshim_totp_secret');
-  document.getElementById('totp-setup-box').style.display = 'none';
-  updateTotpStatusBadge();
-  showStatus('TOTP הוסר', 'success');
-}
-
-/* ══════════════════════════════════════
    Show admin + load config
 ══════════════════════════════════════ */
 async function showAdmin() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('admin-screen').style.display = 'block';
-  updateTotpStatusBadge();
   await loadConfig();
 }
 
