@@ -266,7 +266,9 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 var REPO_OWNER = 'nir5177';
 var REPO_NAME  = 'Sharon';
 var REPO_BRANCH = 'gh-pages';
-var ADMIN_PASS_HASH = '5e884898da28047151d0e56f8dc6292773603d0d56f86021d60e1a7f5b12a8e'; // "password" — change this!
+/* Set your own password hash here. Generate with: https://emn178.github.io/online-tools/sha256.html
+   Default is intentionally empty — admin login requires a valid GitHub PAT as the primary credential. */
+var ADMIN_PASS_HASH = localStorage.getItem('shoreshim_pass_hash') || '';
 
 /* ══════════════════════════════════════
    Auth
@@ -293,7 +295,7 @@ async function doLogin() {
   var hash = await sha256(pass);
   var storedHash = localStorage.getItem('shoreshim_pass_hash') || ADMIN_PASS_HASH;
 
-  if (hash !== storedHash) {
+  if (storedHash && hash !== storedHash) {
     errEl.textContent = 'סיסמה שגויה';
     errEl.style.display = 'block';
     btn.textContent = 'כניסה לניהול';
@@ -353,10 +355,10 @@ function populateForm(cfg) {
   set('cfg-phone-in',       cfg.phone     || '');
   set('cfg-wa-in',          cfg.whatsapp  || '');
   set('cfg-email-in',       cfg.email     || '');
-  set('cfg-families',       cfg.stats && cfg.stats.families    || '');
-  set('cfg-workshops',      cfg.stats && cfg.stats.workshops   || '');
-  set('cfg-facilitators',   cfg.stats && cfg.stats.facilitators|| '');
-  set('cfg-cities',         cfg.stats && cfg.stats.cities      || '');
+  set('cfg-families',       cfg.stats ? cfg.stats.families     : '');
+  set('cfg-workshops',      cfg.stats ? cfg.stats.workshops    : '');
+  set('cfg-facilitators',   cfg.stats ? cfg.stats.facilitators : '');
+  set('cfg-cities',         cfg.stats ? cfg.stats.cities       : '');
   set('cfg-matara-in',      cfg.mataraUrl || '');
 }
 
@@ -386,9 +388,14 @@ async function saveChanges() {
   };
 
   try {
-    await commitFile('config.json',    makeConfigJson(cfg), pat);
-    await commitFile('config.js',      makeConfigJs(cfg),   pat);
-    if (cfg.mataraUrl) await commitFile('donate.html', await patchDonate(cfg.mataraUrl, pat), pat);
+    await Promise.all([
+      commitFile('config.json', makeConfigJson(cfg), pat),
+      commitFile('config.js',   makeConfigJs(cfg),   pat)
+    ]);
+    if (cfg.mataraUrl) {
+      var donateHtml = await patchDonate(cfg.mataraUrl, pat);
+      if (donateHtml) await commitFile('donate.html', donateHtml, pat);
+    }
     showStatus('האתר עודכן ויפורסם תוך כ-2 דקות ✓', 'success');
   } catch(e) {
     showStatus('שגיאה בשמירה: ' + e.message, 'error');
@@ -420,15 +427,16 @@ async function commitFile(path, content, pat) {
 }
 
 async function patchDonate(mataraUrl, pat) {
-  /* read current donate.html and replace the placeholder URL */
+  try { new URL(mataraUrl); } catch(e) { throw new Error('כתובת URL לא תקינה'); }
+  if (!/^https:\/\//.test(mataraUrl)) throw new Error('URL חייב להתחיל ב-https://');
   var r = await fetch('https://api.github.com/repos/' + REPO_OWNER + '/' + REPO_NAME + '/contents/donate.html?ref=' + REPO_BRANCH, {
     headers: { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json' }
   });
   if (!r.ok) return null;
   var d    = await r.json();
   var html = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
-  /* replace the MATARA_URL line */
-  html = html.replace(/var MATARA_URL\s*=\s*'[^']*'/, "var MATARA_URL = '" + mataraUrl + "'");
+  var safeUrl = mataraUrl.replace(/'/g, '%27');
+  html = html.replace(/var MATARA_URL\s*=\s*'[^']*'/, "var MATARA_URL = '" + safeUrl + "'");
   return html;
 }
 
@@ -440,20 +448,19 @@ function makeConfigJson(cfg) {
 }
 
 function makeConfigJs(cfg) {
-  var wa  = cfg.whatsapp;
-  var msg = encodeURIComponent('שלום, הגעתי מאתר שורשים ואשמח לפרטים בדיסקרטיות');
+  var data = {
+    phone:    cfg.phone,
+    whatsapp: cfg.whatsapp,
+    email:    cfg.email,
+    stats: {
+      families:     cfg.stats.families,
+      workshops:    cfg.stats.workshops,
+      facilitators: cfg.stats.facilitators,
+      cities:       cfg.stats.cities
+    }
+  };
   return '/* שורשים — config.js  (edit via /admin/) */\n' +
-    'var SHORESHIM = {\n' +
-    '  phone:    "' + cfg.phone    + '",\n' +
-    '  whatsapp: "' + wa           + '",\n' +
-    '  email:    "' + cfg.email    + '",\n' +
-    '  stats: {\n' +
-    '    families:    ' + cfg.stats.families     + ',\n' +
-    '    workshops:   ' + cfg.stats.workshops    + ',\n' +
-    '    facilitators:' + cfg.stats.facilitators + ',\n' +
-    '    cities:      ' + cfg.stats.cities       + '\n' +
-    '  }\n' +
-    '};\n\n' +
+    'var SHORESHIM = ' + JSON.stringify(data, null, 2) + ';\n\n' +
     "(function (cfg) {\n" +
     "  var p = document.getElementById('cfg-phone');\n" +
     "  if (p) p.textContent = cfg.phone;\n\n" +
