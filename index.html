@@ -913,6 +913,9 @@ window.addEventListener('message', function(e) {
     if (d.act === 'hero-thumb') {
       var el = document.querySelector('.hero-video-thumbnail');
       if (el) el.innerHTML = imgHtml;
+    } else if (d.act === 'about-vid') {
+      var el = document.getElementById(d.id || 'mission-visual');
+      if (el) { el.innerHTML = imgHtml; }
     } else if (d.act === 'set-img') {
       var el = document.getElementById(d.id);
       if (el) { el.innerHTML = imgHtml; }
