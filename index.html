@@ -838,6 +838,15 @@ window.addEventListener('message', function(e) {
   } else if (d.type === 'update-text') {
     var el = document.getElementById(d.id);
     if (el) el.textContent = d.value;
+  } else if (d.type === 'set-img') {
+    var imgHtml = d.url ? '<img src="'+d.url.replace(/"/g,'%22')+'" alt="" style="width:100%;height:'+(d.h||'200px')+';object-fit:cover;border-radius:inherit;display:block">' : '';
+    if (d.act === 'hero-thumb') {
+      var el = document.querySelector('.hero-video-thumbnail');
+      if (el) el.innerHTML = imgHtml;
+    } else if (d.act === 'set-img') {
+      var el = document.getElementById(d.id);
+      if (el) { el.innerHTML = imgHtml; el.classList.add('_admin-highlight'); setTimeout(function(){el.classList.remove('_admin-highlight');},2200); }
+    }
   }
 });
 </script>

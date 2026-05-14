@@ -61,6 +61,13 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
   display:flex;align-items:center;justify-content:center;gap:.5rem;transition:opacity .2s}
 .btn-save-form:hover{opacity:.85}
 .btn-save-form:disabled{opacity:.5;cursor:not-allowed}
+.btn-download{background:#fff;color:var(--navy);border:1.5px solid var(--border);border-radius:8px;
+  padding:.7rem .85rem;cursor:pointer;font-family:inherit;display:flex;align-items:center;
+  gap:.35rem;font-size:.82rem;font-weight:600;transition:background .15s;flex-shrink:0;white-space:nowrap}
+.btn-download:hover{background:#eef2fa}
+.download-hint{font-size:.74rem;color:#888;text-align:center;padding:.35rem 1rem .5rem;
+  border-top:1px solid var(--border);display:none}
+.download-hint a{color:var(--navy-mid);text-decoration:underline}
 
 /* ─── Split layout ─── */
 .admin-split{display:flex;flex:1;overflow:hidden;height:calc(100vh - 52px)}
@@ -709,10 +716,17 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
     </div>
 
       </main>
+      <div id="download-hint" class="download-hint">
+        לא ניתן לפרסם אוטומטית. הורידו את הקבצים ועלו אותם לשרת:
+      </div>
       <div class="form-save-bar">
         <button class="btn-save-form" id="save-btn" onclick="saveChanges()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg>
           שמירה ופרסום
+        </button>
+        <button class="btn-download" id="dl-btn" onclick="downloadAllFiles()" title="הורד את קבצי התוכן לשרת" style="display:none">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          הורד קבצים
         </button>
       </div>
       <div id="status-bar"></div>
@@ -842,6 +856,7 @@ async function handleFileChange(input, urlId, previewId) {
     if (!data.secure_url) throw new Error(data.error && data.error.message || 'שגיאה');
     set(urlId, data.secure_url);
     renderPreview(previewId, data.secure_url, urlId, isVideo);
+    sendLiveImage(urlId, data.secure_url);
     showStatus('הועלה בהצלחה ✓', 'success');
   } catch(e) {
     if (prevWrap) { prevWrap.innerHTML = ''; prevWrap.classList.remove('visible'); }
@@ -878,11 +893,27 @@ function clearMedia(previewId, urlId) {
   if (urlId) set(urlId, '');
 }
 
+var _liveImgMap = {
+  'cnt-hero-thumb-url':        {act:'hero-thumb'},
+  'cnt-about-img-url':         {act:'set-img', id:'mission-visual',    h:'340px'},
+  'cnt-about-video-thumb-url': {act:'set-img', id:'mission-visual',    h:'340px'},
+  'cnt-svc-workshops-url':     {act:'set-img', id:'svc-img-workshops', h:'260px'},
+  'cnt-svc-coaching-url':      {act:'set-img', id:'svc-img-coaching',  h:'260px'},
+  'cnt-svc-resilience-url':    {act:'set-img', id:'svc-img-resilience','h':'260px'}
+};
+
+function sendLiveImage(urlId, url) {
+  var m = _liveImgMap[urlId];
+  if (!m) return;
+  previewMsg({type:'set-img', act:m.act, id:m.id, h:m.h, url:url||''});
+}
+
 function urlFieldPreview(urlId, previewId) {
   var url = get(urlId);
-  if (!url) { clearMedia(previewId, null); return; }
+  if (!url) { clearMedia(previewId, null); sendLiveImage(urlId, ''); return; }
   var isVideo = /\.(mp4|webm|ogg|mov)$/i.test(url) || url.includes('/video/upload/');
   renderPreview(previewId, url, urlId, isVideo);
+  sendLiveImage(urlId, url);
 }
 
 function restorePreview(urlId, previewId) {
@@ -932,14 +963,21 @@ async function showAdmin() {
 
 async function loadConfig() {
   var base = 'https://raw.githubusercontent.com/'+REPO_OWNER+'/'+REPO_NAME+'/'+REPO_BRANCH+'/';
+  var cfgOk = false, cntOk = false;
   try {
     var r = await fetch(base + 'config.json?_=' + Date.now());
-    if (r.ok) { populateForm(await r.json()); }
-  } catch(e) { /* ignore */ }
+    if (r.ok) { populateForm(await r.json()); cfgOk = true; }
+  } catch(e) {}
+  if (!cfgOk) {
+    try { var d=localStorage.getItem('shoreshim_cfg_draft'); if(d) populateForm(JSON.parse(d)); } catch(e) {}
+  }
   try {
     var rc = await fetch(base + 'content.json?_=' + Date.now());
-    if (rc.ok) { populateContentForm(await rc.json()); }
-  } catch(e) { /* ignore */ }
+    if (rc.ok) { populateContentForm(await rc.json()); cntOk = true; }
+  } catch(e) {}
+  if (!cntOk) {
+    try { var d=localStorage.getItem('shoreshim_cnt_draft'); if(d) populateContentForm(JSON.parse(d)); } catch(e) {}
+  }
 }
 
 function populateForm(cfg) {
@@ -1246,14 +1284,8 @@ function getContentFromForm() {
 /* ══════════════════════════════════════
    Save
 ══════════════════════════════════════ */
-async function saveChanges() {
-  var pat = ADMIN_PAT;
-  if (!pat || pat === '%%ADMIN_PAT%%') { showStatus('שגיאת הגדרה — פנה למנהל הטכני', 'error'); return; }
-  var btn = document.getElementById('save-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:18px;height:18px"></div> שומר ומפרסם...';
-
-  var cfg = {
+function collectConfig() {
+  return {
     phone:        get('cfg-phone-in'),
     whatsapp:     get('cfg-wa-in').replace(/\D/g,''),
     email:        get('cfg-email-in'),
@@ -1265,16 +1297,38 @@ async function saveChanges() {
       cities:       parseInt(get('cfg-cities'),10)      || 0
     },
     statLabels: {
-      '1': get('cfg-stat-label-1'),
-      '2': get('cfg-stat-label-2'),
-      '3': get('cfg-stat-label-3'),
-      '4': get('cfg-stat-label-4')
+      '1': get('cfg-stat-label-1'), '2': get('cfg-stat-label-2'),
+      '3': get('cfg-stat-label-3'), '4': get('cfg-stat-label-4')
     },
     mataraUrl:  get('cfg-matara-in'),
     youtubeUrl: get('cfg-youtube-in'),
     statsUrl:   get('cfg-stats-url')
   };
+}
+
+var _SAVE_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg>';
+
+async function saveChanges() {
+  var btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:18px;height:18px"></div> שומר...';
+
+  var cfg = collectConfig();
   var cnt = getContentFromForm();
+
+  /* Always persist locally — works as draft even without GitHub */
+  try { localStorage.setItem('shoreshim_cfg_draft', makeConfigJson(cfg)); } catch(e) {}
+  try { localStorage.setItem('shoreshim_cnt_draft', makeContentJson(cnt)); } catch(e) {}
+
+  var pat = ADMIN_PAT;
+  if (!pat || pat === '%%ADMIN_PAT%%') {
+    /* No GitHub token injected — offer download */
+    showStatus('נשמר מקומית ✓ — לפרסום הורד את הקבצים ↓', 'success');
+    btn.disabled = false;
+    btn.innerHTML = _SAVE_SVG + ' שמירה ופרסום';
+    showDownloadOption(cfg, cnt);
+    return;
+  }
 
   try {
     var tasks = [
@@ -1284,20 +1338,48 @@ async function saveChanges() {
       commitFile('content.js',   makeContentJs(cnt),   pat)
     ];
     if (cfg.mataraUrl) {
-      tasks.push(
-        patchDonate(cfg.mataraUrl, pat).then(function(html){
-          if (html) return commitFile('donate.html', html, pat);
-        })
-      );
+      tasks.push(patchDonate(cfg.mataraUrl, pat).then(function(html){
+        if (html) return commitFile('donate.html', html, pat);
+      }));
     }
     await Promise.all(tasks);
     showStatus('האתר עודכן ויפורסם תוך כ-2 דקות ✓', 'success');
+    document.getElementById('dl-btn').style.display = 'none';
+    document.getElementById('download-hint').style.display = 'none';
   } catch(e) {
     showStatus('שגיאה בשמירה: ' + e.message, 'error');
+    showDownloadOption(cfg, cnt);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg> שמירה ופרסום';
+    btn.innerHTML = _SAVE_SVG + ' שמירה ופרסום';
   }
+}
+
+function showDownloadOption(cfg, cnt) {
+  document.getElementById('dl-btn').style.display = '';
+  document.getElementById('download-hint').style.display = 'block';
+}
+
+function downloadAllFiles() {
+  var cfg = collectConfig();
+  var cnt = getContentFromForm();
+  var files = [
+    {name:'config.json',  text: makeConfigJson(cfg)},
+    {name:'config.js',    text: makeConfigJs(cfg)},
+    {name:'content.json', text: makeContentJson(cnt)},
+    {name:'content.js',   text: makeContentJs(cnt)}
+  ];
+  files.forEach(function(f, i) {
+    setTimeout(function() {
+      var blob = new Blob([f.text], {type:'text/plain;charset=utf-8'});
+      var url  = URL.createObjectURL(blob);
+      var a    = document.createElement('a');
+      a.href = url; a.download = f.name; a.style.display = 'none';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+    }, i * 250);
+  });
+  showStatus('מוריד 4 קבצים — העלה אותם לתיקייה הראשית של האתר ✓', 'success');
 }
 
 async function commitFile(path, content, pat) {
@@ -1491,15 +1573,10 @@ function previewMsg(data) {
 
 function jumpToSection(sectionId) {
   previewMsg({type: 'scroll-to', id: sectionId});
-  /* highlight + scroll in form panel */
+  /* highlight active card in form panel (no scrollIntoView — too disruptive) */
   document.querySelectorAll('.section-card').forEach(function(c){ c.classList.remove('active-section'); });
   var h = document.querySelector('.section-header[data-section="'+sectionId+'"]');
-  if (h) {
-    var card = h.closest('.section-card');
-    card.classList.add('active-section');
-    card.scrollIntoView({behavior: 'smooth', block: 'nearest'});
-  }
-  /* on mobile — switch to preview tab */
+  if (h) h.closest('.section-card').classList.add('active-section');
   if (window.innerWidth <= 900) switchTab('preview');
 }
 
@@ -1535,17 +1612,17 @@ function showStatus(msg, type) {
 /* ══════════════════════════════════════
    Boot
 ══════════════════════════════════════ */
-(function() {
-  /* Auto-jump preview when any field inside a section card gains focus */
-  document.addEventListener('focusin', function(e) {
-    var card = e.target.closest && e.target.closest('.section-card');
-    if (!card) return;
-    if (card.classList.contains('active-section')) return;
-    var header = card.querySelector('.section-header[data-section]');
-    if (!header) return;
-    jumpToSection(header.dataset.section);
-  });
-})();
+var _lastSection = null;
+document.addEventListener('focusin', function(e) {
+  var card = e.target.closest && e.target.closest('.section-card');
+  if (!card) return;
+  var header = card.querySelector('.section-header[data-section]');
+  if (!header) return;
+  var sid = header.dataset.section;
+  if (sid === _lastSection) return; /* same section — don't re-jump */
+  _lastSection = sid;
+  jumpToSection(sid);
+});
 
 (function() {
   if (sessionStorage.getItem('shoreshim_authed') === '1') { showAdmin(); return; }
