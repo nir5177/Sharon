@@ -347,6 +347,23 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
       </div>
     </div>
 
+    <!-- ── סרטון יוטיוב ── -->
+    <div class="section-card">
+      <div class="section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M10 9l6 3-6 3V9Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        סרטון יוטיוב (כרטיס Hero)
+      </div>
+      <div class="section-body">
+        <div class="field-row full">
+          <div class="admin-field">
+            <label for="cfg-youtube-in">קישור לסרטון ביוטיוב</label>
+            <input type="url" id="cfg-youtube-in" placeholder="https://www.youtube.com/watch?v=XXXXXXXXX" dir="ltr">
+            <span class="hint">הכרטיס בדף הבית יהפוך ללחיצה שפותחת את הסרטון בלשונית חדשה. השאירו ריק להסתרת כפתור ה-Play.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── קישור תרומות ── -->
     <div class="section-card">
       <div class="section-header">
@@ -522,7 +539,8 @@ function populateForm(cfg) {
   set('cfg-workshops',      cfg.stats ? cfg.stats.workshops    : '');
   set('cfg-facilitators',   cfg.stats ? cfg.stats.facilitators : '');
   set('cfg-cities',         cfg.stats ? cfg.stats.cities       : '');
-  set('cfg-matara-in',      cfg.mataraUrl || '');
+  set('cfg-matara-in',      cfg.mataraUrl  || '');
+  set('cfg-youtube-in',     cfg.youtubeUrl || '');
 }
 
 function populateContentForm(cnt) {
@@ -635,7 +653,8 @@ async function saveChanges() {
       facilitators: parseInt(get('cfg-facilitators'),10)|| 0,
       cities:       parseInt(get('cfg-cities'),10)      || 0
     },
-    mataraUrl: get('cfg-matara-in')
+    mataraUrl:  get('cfg-matara-in'),
+    youtubeUrl: get('cfg-youtube-in')
   };
   var cnt = getContentFromForm();
 
@@ -703,7 +722,7 @@ async function patchDonate(mataraUrl, pat) {
 function makeConfigJson(cfg) { return JSON.stringify(cfg, null, 2) + '\n'; }
 
 function makeConfigJs(cfg) {
-  var data = { phone:cfg.phone, whatsapp:cfg.whatsapp, email:cfg.email, formEndpoint:cfg.formEndpoint||'', stats:cfg.stats };
+  var data = { phone:cfg.phone, whatsapp:cfg.whatsapp, email:cfg.email, formEndpoint:cfg.formEndpoint||'', stats:cfg.stats, youtubeUrl:cfg.youtubeUrl||'' };
   return '/* שורשים — config.js  (edit via /admin/) */\n'+
     'var SHORESHIM = '+JSON.stringify(data, null, 2)+';\n\n'+
     "(function (cfg) {\n"+
@@ -720,7 +739,17 @@ function makeConfigJs(cfg) {
     "  document.querySelectorAll('a[href^=\"https://wa.me/\"]').forEach(function (a) {\n"+
     "    var hasText = a.getAttribute('href').indexOf('?text=') !== -1;\n"+
     "    a.href = 'https://wa.me/' + cfg.whatsapp + (hasText ? '?text=' + waMsg : '');\n"+
-    "  });\n"+
+    "  });\n\n"+
+    "  var ytLink = document.getElementById('hero-video-link');\n"+
+    "  if (ytLink) {\n"+
+    "    if (cfg.youtubeUrl) {\n"+
+    "      ytLink.href = cfg.youtubeUrl;\n"+
+    "      ytLink.style.display = '';\n"+
+    "    } else {\n"+
+    "      ytLink.style.pointerEvents = 'none';\n"+
+    "      ytLink.removeAttribute('href');\n"+
+    "    }\n"+
+    "  }\n"+
     "}(SHORESHIM));\n";
 }
 
