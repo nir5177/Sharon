@@ -394,6 +394,25 @@ function liveText(previewId, val){
   scheduleAS();
 }
 
+function ytId(url){
+  if(!url) return null;
+  var m=url.match(/(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/)([A-Za-z0-9_-]{11})/);
+  return m?m[1]:null;
+}
+
+function onYoutubeInput(url, imgKey){
+  scheduleAS();
+  var id=ytId(url);
+  if(!id) return;
+  var existing=gv('img-url-'+imgKey);
+  /* auto-set only when field is empty or was previously auto-set from youtube */
+  if(existing && existing.indexOf('img.youtube.com')===-1) return;
+  var thumb='https://img.youtube.com/vi/'+id+'/hqdefault.jpg';
+  setImgW(imgKey, thumb);
+  sv('img-url-'+imgKey, thumb);
+  sendImgToPreview(imgKey, thumb);
+}
+
 function reloadIframe(){
   var f=g('iframe');
   if(f) f.src=f.src.split('?')[0]+'?_='+Date.now();
@@ -623,9 +642,15 @@ function populateData(cfg, cnt){
     sv('cnt-hs', cnt['hero.subtitle']);
     sv('cnt-ab', cnt['about.body']);
     sv('cnt-avurl', cnt['about.videoUrl']);
-    setImgW('hero-thumb',    cnt['hero.thumbUrl']||'');
+    /* hero thumb: use stored URL, or auto-generate from YouTube */
+    var heroThumb = cnt['hero.thumbUrl'] ||
+      (ytId(cnt['hero.youtubeUrl']||'') ? 'https://img.youtube.com/vi/'+ytId(cnt['hero.youtubeUrl']||'')+'/hqdefault.jpg' : '');
+    setImgW('hero-thumb', heroThumb);
     setImgW('about-img',     cnt['about.imageUrl']||'');
-    setImgW('about-vid',     cnt['about.videoThumbUrl']||'');
+    /* about vid thumb: use stored URL, or auto-generate from YouTube */
+    var aboutVidThumb = cnt['about.videoThumbUrl'] ||
+      (ytId(cnt['about.videoUrl']||'') ? 'https://img.youtube.com/vi/'+ytId(cnt['about.videoUrl']||'')+'/hqdefault.jpg' : '');
+    setImgW('about-vid', aboutVidThumb);
     setImgW('svc-workshops', cnt['svc.workshops.imgUrl']||'');
     setImgW('svc-coaching',  cnt['svc.coaching.imgUrl']||'');
     setImgW('svc-resilience',cnt['svc.resilience.imgUrl']||'');
@@ -811,7 +836,9 @@ function makeContentJs(c){
   '  st("content-hero-subtitle",c["hero.subtitle"]);\n'+
   '  st("content-mission-body",c["about.body"]);\n'+
   '  var ht=document.querySelector(".hero-video-thumbnail");\n'+
-  '  if(ht&&c["hero.thumbUrl"])ht.innerHTML=\'<img src="\'+c["hero.thumbUrl"].replace(/"/g,\'%22\')+\'" alt="" style="width:100%;height:200px;object-fit:cover">\';\n'+
+  '  var _ytId=function(u){if(!u)return null;var m=u.match(/(?:youtu\\.be\\/|[?&]v=|\\/embed\\/|\\/shorts\\/)([A-Za-z0-9_-]{11})/);return m?m[1]:null};\n'+
+  '  var heroThumb=c["hero.thumbUrl"]||(_ytId(c["hero.youtubeUrl"]||SHORESHIM.youtubeUrl||"")?"https://img.youtube.com/vi/"+_ytId(c["hero.youtubeUrl"]||SHORESHIM.youtubeUrl||"")+"/hqdefault.jpg":"");\n'+
+  '  if(ht&&heroThumb)ht.innerHTML=\'<img src="\'+heroThumb.replace(/"/g,\'%22\')+\'" alt="" style="width:100%;height:200px;object-fit:cover">\';\n'+
   '  si("mission-visual",c["about.imageUrl"],"340px");\n'+
   '  si("svc-img-workshops",c["svc.workshops.imgUrl"],"260px");\n'+
   '  si("svc-img-coaching",c["svc.coaching.imgUrl"],"260px");\n'+
@@ -928,9 +955,9 @@ function buildForms(){
     '<div class="f"><label>תת-כותרת</label>'+
       '<textarea id="cnt-hs" rows="3" placeholder="תיאור קצר תחת הכותרת..." oninput="liveText(\'content-hero-subtitle\',this.value)"></textarea></div>'+
     '<div class="f"><label>קישור יוטיוב לסרטון</label>'+
-      '<input type="url" id="cfg-youtube" dir="ltr" placeholder="https://youtu.be/...">'+
-      '<div class="hint">הכרטיס יהפוך ללחיץ עם קישור זה</div></div>'+
-    '<div class="f"><label>תמונת כרטיס הסרטון</label>'+imgw('hero-thumb')+'</div>'+
+      '<input type="url" id="cfg-youtube" dir="ltr" placeholder="https://youtu.be/..." oninput="onYoutubeInput(this.value,\'hero-thumb\')">'+
+      '<div class="hint">תמונת התצוגה תתמלא אוטומטית מיוטיוב</div></div>'+
+    '<div class="f"><label>תמונת כרטיס הסרטון (אוטומטי מיוטיוב / או העלו ידנית)</label>'+imgw('hero-thumb')+'</div>'+
   '</div>';
 
   /* ABOUT */
@@ -940,8 +967,8 @@ function buildForms(){
       '<textarea id="cnt-ab" rows="7" placeholder="תיאור הארגון, המשימה, הגישה..." oninput="liveText(\'content-mission-body\',this.value)"></textarea></div>'+
     '<div class="f"><label>תמונת הארגון / הצוות</label>'+imgw('about-img')+'</div>'+
     '<div class="f"><label>קישור יוטיוב — "אודות"</label>'+
-      '<input type="url" id="cnt-avurl" dir="ltr" placeholder="https://youtu.be/..."></div>'+
-    '<div class="f"><label>תמונת כרטיס הסרטון "אודות"</label>'+imgw('about-vid')+'</div>'+
+      '<input type="url" id="cnt-avurl" dir="ltr" placeholder="https://youtu.be/..." oninput="onYoutubeInput(this.value,\'about-vid\')"></div>'+
+    '<div class="f"><label>תמונת כרטיס הסרטון "אודות" (אוטומטי / ידני)</label>'+imgw('about-vid')+'</div>'+
   '</div>';
 
   /* SERVICES */
