@@ -41,29 +41,70 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
   border-radius:6px;padding:.3rem .7rem;font-size:.78rem;font-weight:600;margin-bottom:1rem;width:100%;text-align:center}
 
 /* ─── Admin layout ─── */
-#admin-screen{display:none}
-.admin-header{background:var(--navy-dark);color:#fff;padding:0 1.5rem;
-  display:flex;align-items:center;justify-content:space-between;height:56px;
-  position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.admin-header-title{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
+#admin-screen{display:none;flex-direction:column;height:100vh;overflow:hidden}
+.admin-header{background:var(--navy-dark);color:#fff;padding:0 1.25rem;
+  display:flex;align-items:center;justify-content:space-between;height:52px;flex-shrink:0;
+  position:relative;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.admin-header-title{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
 .admin-header-title svg{flex-shrink:0}
 .admin-actions{display:flex;gap:.5rem;align-items:center}
 .btn-save{background:var(--gold);color:var(--navy-dark);border:none;border-radius:6px;
-  padding:.45rem 1.1rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;
+  padding:.4rem 1rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
   transition:opacity .2s;display:flex;align-items:center;gap:.4rem}
 .btn-save:hover{opacity:.85}
 .btn-save:disabled{opacity:.5;cursor:not-allowed}
 .btn-logout{background:transparent;color:#aab;border:1px solid #445;border-radius:6px;
-  padding:.4rem .8rem;font-size:.82rem;cursor:pointer;font-family:inherit}
+  padding:.35rem .7rem;font-size:.8rem;cursor:pointer;font-family:inherit}
 .btn-logout:hover{background:#1a2840}
 
-.admin-body{max-width:800px;margin:0 auto;padding:1.5rem 1rem 4rem}
+/* ─── Split layout ─── */
+.admin-split{display:flex;flex:1;overflow:hidden;height:calc(100vh - 52px)}
+.admin-form-panel{width:420px;min-width:320px;flex-shrink:0;overflow-y:auto;
+  background:var(--cream);border-left:1px solid #dee4f0;
+  display:flex;flex-direction:column}
+.admin-preview-panel{flex:1;display:flex;flex-direction:column;background:#e8ecf2;
+  position:relative;overflow:hidden}
+.admin-preview-label{background:#2c3e5a;color:#9ba8bc;font-size:.72rem;font-weight:600;
+  padding:.3rem .75rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
+  letter-spacing:.04em;text-transform:uppercase}
+.preview-url{font-size:.68rem;color:#6a7a8e;direction:ltr}
+#site-preview{flex:1;border:none;width:100%;height:100%;
+  transform-origin:top right;background:#fff}
+.preview-loading{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:.75rem;background:#e8ecf2;
+  color:#7a8898;font-size:.85rem;pointer-events:none}
+.preview-loading.hidden{display:none}
+.preview-spinner{width:28px;height:28px;border:3px solid rgba(74,144,217,.2);
+  border-top-color:#4A90D9;border-radius:50%;animation:spin .7s linear infinite}
+
+/* Preview tabs (mobile) */
+.preview-tabs{display:none}
+@media(max-width:900px){
+  .admin-split{flex-direction:column}
+  .admin-form-panel{width:100%;height:100%;flex:1}
+  .admin-preview-panel{position:fixed;inset:52px 0 0 0;z-index:50;display:none}
+  .admin-preview-panel.show-mobile{display:flex}
+  .preview-tabs{display:flex;flex-shrink:0;border-bottom:2px solid #dee4f0;background:#fff}
+  .preview-tab{flex:1;padding:.65rem;font-size:.85rem;font-weight:600;border:none;
+    background:transparent;cursor:pointer;font-family:inherit;color:#888;transition:color .2s}
+  .preview-tab.active{color:var(--navy);border-bottom:2.5px solid var(--navy);margin-bottom:-2px}
+}
+
+.admin-body{padding:1.25rem 1rem 4rem}
 
 .section-card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06);
-  margin-bottom:1.25rem;overflow:hidden}
-.section-header{background:var(--navy);color:#fff;padding:.75rem 1.25rem;
-  font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
-.section-body{padding:1.25rem}
+  margin-bottom:1.1rem;overflow:hidden;transition:box-shadow .2s}
+.section-card.active-section{box-shadow:0 0 0 2.5px var(--gold),0 4px 16px rgba(0,0,0,.1)}
+.section-header{background:var(--navy);color:#fff;padding:.65rem 1.1rem;
+  font-size:.9rem;font-weight:700;display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;user-select:none;gap:.5rem}
+.section-header-left{display:flex;align-items:center;gap:.45rem}
+.section-jump{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:5px;
+  padding:.2rem .5rem;font-size:.7rem;cursor:pointer;font-family:inherit;white-space:nowrap;
+  display:flex;align-items:center;gap:.25rem;transition:background .15s}
+.section-jump:hover{background:rgba(255,255,255,.28)}
+.section-jump svg{flex-shrink:0}
+.section-body{padding:1.1rem}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
 .field-row.full{grid-template-columns:1fr}
 @media(max-width:520px){.field-row{grid-template-columns:1fr}}
@@ -220,47 +261,59 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 <div id="admin-screen">
   <header class="admin-header">
     <div class="admin-header-title">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7v10l10 5 10-5V7L12 2Z" stroke="#D4A853" stroke-width="1.8"/><path d="M12 22V12M2 7l10 5 10-5" stroke="#D4A853" stroke-width="1.8"/></svg>
-      ממשק ניהול — שורשים
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7v10l10 5 10-5V7L12 2Z" stroke="#D4A853" stroke-width="1.8"/><path d="M12 22V12M2 7l10 5 10-5" stroke="#D4A853" stroke-width="1.8"/></svg>
+      ניהול — שורשים
     </div>
     <div class="admin-actions">
-      <a href="https://nir5177.github.io/Sharon/" target="_blank" class="preview-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        צפייה באתר
-      </a>
       <button class="btn-save" id="save-btn" onclick="saveChanges()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg>
         שמירה ופרסום
       </button>
       <button class="btn-logout" onclick="doLogout()">יציאה</button>
     </div>
   </header>
 
-  <main class="admin-body">
+  <!-- Mobile tabs -->
+  <div class="preview-tabs">
+    <button class="preview-tab active" id="tab-form" onclick="switchTab('form')">✏️ עריכה</button>
+    <button class="preview-tab" id="tab-preview" onclick="switchTab('preview')">👁️ תצוגה מקדימה</button>
+  </div>
+
+  <div class="admin-split">
+
+    <!-- ── FORM PANEL (right) ── -->
+    <div class="admin-form-panel" id="form-panel">
+      <main class="admin-body">
 
     <!-- ── תוכן עמוד הבית ── -->
     <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        תוכן הירו — כותרת וסרטון
+      <div class="section-header" data-section="hero" onclick="jumpToSection('hero')">
+        <div class="section-header-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          תוכן הירו — כותרת וסרטון
+        </div>
+        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('hero')" title="הצג באתר">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
+          אתר
+        </button>
       </div>
       <div class="section-body">
         <div class="field-row full">
           <div class="admin-field">
             <label for="cnt-hero-title">כותרת ראשית</label>
-            <input type="text" id="cnt-hero-title" placeholder="העוצמה, הידע והכח">
+            <input type="text" id="cnt-hero-title" placeholder="העוצמה, הידע והכח" oninput="liveUpdate('content-hero-title',this.value)">
           </div>
         </div>
         <div class="field-row full">
           <div class="admin-field">
             <label for="cnt-hero-accent">כותרת משנה / accent</label>
-            <input type="text" id="cnt-hero-accent" placeholder="להורים המתמודדים">
+            <input type="text" id="cnt-hero-accent" placeholder="להורים המתמודדים" oninput="liveUpdate('content-hero-accent',this.value)">
           </div>
         </div>
         <div class="field-row full">
           <div class="admin-field">
             <label for="cnt-hero-subtitle">תיאור קצר</label>
-            <textarea id="cnt-hero-subtitle" rows="3" placeholder="המקום בו תמצאו..."></textarea>
+            <textarea id="cnt-hero-subtitle" rows="3" placeholder="המקום בו תמצאו..." oninput="liveUpdate('content-hero-subtitle',this.value)"></textarea>
           </div>
         </div>
 
@@ -303,15 +356,21 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 
     <!-- ── אודות ומשימה ── -->
     <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        אודות ומשימה
+      <div class="section-header" data-section="about" onclick="jumpToSection('about')">
+        <div class="section-header-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          אודות ומשימה
+        </div>
+        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('about')" title="הצג באתר">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
+          אתר
+        </button>
       </div>
       <div class="section-body">
         <div class="field-row full">
           <div class="admin-field">
             <label for="cnt-about-body">גוף הטקסט</label>
-            <textarea id="cnt-about-body" rows="4" placeholder="ארגון שורשים..."></textarea>
+            <textarea id="cnt-about-body" rows="4" placeholder="ארגון שורשים..." oninput="liveUpdate('content-mission-body',this.value)"></textarea>
           </div>
         </div>
         <hr style="border:none;border-top:1px solid var(--border);margin:1rem 0">
@@ -372,9 +431,15 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 
     <!-- ── תמונות שירותים ── -->
     <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7v10l10 5 10-5V7L12 2Z" stroke="currentColor" stroke-width="1.8"/><path d="M12 22V12M2 7l10 5 10-5" stroke="currentColor" stroke-width="1.8"/></svg>
-        תמונות לאזור השירותים (3 לשוניות)
+      <div class="section-header" data-section="services" onclick="jumpToSection('services')">
+        <div class="section-header-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7v10l10 5 10-5V7L12 2Z" stroke="currentColor" stroke-width="1.8"/><path d="M12 22V12M2 7l10 5 10-5" stroke="currentColor" stroke-width="1.8"/></svg>
+          תמונות לאזור השירותים (3 לשוניות)
+        </div>
+        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('services')" title="הצג באתר">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
+          אתר
+        </button>
       </div>
       <div class="section-body">
         <div class="media-grid-3">
@@ -441,9 +506,15 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 
     <!-- ── ניהול אנשי צוות ── -->
     <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.87" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        אנשי הצוות (תמונה + פרטים)
+      <div class="section-header" data-section="team" onclick="jumpToSection('team')">
+        <div class="section-header-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.87" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          אנשי הצוות (תמונה + פרטים)
+        </div>
+        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('team')" title="הצג באתר">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
+          אתר
+        </button>
       </div>
       <div class="section-body">
         <div id="team-editor"></div>
@@ -453,9 +524,15 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 
     <!-- ── כנסים ואירועים ── -->
     <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        כנסים ואירועים — גלריית פוסטרים
+      <div class="section-header" data-section="events-section" onclick="jumpToSection('events-section')">
+        <div class="section-header-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          כנסים ואירועים — גלריית פוסטרים
+        </div>
+        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('events-section')" title="הצג באתר">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
+          אתר
+        </button>
       </div>
       <div class="section-body">
         <p style="font-size:.8rem;color:#666;margin-bottom:.9rem">כל תמונה שתעלו תופיע כפוסטר בקרוסלת האירועים באתר. ניתן להוסיף כותרת וקישור לכל פוסטר.</p>
@@ -466,9 +543,15 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 
     <!-- ── עדויות הורים ── -->
     <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        עדויות הורים
+      <div class="section-header" data-section="testimonials" onclick="jumpToSection('testimonials')">
+        <div class="section-header-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          עדויות הורים
+        </div>
+        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('testimonials')" title="הצג באתר">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
+          אתר
+        </button>
       </div>
       <div class="section-body">
         <div id="testimonials-editor"></div>
@@ -478,9 +561,15 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 
     <!-- ── פרטי התקשרות ── -->
     <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2C7.16 21 3 16.84 3 6a2 2 0 012-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        פרטי התקשרות
+      <div class="section-header" data-section="contact" onclick="jumpToSection('contact')">
+        <div class="section-header-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2C7.16 21 3 16.84 3 6a2 2 0 012-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          פרטי התקשרות
+        </div>
+        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('contact')" title="הצג באתר">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
+          אתר
+        </button>
       </div>
       <div class="section-body">
         <div class="field-row">
@@ -505,9 +594,15 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 
     <!-- ── נתוני פעילות ── -->
     <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        נתוני פעילות — המספרים הגדולים
+      <div class="section-header" data-section="stats" onclick="jumpToSection('stats')">
+        <div class="section-header-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          נתוני פעילות — המספרים הגדולים
+        </div>
+        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('stats')" title="הצג באתר">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
+          אתר
+        </button>
       </div>
       <div class="section-body">
         <p style="font-size:.79rem;color:#666;margin-bottom:.75rem">ערכו ידנית — <strong>או</strong> הזינו URL ל-JSON שמתעדכן אוטומטית (לדוג׳ Google Sheets JSON, Airtable API):</p>
@@ -545,9 +640,15 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 
     <!-- ── טופס יצירת קשר ── -->
     <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z" stroke="currentColor" stroke-width="1.8"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.8"/></svg>
-        טופס יצירת קשר — קבלת פניות במייל
+      <div class="section-header" data-section="contact" onclick="jumpToSection('contact')">
+        <div class="section-header-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z" stroke="currentColor" stroke-width="1.8"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.8"/></svg>
+          טופס יצירת קשר — קבלת פניות במייל
+        </div>
+        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('contact')" title="הצג באתר">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
+          אתר
+        </button>
       </div>
       <div class="section-body">
         <div class="field-row full">
@@ -605,8 +706,28 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
       </div>
     </div>
 
-  </main>
-</div>
+      </main>
+    </div><!-- /form-panel -->
+
+    <!-- ── PREVIEW PANEL (left) ── -->
+    <div class="admin-preview-panel" id="preview-panel">
+      <div class="admin-preview-label">
+        <span>תצוגה מקדימה — כפי שנראה באתר</span>
+        <span class="preview-url">nir5177.github.io/Sharon/</span>
+      </div>
+      <div class="preview-loading" id="preview-loading">
+        <div class="preview-spinner"></div>
+        <span>טוען תצוגה מקדימה...</span>
+      </div>
+      <iframe id="site-preview"
+        src="https://nir5177.github.io/Sharon/"
+        title="תצוגה מקדימה"
+        onload="onPreviewLoaded()">
+      </iframe>
+    </div><!-- /preview-panel -->
+
+  </div><!-- /admin-split -->
+</div><!-- /admin-screen -->
 
 <!-- Status bar -->
 <div id="status-bar"></div>
@@ -798,7 +919,7 @@ function showInlineMsg(el, msg, ok) {
 ══════════════════════════════════════ */
 async function showAdmin() {
   document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('admin-screen').style.display = 'block';
+  document.getElementById('admin-screen').style.display = 'flex';
   await loadConfig();
 }
 
@@ -1345,6 +1466,46 @@ function makeContentJs(cnt) {
     "  }\n"+
     "\n"+
     "}(SHORESHIM_CONTENT));\n";
+}
+
+/* ══════════════════════════════════════
+   Split-screen preview
+══════════════════════════════════════ */
+function onPreviewLoaded() {
+  var loading = document.getElementById('preview-loading');
+  if (loading) loading.classList.add('hidden');
+}
+
+function previewMsg(data) {
+  var iframe = document.getElementById('site-preview');
+  if (!iframe || !iframe.contentWindow) return;
+  try { iframe.contentWindow.postMessage(data, 'https://nir5177.github.io'); } catch(e) {}
+}
+
+function jumpToSection(sectionId) {
+  previewMsg({type: 'scroll-to', id: sectionId});
+  document.querySelectorAll('.section-card').forEach(function(c){ c.classList.remove('active-section'); });
+  var h = document.querySelector('.section-header[data-section="'+sectionId+'"]');
+  if (h) h.closest('.section-card').classList.add('active-section');
+  /* on mobile — switch to preview tab */
+  if (window.innerWidth <= 900) switchTab('preview');
+}
+
+function switchTab(tab) {
+  var previewPanel = document.getElementById('preview-panel');
+  var tabForm = document.getElementById('tab-form');
+  var tabPrev = document.getElementById('tab-preview');
+  if (tab === 'form') {
+    previewPanel.classList.remove('show-mobile');
+    tabForm.classList.add('active'); tabPrev.classList.remove('active');
+  } else {
+    previewPanel.classList.add('show-mobile');
+    tabPrev.classList.add('active'); tabForm.classList.remove('active');
+  }
+}
+
+function liveUpdate(domId, value) {
+  previewMsg({type: 'update-text', id: domId, value: value});
 }
 
 /* ══════════════════════════════════════

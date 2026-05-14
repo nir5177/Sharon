@@ -9,6 +9,17 @@
   <meta property="og:site_name" content="שורשים"/>
   <title>שורשים | העוצמה, הידע והכח להורים — מבית עמותת התקשרות</title>
   <link rel="stylesheet" href="style.css"/>
+  <style id="_admin-preview-style">
+    ._admin-highlight {
+      outline: 3px solid #D4A853 !important;
+      outline-offset: 6px;
+      animation: _admin-pulse 0.6s ease-in-out 3;
+    }
+    @keyframes _admin-pulse {
+      0%,100% { outline-color: #D4A853; }
+      50%      { outline-color: #E8934A; }
+    }
+  </style>
 </head>
 <body>
 
@@ -811,5 +822,24 @@
 <script src="content.js"></script>
 <script src="config.js"></script>
 <script src="script.js"></script>
+<script>
+/* Admin live-preview postMessage receiver */
+window.addEventListener('message', function(e) {
+  if (e.origin !== 'https://nir5177.github.io') return;
+  var d = e.data;
+  if (!d || !d.type) return;
+  if (d.type === 'scroll-to') {
+    var el = document.getElementById(d.id);
+    if (el) {
+      el.scrollIntoView({behavior: 'smooth', block: 'start'});
+      el.classList.add('_admin-highlight');
+      setTimeout(function() { el.classList.remove('_admin-highlight'); }, 2200);
+    }
+  } else if (d.type === 'update-text') {
+    var el = document.getElementById(d.id);
+    if (el) el.textContent = d.value;
+  }
+});
+</script>
 </body>
 </html>
