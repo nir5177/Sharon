@@ -1,5 +1,10 @@
 name: Deploy to GitHub Pages
 
+# Required secrets (set once in repo Settings → Secrets → Actions):
+#   ADMIN_PAT   — GitHub fine-grained token, contents:write on this repo
+#   CLD_CLOUD   — Cloudinary cloud name
+#   CLD_PRESET  — Cloudinary unsigned upload preset
+
 on:
   push:
     branches: [gh-pages]
@@ -25,6 +30,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: gh-pages
+
+      - name: Inject secrets into admin panel
+        env:
+          ADMIN_PAT:  ${{ secrets.ADMIN_PAT }}
+          CLD_CLOUD:  ${{ secrets.CLD_CLOUD }}
+          CLD_PRESET: ${{ secrets.CLD_PRESET }}
+        run: |
+          sed -i "s|%%ADMIN_PAT%%|${ADMIN_PAT}|g"   admin/index.html
+          sed -i "s|%%CLD_CLOUD%%|${CLD_CLOUD}|g"   admin/index.html
+          sed -i "s|%%CLD_PRESET%%|${CLD_PRESET}|g" admin/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
