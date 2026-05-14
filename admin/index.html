@@ -908,6 +908,57 @@ function sendLiveImage(urlId, url) {
   previewMsg({type:'set-img', act:m.act, id:m.id, h:m.h, url:url||''});
 }
 
+/* maps admin field IDs → preview element to highlight on focus */
+var _fieldHighlightMap = {
+  'cnt-hero-title':            {id:'content-hero-title'},
+  'cnt-hero-accent':           {id:'content-hero-accent'},
+  'cnt-hero-subtitle':         {id:'content-hero-subtitle'},
+  'cnt-hero-thumb-url':        {sel:'.hero-video-thumbnail'},
+  'cnt-about-body':            {id:'content-mission-body'},
+  'cnt-about-img-url':         {id:'mission-visual'},
+  'cnt-about-video-url':       {id:'mission-visual'},
+  'cnt-about-video-thumb-url': {id:'mission-visual'},
+  'cnt-svc-workshops-url':     {id:'svc-img-workshops'},
+  'cnt-svc-coaching-url':      {id:'svc-img-coaching'},
+  'cnt-svc-resilience-url':    {id:'svc-img-resilience'},
+  'cfg-phone-in':              {id:'cfg-phone'},
+  'cfg-email-in':              {id:'cfg-email'},
+  'cfg-wa-in':                 {id:'contact'},
+  'cfg-families':              {id:'cfg-stat-families'},
+  'cfg-workshops':             {id:'cfg-stat-workshops'},
+  'cfg-facilitators':          {id:'cfg-stat-facilitators'},
+  'cfg-cities':                {id:'cfg-stat-cities'},
+  'cfg-stat-label-1':          {id:'cfg-stat-families'},
+  'cfg-stat-label-2':          {id:'cfg-stat-workshops'},
+  'cfg-stat-label-3':          {id:'cfg-stat-facilitators'},
+  'cfg-stat-label-4':          {id:'cfg-stat-cities'}
+};
+/* section → container element for dynamic rows (team / events / testimonials) */
+var _sectionContainerMap = {
+  'team':           'team-carousel',
+  'events-section': 'events-track',
+  'testimonials':   'testimonials-slider'
+};
+
+function highlightPreviewField(fieldId, sectionId) {
+  var m = _fieldHighlightMap[fieldId];
+  if (m) {
+    previewMsg({type:'highlight-element', id: m.id || null, sel: m.sel || null});
+    return;
+  }
+  /* dynamic row fields: prefix match */
+  var dynPrefixes = {'cnt-quote-':1,'cnt-body-':1,'cnt-author-':1,'cnt-role-':1,'cnt-photo-':1,
+                     'team-name-':1,'team-role-':1,'team-bio-':1,'team-photo-url-':1,
+                     'ev-title-':1,'ev-link-':1,'ev-img-url-':1};
+  for (var pfx in dynPrefixes) {
+    if (fieldId.indexOf(pfx) === 0) {
+      var cid = _sectionContainerMap[sectionId];
+      if (cid) previewMsg({type:'highlight-element', id: cid});
+      return;
+    }
+  }
+}
+
 function urlFieldPreview(urlId, previewId) {
   var url = get(urlId);
   if (!url) { clearMedia(previewId, null); sendLiveImage(urlId, ''); return; }
@@ -1342,9 +1393,6 @@ async function saveChanges() {
       }));
     }
     await Promise.all(tasks);
-    /* Published successfully — clear local drafts so next load reads from GitHub */
-    try { localStorage.removeItem('shoreshim_cfg_draft'); } catch(e) {}
-    try { localStorage.removeItem('shoreshim_cnt_draft'); } catch(e) {}
     showStatus('האתר עודכן ויפורסם תוך כ-2 דקות ✓', 'success');
     document.getElementById('dl-btn').style.display = 'none';
     document.getElementById('download-hint').style.display = 'none';
@@ -1621,9 +1669,13 @@ document.addEventListener('focusin', function(e) {
   var header = card.querySelector('.section-header[data-section]');
   if (!header) return;
   var sid = header.dataset.section;
-  if (sid === _lastSection) return; /* same section — don't re-jump */
-  _lastSection = sid;
-  jumpToSection(sid);
+  /* section jump only when entering a new section */
+  if (sid !== _lastSection) {
+    _lastSection = sid;
+    jumpToSection(sid);
+  }
+  /* always highlight the specific element for the focused field */
+  if (e.target.id) highlightPreviewField(e.target.id, sid);
 });
 
 (function() {

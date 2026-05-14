@@ -830,11 +830,7 @@ window.addEventListener('message', function(e) {
   if (!d || !d.type) return;
   if (d.type === 'scroll-to') {
     var el = document.getElementById(d.id);
-    if (el) {
-      el.scrollIntoView({behavior: 'smooth', block: 'start'});
-      el.classList.add('_admin-highlight');
-      setTimeout(function() { el.classList.remove('_admin-highlight'); }, 2200);
-    }
+    if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
   } else if (d.type === 'update-text') {
     var el = document.getElementById(d.id);
     if (el) el.textContent = d.value;
@@ -846,6 +842,14 @@ window.addEventListener('message', function(e) {
     } else if (d.act === 'set-img') {
       var el = document.getElementById(d.id);
       if (el) { el.innerHTML = imgHtml; el.classList.add('_admin-highlight'); setTimeout(function(){el.classList.remove('_admin-highlight');},2200); }
+    }
+  } else if (d.type === 'highlight-element') {
+    var hl = d.sel ? document.querySelector(d.sel) : (d.id ? document.getElementById(d.id) : null);
+    if (hl) {
+      hl.classList.remove('_admin-highlight');
+      void hl.offsetWidth;
+      hl.classList.add('_admin-highlight');
+      setTimeout(function(){ hl.classList.remove('_admin-highlight'); }, 2200);
     }
   }
 });
