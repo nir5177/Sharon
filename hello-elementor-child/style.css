@@ -1,0 +1,281 @@
+/*
+Theme Name:  Hello Elementor Child
+Template:    hello-elementor
+Description: Child theme for Israeli nonprofit charity website — RTL Hebrew
+Text Domain: hello-elementor-child
+Version:     1.0.0
+*/
+
+/* ─── Brand tokens — replace before delivery ─── */
+:root {
+  --color-primary:   #REPLACE_COLOR_PRIMARY;
+  --color-secondary: #REPLACE_COLOR_SECONDARY;
+  --color-accent:    #REPLACE_COLOR_ACCENT;
+  --color-dark:      #1a1a2e;
+  --color-light:     #f8f9fa;
+  --color-text:      #333333;
+  --font-main:       'REPLACE_FONT', 'Heebo', sans-serif;
+  --border-radius:   8px;
+  --transition:      0.3s ease;
+}
+
+/* ─── Base ─── */
+body {
+  font-family: var(--font-main);
+  direction: rtl;
+  text-align: right;
+  color: var(--color-text);
+}
+
+/* ─── Typography ─── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-main);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* ─── Links ─── */
+a {
+  color: var(--color-primary);
+  transition: color var(--transition);
+}
+a:hover {
+  color: var(--color-secondary);
+}
+
+/* ─── Buttons ─── */
+.elementor-button.btn-primary,
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 14px 32px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color var(--transition), transform var(--transition);
+}
+.elementor-button.btn-primary:hover,
+.btn-primary:hover {
+  background-color: var(--color-secondary);
+  transform: translateY(-2px);
+}
+
+.elementor-button.btn-secondary,
+.btn-secondary {
+  background-color: transparent;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: var(--border-radius);
+  padding: 12px 30px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+}
+.elementor-button.btn-secondary:hover,
+.btn-secondary:hover {
+  background-color: #fff;
+  color: var(--color-primary);
+}
+
+/* ─── Header ─── */
+.site-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 999;
+  transition: background-color var(--transition), box-shadow var(--transition);
+}
+.site-header.transparent {
+  background-color: transparent;
+}
+.site-header.scrolled {
+  background-color: #fff;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* ─── Hero section ─── */
+.hero-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.hero-section .elementor-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Stats counter section ─── */
+.stats-section {
+  background-color: var(--color-primary);
+  color: #fff;
+  padding: 60px 0;
+}
+.stats-section .elementor-counter-number-wrapper {
+  font-size: 3rem;
+  font-weight: 700;
+}
+.stats-section .elementor-counter-title {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* ─── Service cards ─── */
+.service-card {
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.service-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+}
+
+/* ─── Gallery carousel ─── */
+.gallery-carousel .slick-arrow {
+  z-index: 10;
+}
+.gallery-carousel .slick-prev { right: auto; left: 10px; }
+.gallery-carousel .slick-next { left: auto; right: 10px; }
+
+/* ─── Contact form ─── */
+.wpcf7-form input,
+.wpcf7-form textarea,
+.wpcf7-form select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-family: var(--font-main);
+  font-size: 1rem;
+  direction: rtl;
+  text-align: right;
+  transition: border-color var(--transition);
+}
+.wpcf7-form input:focus,
+.wpcf7-form textarea:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+.wpcf7-form .wpcf7-submit {
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 14px 40px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color var(--transition);
+  width: 100%;
+}
+.wpcf7-form .wpcf7-submit:hover {
+  background-color: var(--color-secondary);
+}
+
+/* ─── Donation page — amount selector ─── */
+.donation-amounts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin: 32px 0;
+}
+.donation-amounts button {
+  min-width: 100px;
+  padding: 14px 20px;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius);
+  background: #fff;
+  color: var(--color-primary);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color var(--transition), color var(--transition);
+}
+.donation-amounts button.active,
+.donation-amounts button:hover {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+.donation-custom-input {
+  display: none;
+  margin-top: 12px;
+}
+.donation-custom-input.visible {
+  display: block;
+}
+.donation-custom-input input {
+  padding: 12px 16px;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius);
+  font-size: 1.1rem;
+  font-family: var(--font-main);
+  text-align: center;
+  width: 160px;
+}
+
+/* ─── Trust badges ─── */
+.trust-badges {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+  color: #666;
+  font-size: 0.9rem;
+}
+.trust-badges span::before {
+  content: '✓ ';
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* ─── Footer ─── */
+.site-footer {
+  background-color: var(--color-dark);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 60px 0 0;
+}
+.site-footer a {
+  color: rgba(255, 255, 255, 0.7);
+}
+.site-footer a:hover {
+  color: #fff;
+}
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px 0;
+  text-align: center;
+  font-size: 0.85rem;
+  margin-top: 40px;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .donation-amounts {
+    gap: 8px;
+  }
+  .donation-amounts button {
+    min-width: 80px;
+    padding: 10px 14px;
+    font-size: 1rem;
+  }
+  .trust-badges {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+}

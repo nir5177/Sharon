@@ -1,0 +1,125 @@
+/* RTL overrides — loaded only when WP locale is Hebrew */
+
+/* ─── Global direction ─── */
+body,
+input,
+textarea,
+select,
+button {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ─── Elementor nav menu ─── */
+.elementor-nav-menu {
+  flex-direction: row-reverse;
+}
+.elementor-nav-menu .sub-menu {
+  right: 0;
+  left: auto;
+}
+
+/* ─── Elementor columns — reverse on desktop so right col renders first ─── */
+.elementor-row {
+  flex-direction: row-reverse;
+}
+
+/* ─── Elementor icon-list — icon on right ─── */
+.elementor-icon-list-item {
+  flex-direction: row-reverse;
+}
+.elementor-icon-list-icon {
+  margin-right: 0;
+  margin-left: 10px;
+}
+
+/* ─── WP blocks ─── */
+.wp-block,
+.wp-block-group,
+.entry-content {
+  text-align: right;
+}
+
+/* ─── WordPress admin bar ─── */
+#wpadminbar {
+  direction: rtl;
+}
+
+/* ─── Comment form ─── */
+.comment-form label {
+  float: right;
+  clear: right;
+}
+.comment-form input,
+.comment-form textarea {
+  float: right;
+  direction: rtl;
+}
+
+/* ─── Navigation arrows — flip for RTL ─── */
+.elementor-carousel .swiper-button-prev,
+.elementor-carousel .slick-prev {
+  right: 10px;
+  left: auto;
+  transform: scaleX(-1);
+}
+.elementor-carousel .swiper-button-next,
+.elementor-carousel .slick-next {
+  left: 10px;
+  right: auto;
+  transform: scaleX(-1);
+}
+
+/* ─── Elementor testimonial ─── */
+.elementor-testimonial-content {
+  text-align: right;
+}
+.elementor-testimonial-details {
+  flex-direction: row-reverse;
+}
+
+/* ─── Donation amounts (RTL layout) ─── */
+.donation-amounts {
+  direction: rtl;
+}
+
+/* ─── Contact Form 7 ─── */
+.wpcf7-form p {
+  text-align: right;
+}
+.wpcf7-list-item {
+  margin: 0 0 0 1em;
+}
+.wpcf7-list-item-label::before {
+  content: none;
+}
+
+/* ─── Footer columns — RTL order ─── */
+.site-footer .elementor-row {
+  flex-direction: row-reverse;
+}
+
+/* ─── WordPress pagination ─── */
+.nav-links {
+  direction: rtl;
+}
+.nav-links .prev::before {
+  content: '→ ';
+}
+.nav-links .next::after {
+  content: ' ←';
+}
+
+/* ─── Yoast breadcrumb ─── */
+.yoast-breadcrumb {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ─── Mobile hamburger — open from right ─── */
+@media (max-width: 768px) {
+  .elementor-nav-menu--dropdown {
+    right: 0;
+    left: auto;
+  }
+}
