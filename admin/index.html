@@ -126,6 +126,29 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
   color:#fff;font-size:.72rem;font-weight:800;display:inline-flex;
   align-items:center;justify-content:center;flex-shrink:0}
 
+/* Token banner */
+#token-banner{background:#fff8e6;border:1.5px solid #f0c040;border-radius:10px;
+  padding:1rem 1.25rem;margin-bottom:1.25rem;display:none}
+#token-banner.visible{display:block}
+.token-banner-title{font-size:.9rem;font-weight:700;color:#7a5c00;margin-bottom:.4rem;
+  display:flex;align-items:center;gap:.4rem}
+.token-banner-body{font-size:.82rem;color:#5a4200;line-height:1.65}
+.token-banner-body a{color:#1A4080;font-weight:600}
+.token-banner-body ol{margin:.5rem 0 .5rem 0;padding-right:1.2rem}
+.token-banner-body ol li{margin-bottom:.25rem}
+.token-input-row{display:flex;gap:.5rem;margin-top:.75rem;align-items:center;flex-wrap:wrap}
+.token-input-row input{flex:1;min-width:200px;padding:.55rem .75rem;border:1.5px solid #d4a800;
+  border-radius:7px;font-size:.85rem;font-family:inherit;outline:none;direction:ltr;
+  background:#fffdf0;color:#333}
+.token-input-row input:focus{border-color:#a07000;box-shadow:0 0 0 3px rgba(212,168,0,.15)}
+.btn-token-save{background:#a07000;color:#fff;border:none;border-radius:7px;
+  padding:.55rem 1rem;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit;
+  white-space:nowrap}
+.btn-token-save:hover{background:#7a5800}
+#token-ok-badge{display:none;align-items:center;gap:.4rem;font-size:.82rem;
+  font-weight:600;color:var(--green);margin-top:.5rem}
+#token-ok-badge.visible{display:flex}
+
 /* Status bar */
 #status-bar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
   background:var(--navy-dark);color:#fff;padding:.7rem 1.4rem;border-radius:30px;
@@ -213,6 +236,32 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
   </header>
 
   <main class="admin-body">
+
+    <!-- ── Token Banner ── -->
+    <div id="token-banner">
+      <div class="token-banner-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0Z" stroke="#a07000" stroke-width="1.8"/><line x1="12" y1="9" x2="12" y2="13" stroke="#a07000" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="#a07000" stroke-width="2" stroke-linecap="round"/></svg>
+        נדרש GitHub Token לשמירה
+      </div>
+      <div class="token-banner-body">
+        על מנת לשמור שינויים ולפרסם באתר, יש להזין Token גישה חד-פעמי:
+        <ol>
+          <li>היכנסו ל-<a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener">github.com/settings/tokens/new</a></li>
+          <li>בחרו <strong>Classic token</strong> → הגדירו שם (לדוג׳ "shoreshim-admin")</li>
+          <li>תחת <strong>Scopes</strong> — סמנו <strong>repo</strong> בלבד</li>
+          <li>לחצו <strong>Generate token</strong> והעתיקו את הטוקן</li>
+          <li>הדביקו כאן:</li>
+        </ol>
+        <div class="token-input-row">
+          <input type="password" id="pat-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" dir="ltr" autocomplete="off">
+          <button class="btn-token-save" onclick="savePat()">שמור Token</button>
+        </div>
+        <div id="token-ok-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Token שמור — אפשר לשמור שינויים
+        </div>
+      </div>
+    </div>
 
     <!-- ── תוכן עמוד הבית ── -->
     <div class="section-card">
@@ -389,6 +438,17 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
       </div>
       <div class="section-body">
 
+        <!-- GitHub Token -->
+        <div class="account-row">
+          <div class="account-row-label">GitHub Token (נדרש לשמירה)</div>
+          <div class="inline-form">
+            <input type="password" id="pat-input-acct" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" dir="ltr" autocomplete="off" style="flex:1;min-width:200px">
+            <button class="btn-action" onclick="savePatFromAcct()">שמור</button>
+            <button class="btn-action danger" onclick="clearPat()">מחק</button>
+          </div>
+          <p id="pat-status-msg" class="inline-msg"></p>
+        </div>
+
         <!-- Change password -->
         <div class="account-row">
           <div class="account-row-label">שינוי סיסמה</div>
@@ -480,6 +540,48 @@ function doLogout() {
 }
 
 /* ══════════════════════════════════════
+   Token management
+══════════════════════════════════════ */
+function savePat() {
+  var val = document.getElementById('pat-input').value.trim();
+  if (!val || !val.startsWith('ghp_')) {
+    alert('הטוקן חייב להתחיל ב-ghp_ — נסו שוב');
+    return;
+  }
+  localStorage.setItem('shoreshim_pat', val);
+  document.getElementById('pat-input').value = '';
+  document.getElementById('token-ok-badge').classList.add('visible');
+  document.getElementById('token-banner').classList.remove('visible');
+  showStatus('Token נשמר — עכשיו ניתן לשמור שינויים ✓', 'success');
+}
+
+function savePatFromAcct() {
+  var val = document.getElementById('pat-input-acct').value.trim();
+  if (!val || !val.startsWith('ghp_')) {
+    return showInlineMsg(document.getElementById('pat-status-msg'), 'הטוקן חייב להתחיל ב-ghp_', false);
+  }
+  localStorage.setItem('shoreshim_pat', val);
+  document.getElementById('pat-input-acct').value = '';
+  checkTokenBanner();
+  showInlineMsg(document.getElementById('pat-status-msg'), 'Token נשמר ✓', true);
+}
+
+function clearPat() {
+  localStorage.removeItem('shoreshim_pat');
+  checkTokenBanner();
+  showInlineMsg(document.getElementById('pat-status-msg'), 'Token נמחק', true);
+}
+
+function checkTokenBanner() {
+  var hasPat = !!localStorage.getItem('shoreshim_pat');
+  var banner = document.getElementById('token-banner');
+  if (banner) {
+    if (!hasPat) banner.classList.add('visible');
+    else banner.classList.remove('visible');
+  }
+}
+
+/* ══════════════════════════════════════
    Account settings
 ══════════════════════════════════════ */
 async function changePassword() {
@@ -515,6 +617,7 @@ function showInlineMsg(el, msg, ok) {
 async function showAdmin() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('admin-screen').style.display = 'block';
+  checkTokenBanner();
   await loadConfig();
 }
 
