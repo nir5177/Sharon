@@ -2,793 +2,1105 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ממשק ניהול — שורשים</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
+<title>ממשק ניהול — שורשים</title>
 <style>
+/* ─── BASE ─── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
 :root{
-  --navy:#1B2A4A;--navy-mid:#2D4A7A;--navy-dark:#0F1B33;
-  --gold:#D4A853;--orange:#E8934A;--cream:#F8F5EE;
-  --green:#2d8a4e;--red:#c0392b;--border:#d0d7e3;
+  --navy:#1B2A4A;--navy2:#2D4A7A;--gold:#D4A853;
+  --green:#27704a;--red:#c0392b;
+  --bg:#EEF0F6;--card:#fff;--border:#D4D9E8;
+  --txt:#1B2A4A;--sub:#6B7A9A;--radius:10px;
 }
-body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
-  background:var(--cream);color:var(--navy-dark);direction:rtl;min-height:100vh}
+body{font-family:'Heebo','Assistant',Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:14px}
 
-/* ─── Login screen ─── */
-#login-screen{display:flex;align-items:center;justify-content:center;
-  min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%)}
-.login-card{background:#fff;border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:400px;
-  box-shadow:0 20px 60px rgba(0,0,0,.35)}
-.login-logo{text-align:center;margin-bottom:1.5rem}
-.login-logo svg{width:52px;height:52px}
-.login-title{text-align:center;font-size:1.4rem;font-weight:700;color:var(--navy);margin-bottom:.25rem}
-.login-sub{text-align:center;font-size:.85rem;color:#666;margin-bottom:1.75rem}
-.field-group{margin-bottom:1rem}
-.field-group label{display:block;font-size:.82rem;font-weight:600;color:var(--navy);margin-bottom:.35rem}
-.field-group input{width:100%;padding:.65rem .9rem;border:1.5px solid var(--border);
-  border-radius:8px;font-size:.95rem;font-family:inherit;outline:none}
-.field-group input:focus{border-color:var(--navy-mid)}
-.field-hint{font-size:.75rem;color:#888;margin-top:.4rem;line-height:1.5}
-.field-hint a{color:var(--navy-mid)}
-.login-btn{width:100%;padding:.8rem;background:var(--navy);color:#fff;border:none;
-  border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:.5rem;
-  font-family:inherit;transition:background .2s}
-.login-btn:hover{background:var(--navy-mid)}
-.login-error{background:#fdecea;color:var(--red);border-radius:6px;padding:.6rem .9rem;
-  font-size:.85rem;margin-bottom:.75rem;display:none}
-.setup-badge{display:inline-block;background:#fff8e6;color:#a07000;border:1px solid #f0d080;
-  border-radius:6px;padding:.3rem .7rem;font-size:.78rem;font-weight:600;margin-bottom:1rem;width:100%;text-align:center}
+/* ─── LOGIN ─── */
+#login-wrap{position:fixed;inset:0;background:linear-gradient(145deg,#0f1b33 0%,#1B2A4A 50%,#2D4A7A 100%);
+  display:flex;align-items:center;justify-content:center;z-index:999}
+.lcard{background:#fff;border-radius:20px;padding:2.5rem 2rem;width:340px;
+  box-shadow:0 32px 80px rgba(0,0,0,.5)}
+.lcard-logo{text-align:center;margin-bottom:1.25rem}
+.lcard-title{text-align:center;font-size:1.25rem;font-weight:700;color:var(--navy);margin-bottom:.3rem}
+.lcard-sub{text-align:center;font-size:.82rem;color:var(--sub);margin-bottom:1.5rem}
+.lf{margin-bottom:.9rem}
+.lf label{display:block;font-size:.78rem;font-weight:600;color:var(--sub);margin-bottom:.3rem}
+.lf input{width:100%;padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:8px;
+  font-size:.9rem;font-family:inherit;outline:none;transition:border .15s}
+.lf input:focus{border-color:var(--navy2)}
+.login-btn{width:100%;padding:.78rem;background:var(--navy);color:#fff;border:none;border-radius:8px;
+  font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.login-btn:hover{background:var(--navy2)}
+.lerr{background:#fdecea;color:var(--red);border-radius:6px;padding:.5rem .75rem;
+  font-size:.8rem;margin-bottom:.75rem;display:none}
 
-/* ─── Admin layout ─── */
-#admin-screen{display:none}
-.admin-header{background:var(--navy-dark);color:#fff;padding:0 1.5rem;
-  display:flex;align-items:center;justify-content:space-between;height:56px;
-  position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.admin-header-title{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
-.admin-header-title svg{flex-shrink:0}
-.admin-actions{display:flex;gap:.5rem;align-items:center}
-.btn-save{background:var(--gold);color:var(--navy-dark);border:none;border-radius:6px;
-  padding:.45rem 1.1rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;
-  transition:opacity .2s;display:flex;align-items:center;gap:.4rem}
-.btn-save:hover{opacity:.85}
-.btn-save:disabled{opacity:.5;cursor:not-allowed}
-.btn-logout{background:transparent;color:#aab;border:1px solid #445;border-radius:6px;
-  padding:.4rem .8rem;font-size:.82rem;cursor:pointer;font-family:inherit}
-.btn-logout:hover{background:#1a2840}
+/* ─── APP SHELL ─── */
+#app{display:none;flex-direction:column;height:100vh}
 
-.admin-body{max-width:800px;margin:0 auto;padding:1.5rem 1rem 4rem}
+/* ─── HEADER ─── */
+.hdr{height:48px;background:var(--navy);color:#fff;display:flex;align-items:center;
+  padding:0 1rem;gap:.6rem;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.hdr-brand{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:.4rem}
+.hdr-space{flex:1}
+.hdr-status{font-size:.72rem;display:flex;align-items:center;gap:.3rem;
+  color:rgba(255,255,255,.55);min-width:80px;justify-content:center}
+.hdr-status.saving{color:#ffd;animation:pulse .7s infinite alternate}
+.hdr-status.saved{color:rgba(140,255,160,.85)}
+@keyframes pulse{to{opacity:.4}}
+.hbtn{border:none;border-radius:6px;padding:.32rem .75rem;font-size:.78rem;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:opacity .15s;white-space:nowrap}
+.hbtn:hover{opacity:.82}
+.hbtn-pub{background:var(--gold);color:var(--navy)}
+.hbtn-pub:disabled{opacity:.5;cursor:not-allowed}
+.hbtn-out{background:rgba(255,255,255,.13);color:rgba(255,255,255,.85)}
 
-.section-card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06);
-  margin-bottom:1.25rem;overflow:hidden}
-.section-header{background:var(--navy);color:#fff;padding:.75rem 1.25rem;
-  font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
-.section-body{padding:1.25rem}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
-.field-row.full{grid-template-columns:1fr}
-@media(max-width:520px){.field-row{grid-template-columns:1fr}}
-.admin-field{display:flex;flex-direction:column;gap:.3rem}
-.admin-field label{font-size:.8rem;font-weight:600;color:#555}
-.admin-field input,.admin-field textarea{padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:7px;
-  font-size:.95rem;font-family:inherit;outline:none;direction:rtl}
-.admin-field input:focus,.admin-field textarea:focus{border-color:var(--navy-mid);box-shadow:0 0 0 3px rgba(45,74,122,.1)}
-.admin-field .hint{font-size:.73rem;color:#888;margin-top:.2rem}
-.admin-field textarea{resize:vertical;line-height:1.6}
-.admin-field input[dir=ltr]{direction:ltr}
+/* ─── SPLIT ─── */
+.split{display:flex;flex:1;overflow:hidden}
 
-/* Stats row */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
-@media(max-width:520px){.stats-grid{grid-template-columns:1fr 1fr}}
-.stat-field label{font-size:.78rem;font-weight:600;color:#555;margin-bottom:.25rem;display:block}
-.stat-field input{width:100%;padding:.5rem .6rem;border:1.5px solid var(--border);border-radius:7px;
-  font-size:1.1rem;font-weight:700;text-align:center;font-family:inherit;outline:none}
-.stat-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,83,.2)}
+/* ─── PREVIEW PANEL ─── */
+.panel-preview{flex:1;display:flex;flex-direction:column;background:#c5cad8;min-width:0;
+  border-left:1px solid #b0b8cc}
+.prev-bar{background:#283347;color:rgba(255,255,255,.55);font-size:.68rem;padding:.28rem .7rem;
+  display:flex;align-items:center;gap:.5rem;flex-shrink:0;user-select:none}
+.prev-bar-lbl{flex:1}
+.prev-reload{background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;
+  font-size:.72rem;font-family:inherit;padding:.1rem .25rem;border-radius:3px}
+.prev-reload:hover{color:#fff;background:rgba(255,255,255,.1)}
+#iframe{flex:1;border:none;width:100%;height:100%;background:#fff}
 
-/* Testimonial editor */
-.testimonial-editor-row{border:1.5px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:.75rem;
-  position:relative;background:#fafbfc}
-.testimonial-editor-row .t-num{font-size:.75rem;font-weight:700;color:var(--gold);margin-bottom:.6rem}
-.testimonial-editor-row .t-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
-@media(max-width:520px){.testimonial-editor-row .t-grid{grid-template-columns:1fr}}
-.testimonial-editor-row .t-full{grid-column:1/-1}
-.btn-remove{position:absolute;top:.6rem;left:.6rem;background:#fdecea;color:var(--red);border:none;
-  border-radius:5px;padding:.25rem .55rem;font-size:.78rem;cursor:pointer;font-family:inherit}
-.btn-remove:hover{background:var(--red);color:#fff}
-.btn-add-testimonial{background:var(--navy);color:#fff;border:none;border-radius:7px;
-  padding:.55rem 1.2rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
-  margin-top:.25rem;transition:background .2s}
-.btn-add-testimonial:hover{background:var(--navy-mid)}
+/* ─── EDIT PANEL ─── */
+.panel-edit{width:420px;min-width:300px;flex-shrink:0;display:flex;flex-direction:column;
+  background:var(--bg);overflow:hidden}
 
-/* Account settings */
-.btn-action{background:var(--navy);color:#fff;border:none;border-radius:7px;
-  padding:.5rem 1.1rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
-  transition:background .2s}
-.btn-action:hover{background:var(--navy-mid)}
-.btn-action.danger{background:var(--red)}
-.btn-action.danger:hover{opacity:.85}
-.inline-form{display:flex;gap:.6rem;align-items:flex-end;flex-wrap:wrap}
-.inline-form input{flex:1;min-width:160px;padding:.55rem .75rem;border:1.5px solid var(--border);
-  border-radius:7px;font-size:.9rem;font-family:inherit;outline:none}
-.inline-form input:focus{border-color:var(--navy-mid)}
-.inline-msg{font-size:.82rem;margin-top:.5rem;display:none}
-.inline-msg.ok{color:var(--green)}
-.inline-msg.err{color:var(--red)}
-.account-row{margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #eee}
-.account-row:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
-.account-row-label{font-size:.82rem;font-weight:600;color:#444;margin-bottom:.5rem}
+/* ─── SECTION TABS ─── */
+.sec-tabs{display:flex;overflow-x:auto;flex-shrink:0;background:var(--card);
+  border-bottom:2px solid var(--border);scrollbar-width:none}
+.sec-tabs::-webkit-scrollbar{display:none}
+.stab{flex-shrink:0;padding:.58rem .78rem;border:none;background:none;cursor:pointer;
+  font-size:.75rem;font-weight:600;color:var(--sub);font-family:inherit;
+  border-bottom:2.5px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color .15s}
+.stab:hover{color:var(--navy)}
+.stab.on{color:var(--navy);border-bottom-color:var(--navy)}
 
-/* Setup steps */
-.setup-step{margin-bottom:1.1rem;padding:.9rem 1rem;background:#f8f7f4;
-  border-radius:9px;border:1.5px solid #e4ddd4}
-.setup-step-label{font-size:.82rem;font-weight:700;color:var(--navy);
-  margin-bottom:.65rem;display:flex;align-items:center;gap:.4rem}
-.setup-step-num{width:20px;height:20px;border-radius:50%;background:var(--navy);
-  color:#fff;font-size:.72rem;font-weight:800;display:inline-flex;
-  align-items:center;justify-content:center;flex-shrink:0}
+/* ─── FORMS ─── */
+.forms{flex:1;overflow-y:auto;padding:.9rem}
+.sf{display:none}.sf.on{display:block}
+.sf-title{font-size:.72rem;font-weight:700;color:var(--sub);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:.8rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
 
-/* Status bar */
-#status-bar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
-  background:var(--navy-dark);color:#fff;padding:.7rem 1.4rem;border-radius:30px;
-  font-size:.88rem;font-weight:600;display:none;align-items:center;gap:.5rem;
-  box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:200}
-#status-bar.visible{display:flex}
-#status-bar.success{background:var(--green)}
-#status-bar.error{background:var(--red)}
+/* Fields */
+.f{margin-bottom:.9rem}
+.f>label{display:block;font-size:.77rem;font-weight:600;color:var(--sub);margin-bottom:.28rem}
+.f input[type=text],.f input[type=url],.f input[type=tel],.f input[type=email],.f input[type=number],.f textarea,.f select{
+  width:100%;padding:.58rem .75rem;border:1.5px solid var(--border);border-radius:8px;
+  font-size:.85rem;font-family:inherit;outline:none;background:#fff;color:var(--txt);
+  transition:border .15s}
+.f input:focus,.f textarea:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(45,74,122,.09)}
+.f textarea{resize:vertical;min-height:76px;line-height:1.6}
+.f .hint{font-size:.7rem;color:var(--sub);margin-top:.22rem}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
 
-/* Spinner */
-.spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);
-  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* ─── IMAGE WIDGET ─── */
+.imgw{border:2px dashed var(--border);border-radius:10px;background:#fff;
+  overflow:hidden;transition:border-color .15s}
+.imgw:hover{border-color:var(--navy2)}
+.imgw-prev{display:none;position:relative;background:#111}
+.imgw-prev.on{display:block}
+.imgw-prev img{width:100%;max-height:150px;object-fit:cover;display:block}
+.imgw-clear{position:absolute;top:.3rem;left:.3rem;background:rgba(0,0,0,.65);color:#fff;
+  border:none;border-radius:4px;padding:.18rem .4rem;font-size:.68rem;cursor:pointer;font-family:inherit}
+.imgw-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:.3rem;padding:1rem .75rem;cursor:pointer;text-align:center;transition:background .15s}
+.imgw-drop:hover,.imgw-drop.drag{background:#edf2ff}
+.imgw-icon{font-size:1.6rem;line-height:1}
+.imgw-txt{font-size:.77rem;font-weight:600;color:var(--sub)}
+.imgw-sub{font-size:.67rem;color:#aab}
+.imgw-url{display:flex;align-items:center;gap:.35rem;padding:.35rem .55rem;
+  border-top:1.5px solid var(--border);background:#f7f8fb}
+.imgw-url span{font-size:.65rem;color:#aab;flex-shrink:0;font-weight:600}
+.imgw-url input{flex:1;border:none;outline:none;font-size:.74rem;direction:ltr;
+  font-family:monospace;background:transparent;color:#555;min-width:0}
+.imgw-spinner{position:absolute;inset:0;background:rgba(255,255,255,.85);
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;color:var(--navy2)}
 
-.preview-link{display:inline-flex;align-items:center;gap:.4rem;
-  font-size:.82rem;color:var(--gold);text-decoration:none}
-.preview-link:hover{text-decoration:underline}
+/* ─── DYNAMIC LIST ─── */
+.di{border:1.5px solid var(--border);border-radius:9px;padding:.85rem;
+  margin-bottom:.65rem;background:#fff;position:relative}
+.di-num{font-size:.68rem;font-weight:700;color:var(--gold);margin-bottom:.55rem;text-transform:uppercase}
+.di-rm{position:absolute;top:.55rem;left:.55rem;background:#fdecea;color:var(--red);
+  border:none;border-radius:5px;padding:.18rem .45rem;font-size:.7rem;cursor:pointer;font-family:inherit}
+.di-rm:hover{background:var(--red);color:#fff}
+.btn-add{display:inline-flex;align-items:center;gap:.35rem;background:var(--navy);color:#fff;
+  border:none;border-radius:7px;padding:.48rem .95rem;font-size:.8rem;font-weight:700;
+  cursor:pointer;font-family:inherit;margin-top:.25rem;transition:background .15s}
+.btn-add:hover{background:var(--navy2)}
+
+/* Stats */
+.stats4{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.9rem}
+.stat-box{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:.55rem .7rem}
+.stat-box label{display:block;font-size:.7rem;font-weight:600;color:var(--sub);margin-bottom:.25rem}
+.stat-box input{width:100%;border:none;outline:none;font-size:1.15rem;font-weight:700;
+  text-align:center;color:var(--navy);font-family:inherit;background:transparent}
+
+/* ─── SAVE BAR ─── */
+.save-bar{flex-shrink:0;background:var(--card);border-top:1.5px solid var(--border);
+  padding:.65rem .9rem;display:flex;gap:.5rem;align-items:center}
+.save-btn{flex:1;background:var(--gold);color:var(--navy);border:none;border-radius:8px;
+  padding:.62rem 1rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:.35rem;transition:opacity .15s}
+.save-btn:hover{opacity:.85}
+.save-btn:disabled{opacity:.4;cursor:not-allowed}
+.dl-btn{background:#fff;color:var(--navy);border:1.5px solid var(--border);border-radius:8px;
+  padding:.62rem .85rem;font-size:.78rem;font-weight:600;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;gap:.3rem;transition:background .15s;white-space:nowrap}
+.dl-btn:hover{background:var(--bg)}
+
+/* ─── TOAST ─── */
+#toast{position:fixed;bottom:1.25rem;left:50%;transform:translateX(-50%);
+  background:var(--navy);color:#fff;padding:.65rem 1.5rem;border-radius:8px;
+  font-size:.84rem;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.28);
+  pointer-events:none;opacity:0;transition:opacity .22s;z-index:9999;
+  text-align:center;max-width:90vw;white-space:pre-line}
+#toast.on{opacity:1}
+#toast.ok{background:var(--green)}
+#toast.err{background:var(--red)}
+
+/* ─── SPINNER ─── */
+.spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
+  border-radius:50%;animation:rot .65s linear infinite;display:inline-block;flex-shrink:0}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* ─── MOBILE ─── */
+.mob-tabs{display:none}
+@media(max-width:800px){
+  .panel-preview{display:none}
+  .panel-edit{width:100%}
+  .mob-tabs{display:flex;flex-shrink:0;border-bottom:2px solid var(--border);background:var(--card)}
+  .mob-tab{flex:1;padding:.55rem;font-size:.82rem;font-weight:600;border:none;
+    background:none;cursor:pointer;font-family:inherit;color:var(--sub)}
+  .mob-tab.on{color:var(--navy);border-bottom:2.5px solid var(--navy);margin-bottom:-2px}
+  .panel-preview.mob-show{display:flex;position:fixed;inset:48px 0 0 0;z-index:50}
+}
 </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════
-     LOGIN
-════════════════════════════════ -->
-<div id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">
-      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- ═══════════ LOGIN ═══════════ -->
+<div id="login-wrap">
+  <div class="lcard">
+    <div class="lcard-logo">
+      <svg width="52" height="52" viewBox="0 0 60 60" fill="none">
         <circle cx="30" cy="30" r="30" fill="#1B2A4A"/>
         <path d="M30 48V28M30 28C30 20 22 14 14 18M30 28C30 20 38 14 46 18M30 28C30 22 26 18 22 20M30 28C30 22 34 18 38 20" stroke="#D4A853" stroke-width="2.2" stroke-linecap="round"/>
       </svg>
     </div>
-    <h1 class="login-title">ממשק ניהול — שורשים</h1>
-
-    <div id="login-error" class="login-error"></div>
-
-    <!-- ── First-time setup ── -->
-    <div id="setup-form" style="display:none">
-      <p class="login-sub">הגדרה ראשונה — שני שלבים בלבד</p>
-
-      <div class="setup-step">
-        <div class="setup-step-label">קבעו סיסמת כניסה לממשק</div>
-        <div class="field-group">
-          <input type="password" id="setup-pass" placeholder="סיסמה (לפחות 6 תווים)" autocomplete="new-password">
-        </div>
-        <div class="field-group" style="margin-bottom:0">
-          <input type="password" id="setup-pass2" placeholder="הזינו שוב לאישור" autocomplete="new-password">
-        </div>
-      </div>
-
-      <button class="login-btn" id="setup-btn" onclick="doSetup()">צור חשבון וכנס ←</button>
+    <h1 class="lcard-title">ממשק ניהול — שורשים</h1>
+    <p class="lcard-sub" id="l-sub">הזינו סיסמה להמשך</p>
+    <div class="lerr" id="l-err"></div>
+    <div class="lf"><label>סיסמה</label>
+      <input type="password" id="l-pass" placeholder="••••••" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-
-    <!-- ── Regular login ── -->
-    <div id="login-form" style="display:none">
-      <p class="login-sub">הזינו את סיסמת הניהול</p>
-      <div class="field-group">
-        <input type="password" id="login-pass" placeholder="סיסמה" autocomplete="current-password">
-      </div>
-      <button class="login-btn" id="login-btn" onclick="doLogin()">כניסה</button>
-    </div>
+    <button class="login-btn" onclick="doLogin()">כניסה ←</button>
   </div>
 </div>
 
-<!-- ════════════════════════════════
-     ADMIN
-════════════════════════════════ -->
-<div id="admin-screen">
-  <header class="admin-header">
-    <div class="admin-header-title">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7v10l10 5 10-5V7L12 2Z" stroke="#D4A853" stroke-width="1.8"/><path d="M12 22V12M2 7l10 5 10-5" stroke="#D4A853" stroke-width="1.8"/></svg>
-      ממשק ניהול — שורשים
+<!-- ═══════════ APP ═══════════ -->
+<div id="app">
+
+  <!-- Header -->
+  <header class="hdr">
+    <div class="hdr-brand">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L2 7v10l10 5 10-5V7L12 2Z" stroke="#D4A853" stroke-width="1.8"/>
+        <path d="M2 7l10 5 10-5M12 22V12" stroke="#D4A853" stroke-width="1.8"/>
+      </svg>
+      שורשים — ניהול
     </div>
-    <div class="admin-actions">
-      <a href="https://nir5177.github.io/Sharon/" target="_blank" class="preview-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        צפייה באתר
-      </a>
-      <button class="btn-save" id="save-btn" onclick="saveChanges()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg>
-        שמירה ופרסום
-      </button>
-      <button class="btn-logout" onclick="doLogout()">יציאה</button>
+    <div class="hdr-space"></div>
+    <div class="hdr-status" id="hdr-status">
+      <svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3.5" fill="currentColor"/></svg>
+      <span id="hdr-status-txt">מוכן</span>
     </div>
+    <button class="hbtn hbtn-pub" id="pub-btn" onclick="publish()">פרסם לאתר ↑</button>
+    <button class="hbtn hbtn-out" onclick="doLogout()">יציאה</button>
   </header>
 
-  <main class="admin-body">
+  <!-- Mobile tabs -->
+  <div class="mob-tabs">
+    <button class="mob-tab on" id="mob-edit-tab" onclick="mobSwitch('edit')">✏ עריכה</button>
+    <button class="mob-tab" id="mob-prev-tab" onclick="mobSwitch('preview')">👁 תצוגה</button>
+  </div>
 
-    <!-- ── תוכן עמוד הבית ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        תוכן עמוד הבית
+  <!-- Split -->
+  <div class="split">
+
+    <!-- PREVIEW -->
+    <div class="panel-preview" id="panel-preview">
+      <div class="prev-bar">
+        <span class="prev-bar-lbl">תצוגה מקדימה — האתר החי</span>
+        <button class="prev-reload" onclick="reloadIframe()">⟳ רענן</button>
       </div>
-      <div class="section-body">
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cnt-hero-title">כותרת ראשית</label>
-            <input type="text" id="cnt-hero-title" placeholder="העוצמה, הידע והכח">
-          </div>
-        </div>
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cnt-hero-accent">כותרת משנה / accent</label>
-            <input type="text" id="cnt-hero-accent" placeholder="להורים המתמודדים">
-          </div>
-        </div>
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cnt-hero-subtitle">תיאור קצר</label>
-            <textarea id="cnt-hero-subtitle" rows="3" placeholder="המקום בו תמצאו..."></textarea>
-          </div>
-        </div>
-      </div>
+      <iframe id="iframe" src="../" loading="lazy"></iframe>
     </div>
 
-    <!-- ── אודות ומשימה ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        אודות ומשימה
-      </div>
-      <div class="section-body">
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cnt-about-body">גוף הטקסט</label>
-            <textarea id="cnt-about-body" rows="4" placeholder="ארגון שורשים..."></textarea>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- EDIT PANEL -->
+    <div class="panel-edit">
 
-    <!-- ── עדויות הורים ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        עדויות הורים
+      <!-- Section tabs -->
+      <div class="sec-tabs" id="sec-tabs">
+        <button class="stab on" data-s="hero"         onclick="showSec('hero')">🏠 ראשי</button>
+        <button class="stab"     data-s="about"        onclick="showSec('about')">📖 אודות</button>
+        <button class="stab"     data-s="services"     onclick="showSec('services')">🛠 שירותים</button>
+        <button class="stab"     data-s="team"         onclick="showSec('team')">👥 צוות</button>
+        <button class="stab"     data-s="events"       onclick="showSec('events')">📅 אירועים</button>
+        <button class="stab"     data-s="testimonials" onclick="showSec('testimonials')">💬 עדויות</button>
+        <button class="stab"     data-s="stats"        onclick="showSec('stats')">📊 נתונים</button>
+        <button class="stab"     data-s="contact"      onclick="showSec('contact')">📞 קשר</button>
+        <button class="stab"     data-s="settings"     onclick="showSec('settings')" id="tab-settings">⚙ הגדרות</button>
       </div>
-      <div class="section-body">
-        <div id="testimonials-editor"></div>
-        <button class="btn-add-testimonial" onclick="addTestimonialRow()">הוסף עדות +</button>
-      </div>
-    </div>
 
-    <!-- ── פרטי התקשרות ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2C7.16 21 3 16.84 3 6a2 2 0 012-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        פרטי התקשרות
-      </div>
-      <div class="section-body">
-        <div class="field-row">
-          <div class="admin-field">
-            <label for="cfg-phone-in">מספר טלפון (מוצג באתר)</label>
-            <input type="tel" id="cfg-phone-in" placeholder="055-0000000" dir="ltr">
-            <span class="hint">מוצג בכותרת תחתונה ובדף יצירת קשר</span>
-          </div>
-          <div class="admin-field">
-            <label for="cfg-wa-in">WhatsApp (ספרות + קידומת 972)</label>
-            <input type="text" id="cfg-wa-in" placeholder="972501234567" dir="ltr">
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="admin-field">
-            <label for="cfg-email-in">כתובת אימייל</label>
-            <input type="email" id="cfg-email-in" placeholder="contact@shoreshim.org.il" dir="ltr">
-          </div>
-        </div>
-      </div>
-    </div>
+      <!-- Forms -->
+      <div class="forms" id="forms"></div>
 
-    <!-- ── נתוני פעילות ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        נתוני פעילות (המספרים הגדולים)
+      <!-- Save bar -->
+      <div class="save-bar">
+        <button class="save-btn" id="save-btn" onclick="saveDraft()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          שמור ופרסם
+        </button>
+        <button class="dl-btn" id="dl-btn" style="display:none" onclick="downloadFiles()">↓ הורד קבצים</button>
       </div>
-      <div class="section-body">
-        <div class="stats-grid">
-          <div class="stat-field">
-            <label>הורים קיבלו ליווי</label>
-            <input type="number" id="cfg-families" min="0" placeholder="320">
-          </div>
-          <div class="stat-field">
-            <label>סדנאות התקיימו</label>
-            <input type="number" id="cfg-workshops" min="0" placeholder="48">
-          </div>
-          <div class="stat-field">
-            <label>מנחים מוסמכים</label>
-            <input type="number" id="cfg-facilitators" min="0" placeholder="12">
-          </div>
-          <div class="stat-field">
-            <label>ערים ויישובים</label>
-            <input type="number" id="cfg-cities" min="0" placeholder="8">
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- ── טופס יצירת קשר ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z" stroke="currentColor" stroke-width="1.8"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.8"/></svg>
-        טופס יצירת קשר — קבלת פניות במייל
-      </div>
-      <div class="section-body">
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cfg-form-endpoint">Formspree Endpoint</label>
-            <input type="url" id="cfg-form-endpoint" placeholder="https://formspree.io/f/xxxxxxxx" dir="ltr">
-            <span class="hint">
-              כל פנייה שתגיע מהאתר תישלח למייל שלכם דרך Formspree.<br>
-              לחיבור: <strong>1.</strong> היכנסו ל-<a href="https://formspree.io" target="_blank" rel="noopener">formspree.io</a>
-              → New Form → הזינו את כתובת המייל שלכם →
-              העתיקו את ה-endpoint (נראה כך: https://formspree.io/f/xxxxxxxx) והדביקו כאן.
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
+    </div><!-- /panel-edit -->
+  </div><!-- /split -->
+</div><!-- /app -->
 
-    <!-- ── קישור תרומות ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.403 4.068 2 6.5 2c1.626 0 3.376.557 5.5 2.811C14.124 2.557 15.874 2 17.5 2 19.932 2 23 3.403 23 7.191c0 4.105-5.369 8.863-11 14.402Z" stroke="currentColor" stroke-width="1.8"/></svg>
-        קישור עמוד תרומות
-      </div>
-      <div class="section-body">
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cfg-matara-in">כתובת URL (Matara.pro / Nedarim Plus)</label>
-            <input type="url" id="cfg-matara-in" placeholder="https://matara.pro/nedarimpl/XXXXXX" dir="ltr">
-            <span class="hint">יעדכן אוטומטית את עמוד התרומות עם השמירה</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── הגדרות חשבון ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        הגדרות חשבון
-      </div>
-      <div class="section-body">
-
-        <!-- Change password -->
-        <div class="account-row">
-          <div class="account-row-label">שינוי סיסמה</div>
-          <div class="inline-form">
-            <input type="password" id="chg-old" placeholder="סיסמה נוכחית" autocomplete="current-password">
-            <input type="password" id="chg-new" placeholder="סיסמה חדשה" autocomplete="new-password">
-            <input type="password" id="chg-new2" placeholder="אימות סיסמה חדשה" autocomplete="new-password">
-            <button class="btn-action" onclick="changePassword()">שנה</button>
-          </div>
-          <p id="chg-msg" class="inline-msg"></p>
-        </div>
-
-      </div>
-    </div>
-
-  </main>
-</div>
-
-<!-- Status bar -->
-<div id="status-bar"></div>
+<div id="toast"></div>
 
 <script>
-/* ══════════════════════════════════════
-   Config
-══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════ */
 var REPO_OWNER  = 'nir5177';
 var REPO_NAME   = 'Sharon';
 var REPO_BRANCH = 'gh-pages';
+var ADMIN_PAT   = '%%ADMIN_PAT%%';
 
-/* ══════════════════════════════════════
-   Crypto helpers
-══════════════════════════════════════ */
-async function sha256(str) {
-  var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf), function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+/* Token resolution: CI-injected > user-entered in settings */
+function getToken(){
+  if(ADMIN_PAT && ADMIN_PAT !== '%%ADMIN_PAT%%') return ADMIN_PAT;
+  return localStorage.getItem('shoreshim_admin_pat')||'';
+}
+function hasToken(){ return getToken().length > 0; }
+
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+function g(id){return document.getElementById(id)}
+function gv(id){var e=g(id);return e?e.value.trim():''}
+function sv(id,v){var e=g(id);if(e)e.value=(v==null?'':v)}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+var _tt;
+function toast(msg, cls, ms){
+  var t=g('toast');
+  t.textContent=msg; t.className='on'+(cls?' '+cls:'');
+  clearTimeout(_tt);
+  _tt=setTimeout(function(){t.className=''}, ms||3500);
 }
 
-/* ══════════════════════════════════════
-   Auth — Login
-══════════════════════════════════════ */
-async function doLogin() {
-  var pass  = document.getElementById('login-pass').value;
-  var btn   = document.getElementById('login-btn');
-  var errEl = document.getElementById('login-error');
-  if (!pass) { showLoginError('יש להזין סיסמה'); return; }
-
-  btn.textContent = 'מתחבר...'; btn.disabled = true;
-  errEl.style.display = 'none';
-
-  var hash   = await sha256(pass);
-  var stored = localStorage.getItem('shoreshim_pass_hash');
-  if (hash !== stored) {
-    showLoginError('סיסמה שגויה');
-    btn.textContent = 'כניסה'; btn.disabled = false; return;
-  }
-
-  sessionStorage.setItem('shoreshim_authed', '1');
-  showAdmin();
+/* ═══════════════════════════════════════
+   HEADER STATUS
+═══════════════════════════════════════ */
+function setStatus(cls,txt){
+  var b=g('hdr-status'); b.className='hdr-status '+cls;
+  g('hdr-status-txt').textContent=txt;
 }
 
-/* ── First-time setup ── */
-async function doSetup() {
-  var pass  = document.getElementById('setup-pass').value;
-  var pass2 = document.getElementById('setup-pass2').value;
-  var btn   = document.getElementById('setup-btn');
-
-  if (!pass || !pass2)  { showLoginError('יש למלא את כל השדות'); return; }
-  if (pass !== pass2)   { showLoginError('הסיסמאות אינן תואמות'); return; }
-  if (pass.length < 6)  { showLoginError('הסיסמה חייבת להכיל לפחות 6 תווים'); return; }
-
-  btn.textContent = 'שומר...'; btn.disabled = true;
-  document.getElementById('login-error').style.display = 'none';
-
-  var hash = await sha256(pass);
-  localStorage.setItem('shoreshim_pass_hash', hash);
-  sessionStorage.setItem('shoreshim_authed', '1');
-  showAdmin();
+/* ═══════════════════════════════════════
+   AUTH
+═══════════════════════════════════════ */
+async function sha256(s){
+  var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
 }
 
-function showLoginError(msg) {
-  var el = document.getElementById('login-error');
-  el.textContent = msg; el.style.display = 'block';
-}
-
-function doLogout() {
-  sessionStorage.removeItem('shoreshim_authed');
-  document.getElementById('admin-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-}
-
-/* ══════════════════════════════════════
-   Account settings
-══════════════════════════════════════ */
-async function changePassword() {
-  var oldPass = document.getElementById('chg-old').value;
-  var newPass = document.getElementById('chg-new').value;
-  var newPass2= document.getElementById('chg-new2').value;
-  var msg     = document.getElementById('chg-msg');
-
-  if (!oldPass || !newPass || !newPass2) { return showInlineMsg(msg, 'יש למלא את כל השדות', false); }
-  if (newPass !== newPass2)              { return showInlineMsg(msg, 'הסיסמאות החדשות אינן תואמות', false); }
-  if (newPass.length < 6)               { return showInlineMsg(msg, 'הסיסמה חייבת להכיל לפחות 6 תווים', false); }
-
-  var oldHash = await sha256(oldPass);
-  if (oldHash !== localStorage.getItem('shoreshim_pass_hash')) {
-    return showInlineMsg(msg, 'הסיסמה הנוכחית שגויה', false);
-  }
-  var newHash = await sha256(newPass);
-  localStorage.setItem('shoreshim_pass_hash', newHash);
-  ['chg-old','chg-new','chg-new2'].forEach(function(id){ document.getElementById(id).value=''; });
-  showInlineMsg(msg, 'הסיסמה שונתה בהצלחה ✓', true);
-}
-
-function showInlineMsg(el, msg, ok) {
-  el.textContent = msg;
-  el.className   = 'inline-msg ' + (ok ? 'ok' : 'err');
-  el.style.display = 'block';
-  setTimeout(function(){ el.style.display='none'; }, 4000);
-}
-
-/* ══════════════════════════════════════
-   Show admin + load config
-══════════════════════════════════════ */
-async function showAdmin() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('admin-screen').style.display = 'block';
-  await loadConfig();
-}
-
-async function loadConfig() {
-  var base = 'https://raw.githubusercontent.com/'+REPO_OWNER+'/'+REPO_NAME+'/'+REPO_BRANCH+'/';
-  try {
-    var r = await fetch(base + 'config.json?_=' + Date.now());
-    if (r.ok) { populateForm(await r.json()); }
-  } catch(e) { /* ignore */ }
-  try {
-    var rc = await fetch(base + 'content.json?_=' + Date.now());
-    if (rc.ok) { populateContentForm(await rc.json()); }
-  } catch(e) { /* ignore */ }
-}
-
-function populateForm(cfg) {
-  set('cfg-phone-in',       cfg.phone         || '');
-  set('cfg-wa-in',          cfg.whatsapp      || '');
-  set('cfg-email-in',       cfg.email         || '');
-  set('cfg-form-endpoint',  cfg.formEndpoint  || '');
-  set('cfg-families',       cfg.stats ? cfg.stats.families     : '');
-  set('cfg-workshops',      cfg.stats ? cfg.stats.workshops    : '');
-  set('cfg-facilitators',   cfg.stats ? cfg.stats.facilitators : '');
-  set('cfg-cities',         cfg.stats ? cfg.stats.cities       : '');
-  set('cfg-matara-in',      cfg.mataraUrl || '');
-}
-
-function populateContentForm(cnt) {
-  set('cnt-hero-title',    cnt['hero.title']    || '');
-  set('cnt-hero-accent',   cnt['hero.accent']   || '');
-  set('cnt-hero-subtitle', cnt['hero.subtitle'] || '');
-  set('cnt-about-body',    cnt['about.body']    || '');
-  renderTestimonialsList(cnt.testimonials || []);
-}
-
-/* ══════════════════════════════════════
-   Testimonials editor
-══════════════════════════════════════ */
-var _testimonialIdx = 0;
-
-function renderTestimonialsList(arr) {
-  var container = document.getElementById('testimonials-editor');
-  container.innerHTML = ''; _testimonialIdx = 0;
-  arr.forEach(function(t){ addTestimonialRow(t); });
-}
-
-function addTestimonialRow(data) {
-  try {
-    var container = document.getElementById('testimonials-editor');
-    if (!container) { alert('שגיאה: לא נמצא אזור העדויות'); return; }
-    if (container.querySelectorAll('.testimonial-editor-row').length >= 8) {
-      showStatus('מקסימום 8 עדויות', 'error'); return;
+function doLogin(){
+  var pass=g('l-pass').value;
+  if(!pass){showLErr('הזינו סיסמה');return}
+  var stored=localStorage.getItem('shoreshim_phash');
+  sha256(pass).then(function(h){
+    if(!stored){
+      if(pass.length<6){showLErr('סיסמה — לפחות 6 תווים');return}
+      localStorage.setItem('shoreshim_phash',h);
+      sessionStorage.setItem('shoreshim_auth','1');
+      launchApp();
+    } else if(h===stored){
+      sessionStorage.setItem('shoreshim_auth','1');
+      launchApp();
+    } else {
+      showLErr('סיסמה שגויה');
     }
-    var i = _testimonialIdx++;
-    var d = (data && typeof data === 'object') ? data : {};
-    var row = document.createElement('div');
-    row.className = 'testimonial-editor-row';
-    row.dataset.idx = i;
-    row.innerHTML =
-      '<div class="t-num">עדות 1</div>'+
-      '<button class="btn-remove" onclick="removeTestimonialRow(this)">הסר</button>'+
-      '<div class="t-grid">'+
-        '<div class="admin-field t-full"><label>ציטוט קצר</label>'+
-          '<input type="text" id="cnt-quote-'+i+'" value="'+esc(d.quote||'')+'" placeholder="ציטוט קצר..."></div>'+
-        '<div class="admin-field t-full"><label>תוכן מלא</label>'+
-          '<textarea id="cnt-body-'+i+'" rows="2" placeholder="תוכן מלא...">'+esc(d.body||'')+'</textarea></div>'+
-        '<div class="admin-field"><label>שם</label>'+
-          '<input type="text" id="cnt-author-'+i+'" value="'+esc(d.author||'')+'" placeholder="שם"></div>'+
-        '<div class="admin-field"><label>תפקיד</label>'+
-          '<input type="text" id="cnt-role-'+i+'" value="'+esc(d.role||'')+'" placeholder="הורה מתמודד"></div>'+
-      '</div>';
-    container.appendChild(row);
-    renumberTestimonials();
-    row.scrollIntoView({behavior:'smooth', block:'nearest'});
-  } catch(err) {
-    alert('שגיאה בהוספת עדות: ' + err.message);
+  });
+}
+
+function showLErr(m){
+  var e=g('l-err'); e.textContent=m; e.style.display='block';
+  setTimeout(function(){e.style.display='none'},3000);
+}
+
+function doLogout(){
+  sessionStorage.removeItem('shoreshim_auth');
+  location.reload();
+}
+
+/* ═══════════════════════════════════════
+   SECTION TABS
+═══════════════════════════════════════ */
+var _curSec = 'hero';
+var _secPreviewId = {
+  hero:'hero', about:'about', services:'services', team:'team',
+  events:'events-section', testimonials:'testimonials', stats:'stats', contact:'contact'
+};
+
+function showSec(s){
+  _curSec = s;
+  document.querySelectorAll('.stab').forEach(function(b){
+    b.classList.toggle('on', b.dataset.s===s);
+  });
+  document.querySelectorAll('.sf').forEach(function(f){
+    f.classList.toggle('on', f.id==='sf-'+s);
+  });
+  pmsg({type:'scroll-to', id:_secPreviewId[s]||s});
+}
+
+/* ═══════════════════════════════════════
+   PREVIEW postMessage
+═══════════════════════════════════════ */
+function pmsg(data){
+  var f=g('iframe');
+  if(!f||!f.contentWindow) return;
+  try{f.contentWindow.postMessage(data,'*')}catch(e){}
+}
+
+function liveText(previewId, val){
+  pmsg({type:'update-text', id:previewId, value:val});
+  scheduleAS();
+}
+
+function ytId(url){
+  if(!url) return null;
+  var m=url.match(/(?:youtu\.be\/|[?&]v=|\/embed\/|\/shorts\/)([A-Za-z0-9_-]{11})/);
+  return m?m[1]:null;
+}
+
+function onYoutubeInput(url, imgKey){
+  scheduleAS();
+  var id=ytId(url);
+  if(!id) return;
+  var existing=gv('img-url-'+imgKey);
+  /* auto-set only when field is empty or was previously auto-set from youtube */
+  if(existing && existing.indexOf('img.youtube.com')===-1) return;
+  var thumb='https://img.youtube.com/vi/'+id+'/hqdefault.jpg';
+  setImgW(imgKey, thumb);
+  sv('img-url-'+imgKey, thumb);
+  sendImgToPreview(imgKey, thumb);
+}
+
+function reloadIframe(){
+  var f=g('iframe');
+  if(f) f.src=f.src.split('?')[0]+'?_='+Date.now();
+}
+
+/* ═══════════════════════════════════════
+   MOBILE TABS
+═══════════════════════════════════════ */
+function mobSwitch(mode){
+  var pp=g('panel-preview');
+  var et=g('mob-edit-tab'), pt=g('mob-prev-tab');
+  if(mode==='preview'){
+    pp.classList.add('mob-show'); et.classList.remove('on'); pt.classList.add('on');
+  } else {
+    pp.classList.remove('mob-show'); pt.classList.remove('on'); et.classList.add('on');
   }
 }
 
-function removeTestimonialRow(btn) {
-  btn.closest('.testimonial-editor-row').remove();
-  renumberTestimonials();
+/* ═══════════════════════════════════════
+   IMAGE WIDGET
+═══════════════════════════════════════ */
+function imgw(key){
+  /* returns HTML string for an image upload widget */
+  var uid='img-url-'+key, pid='img-prev-'+key, fid='img-file-'+key, eid='img-el-'+key;
+  return '<div class="imgw" id="imgw-'+key+'">'
+    +'<div class="imgw-prev" id="'+pid+'">'
+      +'<img id="'+eid+'" src="" alt="">'
+      +'<button class="imgw-clear" onclick="clearImgW(\''+key+'\')">✕ הסר</button>'
+    +'</div>'
+    +'<div class="imgw-drop" id="imgw-drop-'+key+'"'
+      +' onclick="g(\''+fid+'\').click()"'
+      +' ondragover="event.preventDefault();this.classList.add(\'drag\')"'
+      +' ondragleave="this.classList.remove(\'drag\')"'
+      +' ondrop="event.preventDefault();this.classList.remove(\'drag\');dropFile(\''+key+'\',event)">'
+      +'<div class="imgw-icon">🖼</div>'
+      +'<div class="imgw-txt">לחצו לבחירת קובץ</div>'
+      +'<div class="imgw-sub">או גררו תמונה לכאן</div>'
+    +'</div>'
+    +'<div class="imgw-url">'
+      +'<span>URL:</span>'
+      +'<input type="url" id="'+uid+'" dir="ltr" placeholder="https://..."'
+        +' oninput="onUrlInput(\''+key+'\',this.value)">'
+    +'</div>'
+    +'<input type="file" id="'+fid+'" accept="image/*" style="display:none"'
+      +' onchange="onFileInput(\''+key+'\',this)">'
+  +'</div>';
 }
 
-function renumberTestimonials() {
-  document.querySelectorAll('.testimonial-editor-row').forEach(function(row, idx) {
-    var num = row.querySelector('.t-num');
-    if (num) num.textContent = 'עדות ' + (idx + 1);
-  });
+function setImgW(key, url){
+  var p=g('img-prev-'+key), el=g('img-el-'+key), uw=g('img-url-'+key);
+  if(!p||!el) return;
+  if(url){el.src=url; p.classList.add('on')} else {el.src=''; p.classList.remove('on')}
+  if(uw && url!==undefined) uw.value=url||'';
 }
 
-/* ══════════════════════════════════════
-   Form helpers
-══════════════════════════════════════ */
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function set(id, val) { var el=document.getElementById(id); if(el) el.value=val; }
-function get(id)      { var el=document.getElementById(id); return el ? el.value.trim() : ''; }
+/* original image URLs — populated at loadData/populateData time */
+var _origImgs = {};
 
-function getContentFromForm() {
-  var testimonials = [];
-  document.querySelectorAll('.testimonial-editor-row').forEach(function(row) {
-    var i = row.dataset.idx;
-    var q=get('cnt-quote-'+i), b=get('cnt-body-'+i), a=get('cnt-author-'+i), r=get('cnt-role-'+i);
-    if (q || b || a) testimonials.push({quote:q,body:b,author:a,role:r});
-  });
-  return {
-    'hero.title':    get('cnt-hero-title'),
-    'hero.accent':   get('cnt-hero-accent'),
-    'hero.subtitle': get('cnt-hero-subtitle'),
-    'about.body':    get('cnt-about-body'),
-    'testimonials':  testimonials
+function clearImgW(key){
+  var orig = _origImgs[key] || '';
+  setImgW(key, orig);
+  sv('img-url-'+key, orig);
+  sendImgToPreview(key, orig);
+  scheduleAS();
+}
+
+function onUrlInput(key, url){
+  setImgW(key, url);
+  sendImgToPreview(key, url);
+  scheduleAS();
+}
+
+function dropFile(key, event){
+  var file = event.dataTransfer.files[0];
+  if(file) processFile(key, file);
+}
+
+function onFileInput(key, input){
+  var file = input.files[0];
+  if(file) processFile(key, file);
+  input.value=''; /* allow re-select same file */
+}
+
+function processFile(key, file){
+  /* Show local preview immediately */
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var dataUrl = e.target.result;
+    setImgW(key, dataUrl);
+    sendImgToPreview(key, dataUrl);
   };
-}
+  reader.readAsDataURL(file);
 
-/* ══════════════════════════════════════
-   Save
-══════════════════════════════════════ */
-async function saveChanges() {
-  var pat = localStorage.getItem('shoreshim_pat');
-  if (!pat) { showStatus('אין Token — פנה למנהל המערכת לחיבור', 'error'); return; }
-  var btn = document.getElementById('save-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner"></div> שומר...';
-
-  var cfg = {
-    phone:        get('cfg-phone-in'),
-    whatsapp:     get('cfg-wa-in').replace(/\D/g,''),
-    email:        get('cfg-email-in'),
-    formEndpoint: get('cfg-form-endpoint'),
-    stats: {
-      families:     parseInt(get('cfg-families'),10)    || 0,
-      workshops:    parseInt(get('cfg-workshops'),10)   || 0,
-      facilitators: parseInt(get('cfg-facilitators'),10)|| 0,
-      cities:       parseInt(get('cfg-cities'),10)      || 0
-    },
-    mataraUrl: get('cfg-matara-in')
-  };
-  var cnt = getContentFromForm();
-
-  try {
-    var tasks = [
-      commitFile('config.json',  makeConfigJson(cfg),  pat),
-      commitFile('config.js',    makeConfigJs(cfg),    pat),
-      commitFile('content.json', makeContentJson(cnt), pat),
-      commitFile('content.js',   makeContentJs(cnt),   pat)
-    ];
-    if (cfg.mataraUrl) {
-      tasks.push(
-        patchDonate(cfg.mataraUrl, pat).then(function(html){
-          if (html) return commitFile('donate.html', html, pat);
-        })
-      );
-    }
-    await Promise.all(tasks);
-    showStatus('האתר עודכן ויפורסם תוך כ-2 דקות ✓', 'success');
-  } catch(e) {
-    showStatus('שגיאה בשמירה: ' + e.message, 'error');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg> שמירה ופרסום';
-  }
-}
-
-async function commitFile(path, content, pat) {
-  var sha = null;
-  try {
-    var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path+'?ref='+REPO_BRANCH, {
-      headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
-    });
-    if (r.ok) { var d = await r.json(); sha = d.sha; }
-  } catch(e) {}
-
-  var body = {message:'Update '+path+' via admin panel', content:btoa(unescape(encodeURIComponent(content))), branch:REPO_BRANCH};
-  if (sha) body.sha = sha;
-
-  var res = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path, {
-    method:'PUT',
-    headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  });
-  if (!res.ok) { var err = await res.json(); throw new Error(err.message || res.status); }
-}
-
-async function patchDonate(mataraUrl, pat) {
-  try { new URL(mataraUrl); } catch(e) { throw new Error('כתובת URL לא תקינה'); }
-  if (!/^https:\/\//.test(mataraUrl)) throw new Error('URL חייב להתחיל ב-https://');
-  var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/donate.html?ref='+REPO_BRANCH, {
-    headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
-  });
-  if (!r.ok) return null;
-  var d    = await r.json();
-  var html = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
-  var safeUrl = mataraUrl.replace(/'/g,'%27');
-  html = html.replace(/var MATARA_URL\s*=\s*'[^']*'/, "var MATARA_URL = '" + safeUrl + "'");
-  return html;
-}
-
-/* ══════════════════════════════════════
-   Templates
-══════════════════════════════════════ */
-function makeConfigJson(cfg) { return JSON.stringify(cfg, null, 2) + '\n'; }
-
-function makeConfigJs(cfg) {
-  var data = { phone:cfg.phone, whatsapp:cfg.whatsapp, email:cfg.email, formEndpoint:cfg.formEndpoint||'', stats:cfg.stats };
-  return '/* שורשים — config.js  (edit via /admin/) */\n'+
-    'var SHORESHIM = '+JSON.stringify(data, null, 2)+';\n\n'+
-    "(function (cfg) {\n"+
-    "  var p = document.getElementById('cfg-phone');\n"+
-    "  if (p) p.textContent = cfg.phone;\n\n"+
-    "  var em = document.getElementById('cfg-email');\n"+
-    "  if (em) em.textContent = cfg.email;\n\n"+
-    "  ['cfg-stat-families','cfg-stat-workshops','cfg-stat-facilitators','cfg-stat-cities'].forEach(function (id, i) {\n"+
-    "    var vals = [cfg.stats.families, cfg.stats.workshops, cfg.stats.facilitators, cfg.stats.cities];\n"+
-    "    var el = document.getElementById(id);\n"+
-    "    if (el) el.setAttribute('data-target', vals[i]);\n"+
-    "  });\n\n"+
-    "  var waMsg = encodeURIComponent('שלום, הגעתי מאתר שורשים ואשמח לפרטים בדיסקרטיות');\n"+
-    "  document.querySelectorAll('a[href^=\"https://wa.me/\"]').forEach(function (a) {\n"+
-    "    var hasText = a.getAttribute('href').indexOf('?text=') !== -1;\n"+
-    "    a.href = 'https://wa.me/' + cfg.whatsapp + (hasText ? '?text=' + waMsg : '');\n"+
-    "  });\n"+
-    "}(SHORESHIM));\n";
-}
-
-function makeContentJson(cnt) { return JSON.stringify(cnt, null, 2) + '\n'; }
-
-function makeContentJs(cnt) {
-  return '/* שורשים — content.js  (edit via /admin/) */\n'+
-    'var SHORESHIM_CONTENT = '+JSON.stringify(cnt)+';\n\n'+
-    "(function (c) {\n"+
-    "  function setText(id, val) { var el=document.getElementById(id); if(el&&val!=null) el.textContent=String(val); }\n"+
-    "  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }\n"+
-    "  setText('content-hero-title',    c['hero.title']);\n"+
-    "  setText('content-hero-accent',   c['hero.accent']);\n"+
-    "  setText('content-hero-subtitle', c['hero.subtitle']);\n"+
-    "  setText('content-mission-body',  c['about.body']);\n"+
-    "  if (Array.isArray(c.testimonials) && c.testimonials.length) {\n"+
-    "    var slider = document.getElementById('testimonials-slider');\n"+
-    "    if (slider) {\n"+
-    "      slider.innerHTML = c.testimonials.map(function (t, i) {\n"+
-    "        return '<div class=\"testimonial-slide'+(i===0?' active':'')+'\">'+\n"+
-    "          '<blockquote class=\"testimonial-quote\">\\u201c'+esc(t.quote)+'\\u201d</blockquote>'+\n"+
-    "          '<p class=\"testimonial-body\">'+esc(t.body)+'</p>'+\n"+
-    "          '<div class=\"testimonial-author\">'+\n"+
-    "          '<div class=\"testimonial-avatar\">'+esc((t.author||'?').charAt(0))+'</div>'+\n"+
-    "          '<div><strong>'+esc(t.author)+'</strong><span>'+esc(t.role)+'</span></div>'+\n"+
-    "          '</div></div>';\n"+
-    "      }).join('');\n"+
-    "    }\n"+
-    "  }\n"+
-    "}(SHORESHIM_CONTENT));\n";
-}
-
-/* ══════════════════════════════════════
-   Status
-══════════════════════════════════════ */
-var _statusTimer;
-function showStatus(msg, type) {
-  var bar = document.getElementById('status-bar');
-  bar.textContent = msg;
-  bar.className   = 'visible ' + (type || '');
-  clearTimeout(_statusTimer);
-  _statusTimer = setTimeout(function(){ bar.className = ''; }, 4000);
-}
-
-/* ══════════════════════════════════════
-   Boot
-══════════════════════════════════════ */
-(function() {
-  /* Capture token from URL param ?token=ghp_xxx (one-time setup) */
-  var urlToken = new URLSearchParams(location.search).get('token');
-  if (urlToken) {
-    localStorage.setItem('shoreshim_pat', urlToken);
-    history.replaceState(null, '', location.pathname);
-  }
-
-  if (sessionStorage.getItem('shoreshim_authed') === '1') { showAdmin(); return; }
-
-  var hasPass = !!localStorage.getItem('shoreshim_pass_hash');
-
-  if (!hasPass) {
-    document.getElementById('setup-form').style.display = 'block';
-    ['setup-pass','setup-pass2'].forEach(function(id){
-      document.getElementById(id).addEventListener('keydown', function(e){ if(e.key==='Enter') doSetup(); });
+  /* Upload to GitHub if PAT available */
+  if(hasToken()){
+    setStatus('saving','מעלה תמונה...');
+    uploadImgToGH(file).then(function(url){
+      setImgW(key, url);
+      sendImgToPreview(key, url);
+      scheduleAS();
+      setStatus('saved','הועלה ✓');
+      toast('תמונה הועלתה ✓','ok');
+    }).catch(function(err){
+      toast('שגיאת העלאה: '+err.message+'\nהתמונה נשמרה בטיוטה מקומית','err',6000);
+      var dataUrl = g('img-el-'+key) && g('img-el-'+key).src;
+      if(dataUrl) sv('img-url-'+key, dataUrl);
+      scheduleAS();
+      setStatus('','מוכן');
     });
   } else {
-    document.getElementById('login-form').style.display = 'block';
-    document.getElementById('login-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+    /* No PAT: store data URL in draft only */
+    var dataUrl = g('img-el-'+key) && g('img-el-'+key).src;
+    if(dataUrl) sv('img-url-'+key, dataUrl);
+    scheduleAS();
+    toast('התמונה מוצגת בתצוגה מקדימה.\nלהעלאה קבועה לאתר — הגדירו ADMIN_PAT ב-GitHub Secrets.','',6000);
   }
+}
+
+/* preview postMessage for images */
+var _imgMap = {
+  'hero-thumb':      {act:'hero-thumb', id:'', h:'200px'},
+  'about-img':       {act:'set-img', id:'mission-visual',    h:'340px'},
+  'about-vid':       {act:'about-vid', id:'mission-visual',  h:'340px'},
+  'svc-workshops':   {act:'set-img', id:'svc-img-workshops', h:'260px'},
+  'svc-coaching':    {act:'set-img', id:'svc-img-coaching',  h:'260px'},
+  'svc-resilience':  {act:'set-img', id:'svc-img-resilience','h':'260px'},
+};
+
+function sendImgToPreview(key, url){
+  var m = _imgMap[key];
+  if(!m) return;
+  pmsg({type:'set-img', act:m.act, id:m.id, h:m.h, url:url||''});
+}
+
+/* ═══════════════════════════════════════
+   GITHUB IMAGE UPLOAD
+═══════════════════════════════════════ */
+async function uploadImgToGH(file){
+  var ext = (file.name.split('.').pop()||'jpg').toLowerCase();
+  var path = 'images/'+Date.now()+'.'+ext;
+  var b64 = await new Promise(function(res,rej){
+    var r=new FileReader();
+    r.onload=function(e){res(e.target.result.split(',')[1])};
+    r.onerror=rej;
+    r.readAsDataURL(file);
+  });
+  var resp = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path,{
+    method:'PUT',
+    headers:{'Authorization':'token '+getToken(),'Content-Type':'application/json'},
+    body:JSON.stringify({message:'Upload image',content:b64,branch:REPO_BRANCH})
+  });
+  if(!resp.ok){var e=await resp.json();throw new Error(e.message||resp.status)}
+  var d=await resp.json();
+  return d.content.download_url;
+}
+
+/* ═══════════════════════════════════════
+   COLLECT / POPULATE
+═══════════════════════════════════════ */
+function collectData(){
+  var team=[], events=[], testimonials=[];
+
+  document.querySelectorAll('#team-list .di').forEach(function(r){
+    var i=r.dataset.i;
+    team.push({name:gv('tm-n-'+i),role:gv('tm-r-'+i),bio:gv('tm-b-'+i),photoUrl:gv('img-url-tm-'+i)});
+  });
+  document.querySelectorAll('#ev-list .di').forEach(function(r){
+    var i=r.dataset.i;
+    events.push({title:gv('ev-t-'+i),link:gv('ev-l-'+i),imgUrl:gv('img-url-ev-'+i)});
+  });
+  document.querySelectorAll('#tst-list .di').forEach(function(r){
+    var i=r.dataset.i;
+    testimonials.push({quote:gv('tst-q-'+i),body:gv('tst-b-'+i),author:gv('tst-a-'+i),role:gv('tst-r-'+i),photoUrl:gv('img-url-tst-'+i)});
+  });
+
+  var cfg = {
+    phone:       gv('cfg-phone'),
+    whatsapp:    gv('cfg-wa').replace(/\D/g,''),
+    email:       gv('cfg-email'),
+    formEndpoint:gv('cfg-formsep'),
+    mataraUrl:   gv('cfg-matara'),
+    youtubeUrl:  gv('cfg-youtube'),
+    statsUrl:    gv('cfg-statsurl'),
+    stats:{
+      families:    +gv('cfg-s1')||0,
+      workshops:   +gv('cfg-s2')||0,
+      facilitators:+gv('cfg-s3')||0,
+      cities:      +gv('cfg-s4')||0
+    },
+    statLabels:{'1':gv('cfg-l1'),'2':gv('cfg-l2'),'3':gv('cfg-l3'),'4':gv('cfg-l4')}
+  };
+
+  var cnt = {
+    'hero.title':           gv('cnt-ht'),
+    'hero.accent':          gv('cnt-ha'),
+    'hero.subtitle':        gv('cnt-hs'),
+    'hero.thumbUrl':        gv('img-url-hero-thumb'),
+    'about.body':           gv('cnt-ab'),
+    'about.imageUrl':       gv('img-url-about-img'),
+    'about.videoThumbUrl':  gv('img-url-about-vid'),
+    'about.videoUrl':       gv('cnt-avurl'),
+    'svc.workshops.imgUrl': gv('img-url-svc-workshops'),
+    'svc.coaching.imgUrl':  gv('img-url-svc-coaching'),
+    'svc.resilience.imgUrl':gv('img-url-svc-resilience'),
+    team:         team,
+    events:       events,
+    testimonials: testimonials
+  };
+
+  return {cfg:cfg, cnt:cnt};
+}
+
+function populateData(cfg, cnt){
+  if(cfg){
+    sv('cfg-phone',    cfg.phone);
+    sv('cfg-wa',       cfg.whatsapp);
+    sv('cfg-email',    cfg.email);
+    sv('cfg-formsep',  cfg.formEndpoint);
+    sv('cfg-matara',   cfg.mataraUrl);
+    sv('cfg-youtube',  cfg.youtubeUrl);
+    sv('cfg-statsurl', cfg.statsUrl);
+    var s=cfg.stats||{};
+    sv('cfg-s1',s.families); sv('cfg-s2',s.workshops);
+    sv('cfg-s3',s.facilitators); sv('cfg-s4',s.cities);
+    var l=cfg.statLabels||{};
+    sv('cfg-l1',l['1']); sv('cfg-l2',l['2']);
+    sv('cfg-l3',l['3']); sv('cfg-l4',l['4']);
+  }
+  if(cnt){
+    sv('cnt-ht', cnt['hero.title']);
+    sv('cnt-ha', cnt['hero.accent']);
+    sv('cnt-hs', cnt['hero.subtitle']);
+    sv('cnt-ab', cnt['about.body']);
+    sv('cnt-avurl', cnt['about.videoUrl']);
+    /* hero thumb: use stored URL, or auto-generate from YouTube */
+    var heroThumb = cnt['hero.thumbUrl'] ||
+      (ytId(cnt['hero.youtubeUrl']||'') ? 'https://img.youtube.com/vi/'+ytId(cnt['hero.youtubeUrl']||'')+'/hqdefault.jpg' : '');
+    /* about vid thumb: use stored URL, or auto-generate from YouTube */
+    var aboutVidThumb = cnt['about.videoThumbUrl'] ||
+      (ytId(cnt['about.videoUrl']||'') ? 'https://img.youtube.com/vi/'+ytId(cnt['about.videoUrl']||'')+'/hqdefault.jpg' : '');
+
+    /* Store originals so clearImgW can restore them */
+    _origImgs['hero-thumb']     = heroThumb;
+    _origImgs['about-img']      = cnt['about.imageUrl']||'';
+    _origImgs['about-vid']      = aboutVidThumb;
+    _origImgs['svc-workshops']  = cnt['svc.workshops.imgUrl']||'';
+    _origImgs['svc-coaching']   = cnt['svc.coaching.imgUrl']||'';
+    _origImgs['svc-resilience'] = cnt['svc.resilience.imgUrl']||'';
+
+    setImgW('hero-thumb', heroThumb);
+    setImgW('about-img',     cnt['about.imageUrl']||'');
+    setImgW('about-vid', aboutVidThumb);
+    setImgW('svc-workshops', cnt['svc.workshops.imgUrl']||'');
+    setImgW('svc-coaching',  cnt['svc.coaching.imgUrl']||'');
+    setImgW('svc-resilience',cnt['svc.resilience.imgUrl']||'');
+    renderTeam(cnt.team||[]);
+    renderEvents(cnt.events||[]);
+    renderTestimonials(cnt.testimonials||[]);
+  }
+}
+
+/* ═══════════════════════════════════════
+   AUTOSAVE
+═══════════════════════════════════════ */
+var _asT;
+function scheduleAS(){
+  setStatus('saving','שומר...');
+  clearTimeout(_asT);
+  _asT=setTimeout(function(){
+    var d=collectData();
+    try{localStorage.setItem('shoreshim_cfg_draft',JSON.stringify(d.cfg))}catch(e){}
+    try{localStorage.setItem('shoreshim_cnt_draft',JSON.stringify(d.cnt))}catch(e){}
+    setStatus('saved','נשמר ✓');
+  },700);
+}
+
+/* ═══════════════════════════════════════
+   LOAD
+═══════════════════════════════════════ */
+async function loadData(){
+  setStatus('','טוען...');
+  var cs=localStorage.getItem('shoreshim_cfg_draft');
+  var ns=localStorage.getItem('shoreshim_cnt_draft');
+  if(cs||ns){
+    try{
+      populateData(cs?JSON.parse(cs):null, ns?JSON.parse(ns):null);
+      setStatus('saved','טיוטה מקומית ✓');
+      return;
+    }catch(e){}
+  }
+  /* fallback: fetch from GitHub */
+  var base='https://raw.githubusercontent.com/'+REPO_OWNER+'/'+REPO_NAME+'/'+REPO_BRANCH+'/';
+  var cfg=null, cnt=null;
+  try{var r=await fetch(base+'config.json?_='+Date.now());  if(r.ok)cfg=await r.json()}catch(e){}
+  try{var r=await fetch(base+'content.json?_='+Date.now()); if(r.ok)cnt=await r.json()}catch(e){}
+  populateData(cfg,cnt);
+  setStatus('saved','נטען מהשרת ✓');
+}
+
+/* ═══════════════════════════════════════
+   SAVE DRAFT + PUBLISH (single action)
+═══════════════════════════════════════ */
+function saveDraft(){
+  /* Always persist locally first */
+  var d=collectData();
+  try{localStorage.setItem('shoreshim_cfg_draft',JSON.stringify(d.cfg))}catch(e){}
+  try{localStorage.setItem('shoreshim_cnt_draft',JSON.stringify(d.cnt))}catch(e){}
+  setStatus('saved','נשמר ✓');
+
+  if(!hasToken()){
+    /* Token injected by CI at deploy time — if missing, the site isn't deployed correctly */
+    toast('הפרסום אינו מוגדר. יש ליצור קשר עם מנהל המערכת.','err',7000);
+    g('dl-btn').style.display='';
+    return;
+  }
+
+  /* Token available: publish straight to GitHub */
+  publish(d);
+}
+
+/* ═══════════════════════════════════════
+   PUBLISH TO GITHUB
+═══════════════════════════════════════ */
+async function publish(preCollected){
+  var token=getToken();
+  if(!token){ toast('הפרסום אינו מוגדר — פנו למנהל המערכת','err'); return; }
+
+  var btn=g('save-btn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spin"></span> מפרסם...';
+  setStatus('saving','מפרסם...');
+
+  try{
+    var d=preCollected||collectData();
+    /* Save locally too */
+    try{localStorage.setItem('shoreshim_cfg_draft',JSON.stringify(d.cfg))}catch(e){}
+    try{localStorage.setItem('shoreshim_cnt_draft',JSON.stringify(d.cnt))}catch(e){}
+
+    var tasks=[
+      ghPut('config.json',  JSON.stringify(d.cfg,null,2)+'\n', token),
+      ghPut('config.js',    makeConfigJs(d.cfg),               token),
+      ghPut('content.json', JSON.stringify(d.cnt,null,2)+'\n', token),
+      ghPut('content.js',   makeContentJs(d.cnt),              token),
+    ];
+    if(d.cfg.mataraUrl){
+      var dhtml=await patchDonate(d.cfg.mataraUrl, token);
+      if(dhtml) tasks.push(ghPut('donate.html',dhtml,token));
+    }
+    await Promise.all(tasks);
+    setStatus('saved','פורסם ✓');
+    toast('פורסם לאתר! השינויים יופיעו תוך ~2 דקות ✓','ok',5000);
+    g('dl-btn').style.display='none';
+  }catch(err){
+    setStatus('','שגיאה');
+    var msg=err.message||'';
+    if(msg.indexOf('401')>-1||msg.toLowerCase().indexOf('bad credential')>-1){
+      toast('פרסום נכשל — Token אינו תקין. יש ליצור קשר עם מנהל המערכת.','err',8000);
+    } else {
+      toast('שגיאה בפרסום:\n'+msg,'err',8000);
+    }
+    g('dl-btn').style.display='';
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML=_SAVE_ICON+' שמור ופרסם';
+  }
+}
+var _SAVE_ICON='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>';
+
+/* ═══════════════════════════════════════
+   GITHUB API
+═══════════════════════════════════════ */
+async function ghPut(path, content, token){
+  var sha=null;
+  try{
+    var r=await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path+'?ref='+REPO_BRANCH,
+      {headers:{'Authorization':'token '+token}});
+    if(r.ok){var d=await r.json(); sha=d.sha}
+  }catch(e){}
+  var body={message:'Update '+path,content:btoa(unescape(encodeURIComponent(content))),branch:REPO_BRANCH};
+  if(sha)body.sha=sha;
+  var res=await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path,{
+    method:'PUT',
+    headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  if(!res.ok){var e=await res.json(); throw new Error(e.message||res.status)}
+}
+
+async function patchDonate(url, token){
+  try{
+    var r=await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/donate.html?ref='+REPO_BRANCH,
+      {headers:{'Authorization':'token '+token}});
+    if(!r.ok)return null;
+    var d=await r.json();
+    var html=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+    return html.replace(/var MATARA_URL\s*=\s*'[^']*'/,"var MATARA_URL = '"+url.replace(/'/g,'%27')+"'");
+  }catch(e){return null}
+}
+
+/* ═══════════════════════════════════════
+   FILE GENERATORS
+═══════════════════════════════════════ */
+function makeConfigJs(c){
+  var data={phone:c.phone,whatsapp:c.whatsapp,email:c.email,formEndpoint:c.formEndpoint||'',
+    stats:c.stats,statLabels:c.statLabels||{},youtubeUrl:c.youtubeUrl||'',statsUrl:c.statsUrl||''};
+  return '/* שורשים — config.js */\nvar SHORESHIM='+JSON.stringify(data,null,2)+';\n'+
+  '(function(c){\n'+
+  '  var p=document.getElementById("cfg-phone");if(p)p.textContent=c.phone;\n'+
+  '  var em=document.getElementById("cfg-email");if(em)em.textContent=c.email;\n'+
+  '  var ids=["cfg-stat-families","cfg-stat-workshops","cfg-stat-facilitators","cfg-stat-cities"];\n'+
+  '  var vals=[c.stats.families,c.stats.workshops,c.stats.facilitators,c.stats.cities];\n'+
+  '  ids.forEach(function(id,i){var el=document.getElementById(id);if(el)el.setAttribute("data-target",vals[i]||0)});\n'+
+  '  var lb=c.statLabels||{};var lels=document.querySelectorAll(".stat-label");\n'+
+  '  [lb["1"],lb["2"],lb["3"],lb["4"]].forEach(function(t,i){if(t&&lels[i])lels[i].textContent=t});\n'+
+  '  var wa=encodeURIComponent("שלום, הגעתי מאתר שורשים ואשמח לפרטים בדיסקרטיות");\n'+
+  '  document.querySelectorAll(\'a[href^="https://wa.me/"]\').forEach(function(a){\n'+
+  '    var h=a.getAttribute("href").indexOf("?text=")!==-1;\n'+
+  '    a.href="https://wa.me/"+c.whatsapp+(h?"?text="+wa:"");\n'+
+  '  });\n'+
+  '  var yt=document.getElementById("hero-video-link");\n'+
+  '  if(yt){if(c.youtubeUrl){yt.href=c.youtubeUrl;yt.style.pointerEvents=""}else{yt.style.pointerEvents="none";yt.removeAttribute("href");}}\n'+
+  '  if(c.statsUrl)fetch(c.statsUrl+"?_="+Date.now()).then(function(r){return r.json()}).then(function(d){\n'+
+  '    if(d&&d.families)ids.forEach(function(id,i){var el=document.getElementById(id);if(el)el.setAttribute("data-target",[d.families,d.workshops,d.facilitators,d.cities][i]||0)});\n'+
+  '  }).catch(function(){});\n'+
+  '}(SHORESHIM));\n';
+}
+
+function makeContentJs(c){
+  return '/* שורשים — content.js */\nvar SHORESHIM_CONTENT='+JSON.stringify(c)+';\n'+
+  '(function(c){\n'+
+  '  function st(id,v){var el=document.getElementById(id);if(el&&v!=null)el.textContent=String(v)}\n'+
+  '  function si(id,url,h){var el=document.getElementById(id);if(el&&url)el.innerHTML=\'<img src="\'+url.replace(/"/g,\'%22\')+\'" alt="" style="width:100%;height:\'+(h||"100%")+\';object-fit:cover;border-radius:inherit;display:block">\'}\n'+
+  '  st("content-hero-title",c["hero.title"]);\n'+
+  '  st("content-hero-accent",c["hero.accent"]);\n'+
+  '  st("content-hero-subtitle",c["hero.subtitle"]);\n'+
+  '  st("content-mission-body",c["about.body"]);\n'+
+  '  var ht=document.querySelector(".hero-video-thumbnail");\n'+
+  '  var _ytId=function(u){if(!u)return null;var m=u.match(/(?:youtu\\.be\\/|[?&]v=|\\/embed\\/|\\/shorts\\/)([A-Za-z0-9_-]{11})/);return m?m[1]:null};\n'+
+  '  var heroThumb=c["hero.thumbUrl"]||(_ytId(c["hero.youtubeUrl"]||SHORESHIM.youtubeUrl||"")?"https://img.youtube.com/vi/"+_ytId(c["hero.youtubeUrl"]||SHORESHIM.youtubeUrl||"")+"/hqdefault.jpg":"");\n'+
+  '  if(ht&&heroThumb)ht.innerHTML=\'<img src="\'+heroThumb.replace(/"/g,\'%22\')+\'" alt="" style="width:100%;height:200px;object-fit:cover">\';\n'+
+  '  si("mission-visual",c["about.imageUrl"],"340px");\n'+
+  '  si("svc-img-workshops",c["svc.workshops.imgUrl"],"260px");\n'+
+  '  si("svc-img-coaching",c["svc.coaching.imgUrl"],"260px");\n'+
+  '  si("svc-img-resilience",c["svc.resilience.imgUrl"],"260px");\n'+
+  '  var tc=document.getElementById("team-carousel");\n'+
+  '  if(tc&&c.team&&c.team.length){tc.innerHTML=c.team.map(function(m){\n'+
+  '    return\'<div class="team-card fade-in-up"><div class="team-photo">\'+\n'+
+  '    (m.photoUrl?\'<img src="\'+m.photoUrl.replace(/"/g,\'%22\')+\'" alt="" style="width:100%;height:100%;object-fit:cover">\':\'\' )+\n'+
+  '    \'</div><h3 class="team-name">\'+m.name+\'</h3><p class="team-role">\'+m.role+\'</p><p class="team-bio">\'+m.bio+\'</p></div>\';\n'+
+  '  }).join(""); }\n'+
+  '  var ev=document.getElementById("events-track");\n'+
+  '  var es=document.getElementById("events-section");\n'+
+  '  if(ev&&c.events&&c.events.length){\n'+
+  '    ev.innerHTML=c.events.map(function(e){return\'<a class="event-card" href="\'+e.link+\'" target="_blank" rel="noopener">\'+\n'+
+  '      (e.imgUrl?\'<img class="event-poster" src="\'+e.imgUrl.replace(/"/g,\'%22\')+\'" alt="">\':\'\' )+\n'+
+  '      \'<div class="event-info"><h3>\'+e.title+\'</h3></div></a>\';}).join("");\n'+
+  '    if(es)es.style.display=""; }else if(es)es.style.display="none";\n'+
+  '  var ts=document.getElementById("testimonials-slider");\n'+
+  '  if(ts&&c.testimonials&&c.testimonials.length){ts.innerHTML=c.testimonials.map(function(t){\n'+
+  '    return\'<div class="testimonial-card fade-in-up"><p class="testimonial-quote">"\'+t.quote+\'"</p>\'+\n'+
+  '    \'<p class="testimonial-body">\'+t.body+\'</p><div class="testimonial-author">\'+\n'+
+  '    (t.photoUrl?\'<img src="\'+t.photoUrl.replace(/"/g,\'%22\')+\'" alt="" class="testimonial-photo">\':\'\' )+\n'+
+  '    \'<div><strong>\'+t.author+\'</strong><span>\'+t.role+\'</span></div></div></div>\';\n'+
+  '  }).join(""); }\n'+
+  '}(SHORESHIM_CONTENT));\n';
+}
+
+/* ═══════════════════════════════════════
+   DOWNLOAD FILES
+═══════════════════════════════════════ */
+function downloadFiles(){
+  var d=collectData();
+  [
+    {name:'config.json',  c:JSON.stringify(d.cfg,null,2)+'\n'},
+    {name:'config.js',    c:makeConfigJs(d.cfg)},
+    {name:'content.json', c:JSON.stringify(d.cnt,null,2)+'\n'},
+    {name:'content.js',   c:makeContentJs(d.cnt)},
+  ].forEach(function(f){
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([f.c],{type:'text/plain;charset=utf-8'}));
+    a.download=f.name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  });
+  toast('4 קבצים הורדו. העלו אותם לשרת לידי הפעלה.','ok',5000);
+}
+
+/* ═══════════════════════════════════════
+   DYNAMIC LISTS
+═══════════════════════════════════════ */
+var _ti=0,_ei=0,_qi=0;
+
+function renderTeam(arr){ g('team-list').innerHTML=''; _ti=0; arr.forEach(addTeamMember); }
+function addTeamMember(d){
+  d=d||{}; var i=_ti++;
+  var el=document.createElement('div');
+  el.className='di'; el.dataset.i=i;
+  el.innerHTML=
+    '<div class="di-num">איש צוות '+(i+1)+'</div>'+
+    '<button class="di-rm" onclick="this.closest(\'.di\').remove();scheduleAS()">הסר</button>'+
+    '<div class="f"><label>שם מלא</label><input type="text" id="tm-n-'+i+'" value="'+esc(d.name||'')+'" placeholder="שם" oninput="scheduleAS()"></div>'+
+    '<div class="f"><label>תפקיד</label><input type="text" id="tm-r-'+i+'" value="'+esc(d.role||'')+'" placeholder="מנחה" oninput="scheduleAS()"></div>'+
+    '<div class="f"><label>ביו קצרה</label><textarea id="tm-b-'+i+'" rows="2" placeholder="כמה מילים על הרקע..." oninput="scheduleAS()">'+esc(d.bio||'')+'</textarea></div>'+
+    '<div class="f"><label>תמונה</label>'+imgw('tm-'+i)+'</div>';
+  g('team-list').appendChild(el);
+  if(d.photoUrl){ sv('img-url-tm-'+i,d.photoUrl); setImgW('tm-'+i,d.photoUrl); }
+}
+
+function renderEvents(arr){ g('ev-list').innerHTML=''; _ei=0; arr.forEach(addEvent); }
+function addEvent(d){
+  d=d||{}; var i=_ei++;
+  var el=document.createElement('div');
+  el.className='di'; el.dataset.i=i;
+  el.innerHTML=
+    '<div class="di-num">אירוע '+(i+1)+'</div>'+
+    '<button class="di-rm" onclick="this.closest(\'.di\').remove();scheduleAS()">הסר</button>'+
+    '<div class="f"><label>כותרת האירוע</label><input type="text" id="ev-t-'+i+'" value="'+esc(d.title||'')+'" placeholder="שם הכנס / אירוע" oninput="scheduleAS()"></div>'+
+    '<div class="f"><label>קישור (URL)</label><input type="url" id="ev-l-'+i+'" dir="ltr" value="'+esc(d.link||'')+'" placeholder="https://..." oninput="scheduleAS()"></div>'+
+    '<div class="f"><label>תמונת פוסטר</label>'+imgw('ev-'+i)+'</div>';
+  g('ev-list').appendChild(el);
+  if(d.imgUrl){ sv('img-url-ev-'+i,d.imgUrl); setImgW('ev-'+i,d.imgUrl); }
+}
+
+function renderTestimonials(arr){ g('tst-list').innerHTML=''; _qi=0; arr.forEach(addTestimonial); }
+function addTestimonial(d){
+  d=d||{}; var i=_qi++;
+  var el=document.createElement('div');
+  el.className='di'; el.dataset.i=i;
+  el.innerHTML=
+    '<div class="di-num">עדות '+(i+1)+'</div>'+
+    '<button class="di-rm" onclick="this.closest(\'.di\').remove();scheduleAS()">הסר</button>'+
+    '<div class="f"><label>ציטוט קצר (מופיע בבלון)</label><input type="text" id="tst-q-'+i+'" value="'+esc(d.quote||'')+'" placeholder="משפט קצר..." oninput="scheduleAS()"></div>'+
+    '<div class="f"><label>תוכן מלא (אופציונלי)</label><textarea id="tst-b-'+i+'" rows="2" placeholder="הרחבה על הסיפור..." oninput="scheduleAS()">'+esc(d.body||'')+'</textarea></div>'+
+    '<div class="frow">'+
+      '<div class="f"><label>שם</label><input type="text" id="tst-a-'+i+'" value="'+esc(d.author||'')+'" placeholder="שם" oninput="scheduleAS()"></div>'+
+      '<div class="f"><label>תפקיד / הגדרה</label><input type="text" id="tst-r-'+i+'" value="'+esc(d.role||'')+'" placeholder="הורה מתמודד" oninput="scheduleAS()"></div>'+
+    '</div>'+
+    '<div class="f"><label>תמונה</label>'+imgw('tst-'+i)+'</div>';
+  g('tst-list').appendChild(el);
+  if(d.photoUrl){ sv('img-url-tst-'+i,d.photoUrl); setImgW('tst-'+i,d.photoUrl); }
+}
+
+/* ═══════════════════════════════════════
+   BUILD FORMS HTML
+═══════════════════════════════════════ */
+function buildForms(){
+  var h='';
+
+  /* HERO */
+  h+='<div class="sf on" id="sf-hero">'+
+    '<div class="sf-title">תוכן דף הבית — הירו</div>'+
+    '<div class="f"><label>כותרת ראשית <span style="font-size:.68rem;color:var(--gold)">★ מרכזי</span></label>'+
+      '<input type="text" id="cnt-ht" placeholder="הבית הוא העוגן..." oninput="liveText(\'content-hero-title\',this.value)"></div>'+
+    '<div class="f"><label>טקסט הדגשה (זהב)</label>'+
+      '<input type="text" id="cnt-ha" placeholder="גם כשהדרך משתנה" oninput="liveText(\'content-hero-accent\',this.value)"></div>'+
+    '<div class="f"><label>תת-כותרת</label>'+
+      '<textarea id="cnt-hs" rows="3" placeholder="תיאור קצר תחת הכותרת..." oninput="liveText(\'content-hero-subtitle\',this.value)"></textarea></div>'+
+    '<div class="f"><label>קישור יוטיוב לסרטון</label>'+
+      '<input type="url" id="cfg-youtube" dir="ltr" placeholder="https://youtu.be/..." oninput="onYoutubeInput(this.value,\'hero-thumb\')">'+
+      '<div class="hint">תמונת התצוגה תתמלא אוטומטית מיוטיוב</div></div>'+
+    '<div class="f"><label>תמונת כרטיס הסרטון (אוטומטי מיוטיוב / או העלו ידנית)</label>'+imgw('hero-thumb')+'</div>'+
+  '</div>';
+
+  /* ABOUT */
+  h+='<div class="sf" id="sf-about">'+
+    '<div class="sf-title">סעיף אודות / מי אנחנו</div>'+
+    '<div class="f"><label>טקסט "מי אנחנו"</label>'+
+      '<textarea id="cnt-ab" rows="7" placeholder="תיאור הארגון, המשימה, הגישה..." oninput="liveText(\'content-mission-body\',this.value)"></textarea></div>'+
+    '<div class="f"><label>תמונת הארגון / הצוות</label>'+imgw('about-img')+'</div>'+
+    '<div class="f"><label>קישור יוטיוב — "אודות"</label>'+
+      '<input type="url" id="cnt-avurl" dir="ltr" placeholder="https://youtu.be/..." oninput="onYoutubeInput(this.value,\'about-vid\')"></div>'+
+    '<div class="f"><label>תמונת כרטיס הסרטון "אודות" (אוטומטי / ידני)</label>'+imgw('about-vid')+'</div>'+
+  '</div>';
+
+  /* SERVICES */
+  h+='<div class="sf" id="sf-services">'+
+    '<div class="sf-title">שירותים — תמונות</div>'+
+    '<div class="f"><label>סדנאות הורים — תמונה</label>'+imgw('svc-workshops')+'</div>'+
+    '<div class="f"><label>ליווי ואימון — תמונה</label>'+imgw('svc-coaching')+'</div>'+
+    '<div class="f"><label>חוסן משפחתי — תמונה</label>'+imgw('svc-resilience')+'</div>'+
+  '</div>';
+
+  /* TEAM */
+  h+='<div class="sf" id="sf-team">'+
+    '<div class="sf-title">אנשי הצוות</div>'+
+    '<div id="team-list"></div>'+
+    '<button class="btn-add" onclick="addTeamMember()">+ הוסף איש צוות</button>'+
+  '</div>';
+
+  /* EVENTS */
+  h+='<div class="sf" id="sf-events">'+
+    '<div class="sf-title">כנסים ואירועים</div>'+
+    '<div id="ev-list"></div>'+
+    '<button class="btn-add" onclick="addEvent()">+ הוסף אירוע</button>'+
+  '</div>';
+
+  /* TESTIMONIALS */
+  h+='<div class="sf" id="sf-testimonials">'+
+    '<div class="sf-title">עדויות הורים</div>'+
+    '<div id="tst-list"></div>'+
+    '<button class="btn-add" onclick="addTestimonial()">+ הוסף עדות</button>'+
+  '</div>';
+
+  /* STATS */
+  h+='<div class="sf" id="sf-stats">'+
+    '<div class="sf-title">מספרי סטטיסטיקה</div>'+
+    '<p style="font-size:.78rem;color:var(--sub);margin-bottom:.85rem">המספרים המופיעים בדף הבית</p>'+
+    '<div class="stats4">'+
+      '<div class="stat-box"><label>משפחות / הורים</label><input type="number" id="cfg-s1" placeholder="320" oninput="scheduleAS()"></div>'+
+      '<div class="stat-box"><label>סדנאות</label><input type="number" id="cfg-s2" placeholder="48" oninput="scheduleAS()"></div>'+
+      '<div class="stat-box"><label>מנחים</label><input type="number" id="cfg-s3" placeholder="12" oninput="scheduleAS()"></div>'+
+      '<div class="stat-box"><label>ערים</label><input type="number" id="cfg-s4" placeholder="8" oninput="scheduleAS()"></div>'+
+    '</div>'+
+    '<p style="font-size:.78rem;font-weight:600;color:var(--sub);margin:.5rem 0">תוויות מתחת למספרים</p>'+
+    '<div class="frow" style="margin-bottom:.65rem">'+
+      '<div class="f"><label>תווית 1</label><input type="text" id="cfg-l1" placeholder="הורים קיבלו ליווי" oninput="scheduleAS()"></div>'+
+      '<div class="f"><label>תווית 2</label><input type="text" id="cfg-l2" placeholder="סדנאות" oninput="scheduleAS()"></div>'+
+    '</div>'+
+    '<div class="frow" style="margin-bottom:.85rem">'+
+      '<div class="f"><label>תווית 3</label><input type="text" id="cfg-l3" placeholder="מנחים מוסמכים" oninput="scheduleAS()"></div>'+
+      '<div class="f"><label>תווית 4</label><input type="text" id="cfg-l4" placeholder="ערים" oninput="scheduleAS()"></div>'+
+    '</div>'+
+    '<div class="f"><label>URL לעדכון אוטומטי (אופציונלי)</label>'+
+      '<input type="url" id="cfg-statsurl" dir="ltr" placeholder="https://..." oninput="scheduleAS()">'+
+      '<div class="hint">JSON עם שדות families, workshops, facilitators, cities</div></div>'+
+  '</div>';
+
+  /* CONTACT */
+  h+='<div class="sf" id="sf-contact">'+
+    '<div class="sf-title">פרטי יצירת קשר</div>'+
+    '<div class="frow">'+
+      '<div class="f"><label>טלפון</label><input type="tel" id="cfg-phone" dir="ltr" placeholder="055-0000000" oninput="scheduleAS()"></div>'+
+      '<div class="f"><label>וואטסאפ (בינ"ל)</label><input type="tel" id="cfg-wa" dir="ltr" placeholder="972500000000" oninput="scheduleAS()"></div>'+
+    '</div>'+
+    '<div class="f"><label>אימייל</label><input type="email" id="cfg-email" dir="ltr" placeholder="contact@example.org.il" oninput="scheduleAS()"></div>'+
+    '<div class="f"><label>Formspree Endpoint (טופס קשר)</label>'+
+      '<input type="url" id="cfg-formsep" dir="ltr" placeholder="https://formspree.io/f/xxxxx" oninput="scheduleAS()">'+
+      '<div class="hint">ניתן לפתוח חשבון חינם בכתובת formspree.io</div></div>'+
+    '<div class="f"><label>קישור תרומות — Matara / Nedarim Plus</label>'+
+      '<input type="url" id="cfg-matara" dir="ltr" placeholder="https://matara.pro/..." oninput="scheduleAS()"></div>'+
+  '</div>';
+
+  /* SETTINGS */
+  h+='<div class="sf" id="sf-settings">'+
+    '<div class="sf-title">הגדרות</div>'+
+    '<div class="f"><label>שינוי סיסמת כניסה לממשק</label>'+
+      '<input type="password" id="cfg-newpass" placeholder="סיסמה חדשה (לפחות 6 תווים)" autocomplete="new-password">'+
+    '</div>'+
+    '<button onclick="changePass()" style="background:var(--navy);color:#fff;border:none;border-radius:8px;padding:.6rem 1.2rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit">עדכן סיסמה ←</button>'+
+  '</div>';
+
+  return h;
+}
+
+/* ═══════════════════════════════════════
+   SETTINGS
+═══════════════════════════════════════ */
+function changePass(){
+  var p=gv('cfg-newpass');
+  if(p.length<6){toast('סיסמה חייבת להיות לפחות 6 תווים','err');return;}
+  sha256(p).then(function(h){
+    localStorage.setItem('shoreshim_phash',h);
+    sv('cfg-newpass','');
+    toast('סיסמה עודכנה ✓','ok');
+  });
+}
+
+/* ═══════════════════════════════════════
+   LAUNCH APP
+═══════════════════════════════════════ */
+function launchApp(){
+  g('login-wrap').style.display='none';
+  g('app').style.display='flex';
+  g('forms').innerHTML = buildForms();
+  loadData();
+}
+
+/* ═══════════════════════════════════════
+   BOOT
+═══════════════════════════════════════ */
+(function(){
+  var stored=localStorage.getItem('shoreshim_phash');
+  if(!stored){
+    g('l-sub').textContent='הגדרה ראשונה — בחרו סיסמה (לפחות 6 תווים)';
+  }
+  if(sessionStorage.getItem('shoreshim_auth')==='1'){
+    launchApp();
+    return;
+  }
+  g('l-pass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
 })();
 </script>
 </body>

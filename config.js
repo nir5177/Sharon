@@ -4,6 +4,7 @@ var SHORESHIM = {
   whatsapp:     "972500000000",
   email:        "contact@shoreshim.org.il",
   formEndpoint: "",
+  youtubeUrl:   "",
   stats: {
     families:    320,
     workshops:   48,
@@ -30,4 +31,15 @@ var SHORESHIM = {
     var hasText = a.getAttribute('href').indexOf('?text=') !== -1;
     a.href = 'https://wa.me/' + cfg.whatsapp + (hasText ? '?text=' + waMsg : '');
   });
+
+  var ytLink = document.getElementById('hero-video-link');
+  if (ytLink) {
+    if (cfg.youtubeUrl) {
+      ytLink.href = cfg.youtubeUrl;
+      ytLink.style.pointerEvents = '';
+    } else {
+      ytLink.style.pointerEvents = 'none';
+      ytLink.removeAttribute('href');
+    }
+  }
 }(SHORESHIM));
