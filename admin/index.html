@@ -259,6 +259,7 @@ body{font-family:'Heebo','Assistant',Arial,sans-serif;background:var(--bg);color
         <button class="stab"     data-s="testimonials" onclick="showSec('testimonials')">💬 עדויות</button>
         <button class="stab"     data-s="stats"        onclick="showSec('stats')">📊 נתונים</button>
         <button class="stab"     data-s="contact"      onclick="showSec('contact')">📞 קשר</button>
+        <button class="stab"     data-s="settings"     onclick="showSec('settings')" id="tab-settings">⚙ הגדרות</button>
       </div>
 
       <!-- Forms -->
@@ -268,7 +269,7 @@ body{font-family:'Heebo','Assistant',Arial,sans-serif;background:var(--bg);color
       <div class="save-bar">
         <button class="save-btn" id="save-btn" onclick="saveDraft()">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          שמור טיוטה
+          שמור ופרסם
         </button>
         <button class="dl-btn" id="dl-btn" style="display:none" onclick="downloadFiles()">↓ הורד קבצים</button>
       </div>
@@ -287,7 +288,13 @@ var REPO_OWNER  = 'nir5177';
 var REPO_NAME   = 'Sharon';
 var REPO_BRANCH = 'gh-pages';
 var ADMIN_PAT   = '%%ADMIN_PAT%%';
-var hasPAT      = ADMIN_PAT && ADMIN_PAT !== '%%ADMIN_PAT%%';
+
+/* Token resolution: CI-injected > user-entered in settings */
+function getToken(){
+  if(ADMIN_PAT && ADMIN_PAT !== '%%ADMIN_PAT%%') return ADMIN_PAT;
+  return localStorage.getItem('shoreshim_admin_pat')||'';
+}
+function hasToken(){ return getToken().length > 0; }
 
 /* ═══════════════════════════════════════
    HELPERS
@@ -371,7 +378,6 @@ function showSec(s){
     f.classList.toggle('on', f.id==='sf-'+s);
   });
   pmsg({type:'scroll-to', id:_secPreviewId[s]||s});
-  // Mobile: switch to preview briefly then back
 }
 
 /* ═══════════════════════════════════════
@@ -477,7 +483,7 @@ function processFile(key, file){
   reader.readAsDataURL(file);
 
   /* Upload to GitHub if PAT available */
-  if(hasPAT){
+  if(hasToken()){
     setStatus('saving','מעלה תמונה...');
     uploadImgToGH(file).then(function(url){
       setImgW(key, url);
@@ -531,7 +537,7 @@ async function uploadImgToGH(file){
   });
   var resp = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path,{
     method:'PUT',
-    headers:{'Authorization':'token '+ADMIN_PAT,'Content-Type':'application/json'},
+    headers:{'Authorization':'token '+getToken(),'Content-Type':'application/json'},
     body:JSON.stringify({message:'Upload image',content:b64,branch:REPO_BRANCH})
   });
   if(!resp.ok){var e=await resp.json();throw new Error(e.message||resp.status)}
@@ -668,83 +674,98 @@ async function loadData(){
 }
 
 /* ═══════════════════════════════════════
-   SAVE DRAFT (local)
+   SAVE DRAFT + PUBLISH (single action)
 ═══════════════════════════════════════ */
 function saveDraft(){
-  var btn=g('save-btn');
-  btn.disabled=true;
+  /* Always persist locally first */
   var d=collectData();
   try{localStorage.setItem('shoreshim_cfg_draft',JSON.stringify(d.cfg))}catch(e){}
   try{localStorage.setItem('shoreshim_cnt_draft',JSON.stringify(d.cnt))}catch(e){}
   setStatus('saved','נשמר ✓');
-  toast('הטיוטה נשמרה בהצלחה ✓','ok');
-  if(!hasPAT) g('dl-btn').style.display='';
-  setTimeout(function(){btn.disabled=false},400);
+
+  if(!hasToken()){
+    /* Token injected by CI at deploy time — if missing, the site isn't deployed correctly */
+    toast('הפרסום אינו מוגדר. יש ליצור קשר עם מנהל המערכת.','err',7000);
+    g('dl-btn').style.display='';
+    return;
+  }
+
+  /* Token available: publish straight to GitHub */
+  publish(d);
 }
 
 /* ═══════════════════════════════════════
    PUBLISH TO GITHUB
 ═══════════════════════════════════════ */
-async function publish(){
-  if(!hasPAT){
-    g('dl-btn').style.display='';
-    toast('אין ADMIN_PAT מוגדר.\nהורידו את הקבצים ועלו ידנית, או הגדירו ADMIN_PAT ב-GitHub Secrets.','',7000);
-    return;
-  }
-  var btn=g('pub-btn');
+async function publish(preCollected){
+  var token=getToken();
+  if(!token){ toast('הפרסום אינו מוגדר — פנו למנהל המערכת','err'); return; }
+
+  var btn=g('save-btn');
   btn.disabled=true;
   btn.innerHTML='<span class="spin"></span> מפרסם...';
   setStatus('saving','מפרסם...');
 
   try{
-    var d=collectData();
+    var d=preCollected||collectData();
+    /* Save locally too */
+    try{localStorage.setItem('shoreshim_cfg_draft',JSON.stringify(d.cfg))}catch(e){}
+    try{localStorage.setItem('shoreshim_cnt_draft',JSON.stringify(d.cnt))}catch(e){}
+
     var tasks=[
-      ghPut('config.json',  JSON.stringify(d.cfg,null,2)+'\n'),
-      ghPut('config.js',    makeConfigJs(d.cfg)),
-      ghPut('content.json', JSON.stringify(d.cnt,null,2)+'\n'),
-      ghPut('content.js',   makeContentJs(d.cnt)),
+      ghPut('config.json',  JSON.stringify(d.cfg,null,2)+'\n', token),
+      ghPut('config.js',    makeConfigJs(d.cfg),               token),
+      ghPut('content.json', JSON.stringify(d.cnt,null,2)+'\n', token),
+      ghPut('content.js',   makeContentJs(d.cnt),              token),
     ];
     if(d.cfg.mataraUrl){
-      var dhtml=await patchDonate(d.cfg.mataraUrl);
-      if(dhtml) tasks.push(ghPut('donate.html',dhtml));
+      var dhtml=await patchDonate(d.cfg.mataraUrl, token);
+      if(dhtml) tasks.push(ghPut('donate.html',dhtml,token));
     }
     await Promise.all(tasks);
     setStatus('saved','פורסם ✓');
-    toast('האתר פורסם! יתעדכן תוך ~2 דקות ✓','ok',5000);
+    toast('פורסם לאתר! השינויים יופיעו תוך ~2 דקות ✓','ok',5000);
+    g('dl-btn').style.display='none';
   }catch(err){
     setStatus('','שגיאה');
-    toast('שגיאה בפרסום:\n'+err.message,'err',8000);
+    var msg=err.message||'';
+    if(msg.indexOf('401')>-1||msg.toLowerCase().indexOf('bad credential')>-1){
+      toast('פרסום נכשל — Token אינו תקין. יש ליצור קשר עם מנהל המערכת.','err',8000);
+    } else {
+      toast('שגיאה בפרסום:\n'+msg,'err',8000);
+    }
     g('dl-btn').style.display='';
   }finally{
     btn.disabled=false;
-    btn.innerHTML='פרסם לאתר ↑';
+    btn.innerHTML=_SAVE_ICON+' שמור ופרסם';
   }
 }
+var _SAVE_ICON='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>';
 
 /* ═══════════════════════════════════════
    GITHUB API
 ═══════════════════════════════════════ */
-async function ghPut(path, content){
+async function ghPut(path, content, token){
   var sha=null;
   try{
     var r=await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path+'?ref='+REPO_BRANCH,
-      {headers:{'Authorization':'token '+ADMIN_PAT}});
+      {headers:{'Authorization':'token '+token}});
     if(r.ok){var d=await r.json(); sha=d.sha}
   }catch(e){}
   var body={message:'Update '+path,content:btoa(unescape(encodeURIComponent(content))),branch:REPO_BRANCH};
   if(sha)body.sha=sha;
   var res=await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path,{
     method:'PUT',
-    headers:{'Authorization':'token '+ADMIN_PAT,'Content-Type':'application/json'},
+    headers:{'Authorization':'token '+token,'Content-Type':'application/json'},
     body:JSON.stringify(body)
   });
   if(!res.ok){var e=await res.json(); throw new Error(e.message||res.status)}
 }
 
-async function patchDonate(url){
+async function patchDonate(url, token){
   try{
     var r=await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/donate.html?ref='+REPO_BRANCH,
-      {headers:{'Authorization':'token '+ADMIN_PAT}});
+      {headers:{'Authorization':'token '+token}});
     if(!r.ok)return null;
     var d=await r.json();
     var html=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
@@ -991,7 +1012,29 @@ function buildForms(){
       '<input type="url" id="cfg-matara" dir="ltr" placeholder="https://matara.pro/..." oninput="scheduleAS()"></div>'+
   '</div>';
 
+  /* SETTINGS */
+  h+='<div class="sf" id="sf-settings">'+
+    '<div class="sf-title">הגדרות</div>'+
+    '<div class="f"><label>שינוי סיסמת כניסה לממשק</label>'+
+      '<input type="password" id="cfg-newpass" placeholder="סיסמה חדשה (לפחות 6 תווים)" autocomplete="new-password">'+
+    '</div>'+
+    '<button onclick="changePass()" style="background:var(--navy);color:#fff;border:none;border-radius:8px;padding:.6rem 1.2rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit">עדכן סיסמה ←</button>'+
+  '</div>';
+
   return h;
+}
+
+/* ═══════════════════════════════════════
+   SETTINGS
+═══════════════════════════════════════ */
+function changePass(){
+  var p=gv('cfg-newpass');
+  if(p.length<6){toast('סיסמה חייבת להיות לפחות 6 תווים','err');return;}
+  sha256(p).then(function(h){
+    localStorage.setItem('shoreshim_phash',h);
+    sv('cfg-newpass','');
+    toast('סיסמה עודכנה ✓','ok');
+  });
 }
 
 /* ═══════════════════════════════════════
