@@ -48,14 +48,19 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
 .admin-header-title{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
 .admin-header-title svg{flex-shrink:0}
 .admin-actions{display:flex;gap:.5rem;align-items:center}
-.btn-save{background:var(--gold);color:var(--navy-dark);border:none;border-radius:6px;
-  padding:.4rem 1rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
-  transition:opacity .2s;display:flex;align-items:center;gap:.4rem}
-.btn-save:hover{opacity:.85}
-.btn-save:disabled{opacity:.5;cursor:not-allowed}
 .btn-logout{background:transparent;color:#aab;border:1px solid #445;border-radius:6px;
   padding:.35rem .7rem;font-size:.8rem;cursor:pointer;font-family:inherit}
 .btn-logout:hover{background:#1a2840}
+
+/* Save bar — sticky at bottom of form panel */
+.form-save-bar{position:sticky;bottom:0;flex-shrink:0;
+  background:var(--cream);border-top:1.5px solid #dee4f0;
+  padding:.75rem 1rem;display:flex;align-items:center;gap:.6rem;z-index:10}
+.btn-save-form{flex:1;background:var(--gold);color:var(--navy-dark);border:none;border-radius:8px;
+  padding:.7rem 1.2rem;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:.5rem;transition:opacity .2s}
+.btn-save-form:hover{opacity:.85}
+.btn-save-form:disabled{opacity:.5;cursor:not-allowed}
 
 /* ─── Split layout ─── */
 .admin-split{display:flex;flex:1;overflow:hidden;height:calc(100vh - 52px)}
@@ -266,10 +271,6 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
       ניהול — שורשים
     </div>
     <div class="admin-actions">
-      <button class="btn-save" id="save-btn" onclick="saveChanges()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg>
-        שמירה ופרסום
-      </button>
       <button class="btn-logout" onclick="doLogout()">יציאה</button>
     </div>
   </header>
@@ -692,24 +693,6 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
       </div>
       <div class="section-body">
 
-        <!-- GitHub Token -->
-        <div class="account-row">
-          <div class="account-row-label" style="display:flex;align-items:center;gap:.5rem">
-            GitHub Token — לשמירה ופרסום
-            <span id="pat-status-badge" style="display:none;border-radius:5px;padding:.15rem .5rem;font-size:.72rem;font-weight:700"></span>
-          </div>
-          <p style="font-size:.78rem;color:#666;margin-bottom:.6rem;line-height:1.6">
-            נשמר בדפדפן זה בלבד. צרו token ב-<a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener" style="color:var(--navy-mid)">github.com/settings/tokens</a>
-            עם הרשאת <code style="background:#eee;padding:.1rem .3rem;border-radius:3px">Contents:write</code> על ריפוזיטורי זה.
-          </p>
-          <div class="inline-form">
-            <input type="password" id="pat-input" placeholder="ghp_... או github_pat_..." dir="ltr" style="font-family:monospace;font-size:.85rem">
-            <button class="btn-action" onclick="savePat()">שמור</button>
-            <button class="btn-action danger" id="pat-clear-btn" onclick="clearPat()" style="display:none">מחק</button>
-          </div>
-          <p id="pat-msg" class="inline-msg"></p>
-        </div>
-
         <!-- Change password -->
         <div class="account-row">
           <div class="account-row-label">שינוי סיסמה</div>
@@ -726,6 +709,12 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
     </div>
 
       </main>
+      <div class="form-save-bar">
+        <button class="btn-save-form" id="save-btn" onclick="saveChanges()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg>
+          שמירה ופרסום
+        </button>
+      </div>
       <div id="status-bar"></div>
     </div><!-- /form-panel -->
 
@@ -931,34 +920,6 @@ function showInlineMsg(el, msg, ok) {
   setTimeout(function(){ el.style.display='none'; }, 4000);
 }
 
-function savePat() {
-  var val = document.getElementById('pat-input').value.trim();
-  var msg = document.getElementById('pat-msg');
-  if (!val) return showInlineMsg(msg, 'יש להזין token', false);
-  localStorage.setItem('shoreshim_admin_pat', val);
-  document.getElementById('pat-input').value = '';
-  updatePatBadge();
-  showInlineMsg(msg, 'Token נשמר בהצלחה ✓', true);
-}
-
-function clearPat() {
-  localStorage.removeItem('shoreshim_admin_pat');
-  updatePatBadge();
-  showInlineMsg(document.getElementById('pat-msg'), 'Token נמחק', true);
-}
-
-function updatePatBadge() {
-  var hasPat = (ADMIN_PAT && ADMIN_PAT !== '%%ADMIN_PAT%%') || !!localStorage.getItem('shoreshim_admin_pat');
-  var badge = document.getElementById('pat-status-badge');
-  var clearBtn = document.getElementById('pat-clear-btn');
-  if (badge) {
-    badge.style.display = 'inline-block';
-    badge.style.background = hasPat ? '#e6f4ea' : '#fdecea';
-    badge.style.color = hasPat ? '#2d7a4e' : '#c0392b';
-    badge.textContent = hasPat ? '✓ מוגדר' : '✗ חסר — שמירה תיכשל';
-  }
-  if (clearBtn) clearBtn.style.display = (!!localStorage.getItem('shoreshim_admin_pat')) ? '' : 'none';
-}
 
 /* ══════════════════════════════════════
    Show admin + load config
@@ -967,7 +928,6 @@ async function showAdmin() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('admin-screen').style.display = 'flex';
   await loadConfig();
-  updatePatBadge();
 }
 
 async function loadConfig() {
@@ -1287,11 +1247,11 @@ function getContentFromForm() {
    Save
 ══════════════════════════════════════ */
 async function saveChanges() {
-  var pat = (ADMIN_PAT && ADMIN_PAT !== '%%ADMIN_PAT%%') ? ADMIN_PAT : (localStorage.getItem('shoreshim_admin_pat') || '');
-  if (!pat) { showStatus('הזינו GitHub Token בהגדרות חשבון ↓', 'error'); return; }
+  var pat = ADMIN_PAT;
+  if (!pat || pat === '%%ADMIN_PAT%%') { showStatus('שגיאת הגדרה — פנה למנהל הטכני', 'error'); return; }
   var btn = document.getElementById('save-btn');
   btn.disabled = true;
-  btn.innerHTML = '<div class="spinner"></div> שומר...';
+  btn.innerHTML = '<div class="spinner" style="width:18px;height:18px"></div> שומר ומפרסם...';
 
   var cfg = {
     phone:        get('cfg-phone-in'),
@@ -1336,7 +1296,7 @@ async function saveChanges() {
     showStatus('שגיאה בשמירה: ' + e.message, 'error');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg> שמירה ופרסום';
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg> שמירה ופרסום';
   }
 }
 
@@ -1575,6 +1535,18 @@ function showStatus(msg, type) {
 /* ══════════════════════════════════════
    Boot
 ══════════════════════════════════════ */
+(function() {
+  /* Auto-jump preview when any field inside a section card gains focus */
+  document.addEventListener('focusin', function(e) {
+    var card = e.target.closest && e.target.closest('.section-card');
+    if (!card) return;
+    if (card.classList.contains('active-section')) return;
+    var header = card.querySelector('.section-header[data-section]');
+    if (!header) return;
+    jumpToSection(header.dataset.section);
+  });
+})();
+
 (function() {
   if (sessionStorage.getItem('shoreshim_authed') === '1') { showAdmin(); return; }
 
