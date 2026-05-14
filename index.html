@@ -825,7 +825,8 @@
 <script>
 /* Admin live-preview postMessage receiver */
 window.addEventListener('message', function(e) {
-  if (e.origin !== 'https://nir5177.github.io') return;
+  /* Accept only from parent frame (admin panel) — same-origin or trusted */
+  if (e.source !== window.parent) return;
   var d = e.data;
   if (!d || !d.type) return;
   if (d.type === 'scroll-to') {

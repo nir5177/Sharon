@@ -2,1696 +2,1021 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ממשק ניהול — שורשים</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
+<title>ממשק ניהול — שורשים</title>
 <style>
+/* ─── BASE ─── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
 :root{
-  --navy:#1B2A4A;--navy-mid:#2D4A7A;--navy-dark:#0F1B33;
-  --gold:#D4A853;--orange:#E8934A;--cream:#F8F5EE;
-  --green:#2d8a4e;--red:#c0392b;--border:#d0d7e3;
+  --navy:#1B2A4A;--navy2:#2D4A7A;--gold:#D4A853;
+  --green:#27704a;--red:#c0392b;
+  --bg:#EEF0F6;--card:#fff;--border:#D4D9E8;
+  --txt:#1B2A4A;--sub:#6B7A9A;--radius:10px;
 }
-body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
-  background:var(--cream);color:var(--navy-dark);direction:rtl;min-height:100vh}
+body{font-family:'Heebo','Assistant',Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:14px}
 
-/* ─── Login screen ─── */
-#login-screen{display:flex;align-items:center;justify-content:center;
-  min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%)}
-.login-card{background:#fff;border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:400px;
-  box-shadow:0 20px 60px rgba(0,0,0,.35)}
-.login-logo{text-align:center;margin-bottom:1.5rem}
-.login-logo svg{width:52px;height:52px}
-.login-title{text-align:center;font-size:1.4rem;font-weight:700;color:var(--navy);margin-bottom:.25rem}
-.login-sub{text-align:center;font-size:.85rem;color:#666;margin-bottom:1.75rem}
-.field-group{margin-bottom:1rem}
-.field-group label{display:block;font-size:.82rem;font-weight:600;color:var(--navy);margin-bottom:.35rem}
-.field-group input{width:100%;padding:.65rem .9rem;border:1.5px solid var(--border);
-  border-radius:8px;font-size:.95rem;font-family:inherit;outline:none}
-.field-group input:focus{border-color:var(--navy-mid)}
-.field-hint{font-size:.75rem;color:#888;margin-top:.4rem;line-height:1.5}
-.field-hint a{color:var(--navy-mid)}
-.login-btn{width:100%;padding:.8rem;background:var(--navy);color:#fff;border:none;
-  border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:.5rem;
-  font-family:inherit;transition:background .2s}
-.login-btn:hover{background:var(--navy-mid)}
-.login-error{background:#fdecea;color:var(--red);border-radius:6px;padding:.6rem .9rem;
-  font-size:.85rem;margin-bottom:.75rem;display:none}
-.setup-badge{display:inline-block;background:#fff8e6;color:#a07000;border:1px solid #f0d080;
-  border-radius:6px;padding:.3rem .7rem;font-size:.78rem;font-weight:600;margin-bottom:1rem;width:100%;text-align:center}
+/* ─── LOGIN ─── */
+#login-wrap{position:fixed;inset:0;background:linear-gradient(145deg,#0f1b33 0%,#1B2A4A 50%,#2D4A7A 100%);
+  display:flex;align-items:center;justify-content:center;z-index:999}
+.lcard{background:#fff;border-radius:20px;padding:2.5rem 2rem;width:340px;
+  box-shadow:0 32px 80px rgba(0,0,0,.5)}
+.lcard-logo{text-align:center;margin-bottom:1.25rem}
+.lcard-title{text-align:center;font-size:1.25rem;font-weight:700;color:var(--navy);margin-bottom:.3rem}
+.lcard-sub{text-align:center;font-size:.82rem;color:var(--sub);margin-bottom:1.5rem}
+.lf{margin-bottom:.9rem}
+.lf label{display:block;font-size:.78rem;font-weight:600;color:var(--sub);margin-bottom:.3rem}
+.lf input{width:100%;padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:8px;
+  font-size:.9rem;font-family:inherit;outline:none;transition:border .15s}
+.lf input:focus{border-color:var(--navy2)}
+.login-btn{width:100%;padding:.78rem;background:var(--navy);color:#fff;border:none;border-radius:8px;
+  font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.login-btn:hover{background:var(--navy2)}
+.lerr{background:#fdecea;color:var(--red);border-radius:6px;padding:.5rem .75rem;
+  font-size:.8rem;margin-bottom:.75rem;display:none}
 
-/* ─── Admin layout ─── */
-#admin-screen{display:none;flex-direction:column;height:100vh;overflow:hidden}
-.admin-header{background:var(--navy-dark);color:#fff;padding:0 1.25rem;
-  display:flex;align-items:center;justify-content:space-between;height:52px;flex-shrink:0;
-  position:relative;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.admin-header-title{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
-.admin-header-title svg{flex-shrink:0}
-.admin-actions{display:flex;gap:.5rem;align-items:center}
-.btn-logout{background:transparent;color:#aab;border:1px solid #445;border-radius:6px;
-  padding:.35rem .7rem;font-size:.8rem;cursor:pointer;font-family:inherit}
-.btn-logout:hover{background:#1a2840}
+/* ─── APP SHELL ─── */
+#app{display:none;flex-direction:column;height:100vh}
 
-/* Save bar — sticky at bottom of form panel */
-.form-save-bar{position:sticky;bottom:0;flex-shrink:0;
-  background:var(--cream);border-top:1.5px solid #dee4f0;
-  padding:.75rem 1rem;display:flex;align-items:center;gap:.6rem;z-index:10}
-.btn-save-form{flex:1;background:var(--gold);color:var(--navy-dark);border:none;border-radius:8px;
-  padding:.7rem 1.2rem;font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;
-  display:flex;align-items:center;justify-content:center;gap:.5rem;transition:opacity .2s}
-.btn-save-form:hover{opacity:.85}
-.btn-save-form:disabled{opacity:.5;cursor:not-allowed}
-.btn-download{background:#fff;color:var(--navy);border:1.5px solid var(--border);border-radius:8px;
-  padding:.7rem .85rem;cursor:pointer;font-family:inherit;display:flex;align-items:center;
-  gap:.35rem;font-size:.82rem;font-weight:600;transition:background .15s;flex-shrink:0;white-space:nowrap}
-.btn-download:hover{background:#eef2fa}
-.download-hint{font-size:.74rem;color:#888;text-align:center;padding:.35rem 1rem .5rem;
-  border-top:1px solid var(--border);display:none}
-.download-hint a{color:var(--navy-mid);text-decoration:underline}
+/* ─── HEADER ─── */
+.hdr{height:48px;background:var(--navy);color:#fff;display:flex;align-items:center;
+  padding:0 1rem;gap:.6rem;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.hdr-brand{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:.4rem}
+.hdr-space{flex:1}
+.hdr-status{font-size:.72rem;display:flex;align-items:center;gap:.3rem;
+  color:rgba(255,255,255,.55);min-width:80px;justify-content:center}
+.hdr-status.saving{color:#ffd;animation:pulse .7s infinite alternate}
+.hdr-status.saved{color:rgba(140,255,160,.85)}
+@keyframes pulse{to{opacity:.4}}
+.hbtn{border:none;border-radius:6px;padding:.32rem .75rem;font-size:.78rem;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:opacity .15s;white-space:nowrap}
+.hbtn:hover{opacity:.82}
+.hbtn-pub{background:var(--gold);color:var(--navy)}
+.hbtn-pub:disabled{opacity:.5;cursor:not-allowed}
+.hbtn-out{background:rgba(255,255,255,.13);color:rgba(255,255,255,.85)}
 
-/* ─── Split layout ─── */
-.admin-split{display:flex;flex:1;overflow:hidden;height:calc(100vh - 52px)}
-.admin-form-panel{width:460px;min-width:360px;flex-shrink:0;overflow-y:auto;
-  background:var(--cream);border-left:1px solid #dee4f0;
-  display:flex;flex-direction:column}
-.admin-preview-panel{flex:1;display:flex;flex-direction:column;background:#e8ecf2;
-  position:relative;overflow:hidden}
-.admin-preview-label{background:#2c3e5a;color:#9ba8bc;font-size:.72rem;font-weight:600;
-  padding:.3rem .75rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;
-  letter-spacing:.04em;text-transform:uppercase}
-.preview-url{font-size:.68rem;color:#6a7a8e;direction:ltr}
-#site-preview{flex:1;border:none;width:100%;height:100%;
-  transform-origin:top right;background:#fff}
-.preview-loading{position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:.75rem;background:#e8ecf2;
-  color:#7a8898;font-size:.85rem;pointer-events:none}
-.preview-loading.hidden{display:none}
-.preview-spinner{width:28px;height:28px;border:3px solid rgba(74,144,217,.2);
-  border-top-color:#4A90D9;border-radius:50%;animation:spin .7s linear infinite}
+/* ─── SPLIT ─── */
+.split{display:flex;flex:1;overflow:hidden}
 
-/* Preview tabs (mobile) */
-.preview-tabs{display:none}
-@media(max-width:900px){
-  .admin-split{flex-direction:column}
-  .admin-form-panel{width:100%;height:100%;flex:1}
-  .admin-preview-panel{position:fixed;inset:52px 0 0 0;z-index:50;display:none}
-  .admin-preview-panel.show-mobile{display:flex}
-  .preview-tabs{display:flex;flex-shrink:0;border-bottom:2px solid #dee4f0;background:#fff}
-  .preview-tab{flex:1;padding:.65rem;font-size:.85rem;font-weight:600;border:none;
-    background:transparent;cursor:pointer;font-family:inherit;color:#888;transition:color .2s}
-  .preview-tab.active{color:var(--navy);border-bottom:2.5px solid var(--navy);margin-bottom:-2px}
+/* ─── PREVIEW PANEL ─── */
+.panel-preview{flex:1;display:flex;flex-direction:column;background:#c5cad8;min-width:0;
+  border-left:1px solid #b0b8cc}
+.prev-bar{background:#283347;color:rgba(255,255,255,.55);font-size:.68rem;padding:.28rem .7rem;
+  display:flex;align-items:center;gap:.5rem;flex-shrink:0;user-select:none}
+.prev-bar-lbl{flex:1}
+.prev-reload{background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;
+  font-size:.72rem;font-family:inherit;padding:.1rem .25rem;border-radius:3px}
+.prev-reload:hover{color:#fff;background:rgba(255,255,255,.1)}
+#iframe{flex:1;border:none;width:100%;height:100%;background:#fff}
+
+/* ─── EDIT PANEL ─── */
+.panel-edit{width:420px;min-width:300px;flex-shrink:0;display:flex;flex-direction:column;
+  background:var(--bg);overflow:hidden}
+
+/* ─── SECTION TABS ─── */
+.sec-tabs{display:flex;overflow-x:auto;flex-shrink:0;background:var(--card);
+  border-bottom:2px solid var(--border);scrollbar-width:none}
+.sec-tabs::-webkit-scrollbar{display:none}
+.stab{flex-shrink:0;padding:.58rem .78rem;border:none;background:none;cursor:pointer;
+  font-size:.75rem;font-weight:600;color:var(--sub);font-family:inherit;
+  border-bottom:2.5px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color .15s}
+.stab:hover{color:var(--navy)}
+.stab.on{color:var(--navy);border-bottom-color:var(--navy)}
+
+/* ─── FORMS ─── */
+.forms{flex:1;overflow-y:auto;padding:.9rem}
+.sf{display:none}.sf.on{display:block}
+.sf-title{font-size:.72rem;font-weight:700;color:var(--sub);letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:.8rem;padding-bottom:.4rem;border-bottom:1px solid var(--border)}
+
+/* Fields */
+.f{margin-bottom:.9rem}
+.f>label{display:block;font-size:.77rem;font-weight:600;color:var(--sub);margin-bottom:.28rem}
+.f input[type=text],.f input[type=url],.f input[type=tel],.f input[type=email],.f input[type=number],.f textarea,.f select{
+  width:100%;padding:.58rem .75rem;border:1.5px solid var(--border);border-radius:8px;
+  font-size:.85rem;font-family:inherit;outline:none;background:#fff;color:var(--txt);
+  transition:border .15s}
+.f input:focus,.f textarea:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(45,74,122,.09)}
+.f textarea{resize:vertical;min-height:76px;line-height:1.6}
+.f .hint{font-size:.7rem;color:var(--sub);margin-top:.22rem}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+
+/* ─── IMAGE WIDGET ─── */
+.imgw{border:2px dashed var(--border);border-radius:10px;background:#fff;
+  overflow:hidden;transition:border-color .15s}
+.imgw:hover{border-color:var(--navy2)}
+.imgw-prev{display:none;position:relative;background:#111}
+.imgw-prev.on{display:block}
+.imgw-prev img{width:100%;max-height:150px;object-fit:cover;display:block}
+.imgw-clear{position:absolute;top:.3rem;left:.3rem;background:rgba(0,0,0,.65);color:#fff;
+  border:none;border-radius:4px;padding:.18rem .4rem;font-size:.68rem;cursor:pointer;font-family:inherit}
+.imgw-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:.3rem;padding:1rem .75rem;cursor:pointer;text-align:center;transition:background .15s}
+.imgw-drop:hover,.imgw-drop.drag{background:#edf2ff}
+.imgw-icon{font-size:1.6rem;line-height:1}
+.imgw-txt{font-size:.77rem;font-weight:600;color:var(--sub)}
+.imgw-sub{font-size:.67rem;color:#aab}
+.imgw-url{display:flex;align-items:center;gap:.35rem;padding:.35rem .55rem;
+  border-top:1.5px solid var(--border);background:#f7f8fb}
+.imgw-url span{font-size:.65rem;color:#aab;flex-shrink:0;font-weight:600}
+.imgw-url input{flex:1;border:none;outline:none;font-size:.74rem;direction:ltr;
+  font-family:monospace;background:transparent;color:#555;min-width:0}
+.imgw-spinner{position:absolute;inset:0;background:rgba(255,255,255,.85);
+  display:flex;align-items:center;justify-content:center;font-size:.8rem;color:var(--navy2)}
+
+/* ─── DYNAMIC LIST ─── */
+.di{border:1.5px solid var(--border);border-radius:9px;padding:.85rem;
+  margin-bottom:.65rem;background:#fff;position:relative}
+.di-num{font-size:.68rem;font-weight:700;color:var(--gold);margin-bottom:.55rem;text-transform:uppercase}
+.di-rm{position:absolute;top:.55rem;left:.55rem;background:#fdecea;color:var(--red);
+  border:none;border-radius:5px;padding:.18rem .45rem;font-size:.7rem;cursor:pointer;font-family:inherit}
+.di-rm:hover{background:var(--red);color:#fff}
+.btn-add{display:inline-flex;align-items:center;gap:.35rem;background:var(--navy);color:#fff;
+  border:none;border-radius:7px;padding:.48rem .95rem;font-size:.8rem;font-weight:700;
+  cursor:pointer;font-family:inherit;margin-top:.25rem;transition:background .15s}
+.btn-add:hover{background:var(--navy2)}
+
+/* Stats */
+.stats4{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.9rem}
+.stat-box{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:.55rem .7rem}
+.stat-box label{display:block;font-size:.7rem;font-weight:600;color:var(--sub);margin-bottom:.25rem}
+.stat-box input{width:100%;border:none;outline:none;font-size:1.15rem;font-weight:700;
+  text-align:center;color:var(--navy);font-family:inherit;background:transparent}
+
+/* ─── SAVE BAR ─── */
+.save-bar{flex-shrink:0;background:var(--card);border-top:1.5px solid var(--border);
+  padding:.65rem .9rem;display:flex;gap:.5rem;align-items:center}
+.save-btn{flex:1;background:var(--gold);color:var(--navy);border:none;border-radius:8px;
+  padding:.62rem 1rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:.35rem;transition:opacity .15s}
+.save-btn:hover{opacity:.85}
+.save-btn:disabled{opacity:.4;cursor:not-allowed}
+.dl-btn{background:#fff;color:var(--navy);border:1.5px solid var(--border);border-radius:8px;
+  padding:.62rem .85rem;font-size:.78rem;font-weight:600;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;gap:.3rem;transition:background .15s;white-space:nowrap}
+.dl-btn:hover{background:var(--bg)}
+
+/* ─── TOAST ─── */
+#toast{position:fixed;bottom:1.25rem;left:50%;transform:translateX(-50%);
+  background:var(--navy);color:#fff;padding:.65rem 1.5rem;border-radius:8px;
+  font-size:.84rem;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.28);
+  pointer-events:none;opacity:0;transition:opacity .22s;z-index:9999;
+  text-align:center;max-width:90vw;white-space:pre-line}
+#toast.on{opacity:1}
+#toast.ok{background:var(--green)}
+#toast.err{background:var(--red)}
+
+/* ─── SPINNER ─── */
+.spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;
+  border-radius:50%;animation:rot .65s linear infinite;display:inline-block;flex-shrink:0}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* ─── MOBILE ─── */
+.mob-tabs{display:none}
+@media(max-width:800px){
+  .panel-preview{display:none}
+  .panel-edit{width:100%}
+  .mob-tabs{display:flex;flex-shrink:0;border-bottom:2px solid var(--border);background:var(--card)}
+  .mob-tab{flex:1;padding:.55rem;font-size:.82rem;font-weight:600;border:none;
+    background:none;cursor:pointer;font-family:inherit;color:var(--sub)}
+  .mob-tab.on{color:var(--navy);border-bottom:2.5px solid var(--navy);margin-bottom:-2px}
+  .panel-preview.mob-show{display:flex;position:fixed;inset:48px 0 0 0;z-index:50}
 }
-
-.admin-body{padding:1.25rem 1rem 4rem}
-
-.section-card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06);
-  margin-bottom:1.1rem;overflow:hidden;transition:box-shadow .2s}
-.section-card.active-section{box-shadow:0 0 0 2.5px var(--gold),0 4px 16px rgba(0,0,0,.1)}
-.section-header{background:var(--navy);color:#fff;padding:.65rem 1.1rem;
-  font-size:.9rem;font-weight:700;display:flex;align-items:center;justify-content:space-between;
-  cursor:pointer;user-select:none;gap:.5rem}
-.section-header-left{display:flex;align-items:center;gap:.45rem}
-.section-jump{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:5px;
-  padding:.2rem .5rem;font-size:.7rem;cursor:pointer;font-family:inherit;white-space:nowrap;
-  display:flex;align-items:center;gap:.25rem;transition:background .15s}
-.section-jump:hover{background:rgba(255,255,255,.28)}
-.section-jump svg{flex-shrink:0}
-.section-body{padding:1.1rem}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
-.field-row.full{grid-template-columns:1fr}
-@media(max-width:520px){.field-row{grid-template-columns:1fr}}
-.admin-field{display:flex;flex-direction:column;gap:.3rem}
-.admin-field label{font-size:.8rem;font-weight:600;color:#555}
-.admin-field input,.admin-field textarea{padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:7px;
-  font-size:.95rem;font-family:inherit;outline:none;direction:rtl}
-.admin-field input:focus,.admin-field textarea:focus{border-color:var(--navy-mid);box-shadow:0 0 0 3px rgba(45,74,122,.1)}
-.admin-field .hint{font-size:.73rem;color:#888;margin-top:.2rem}
-.admin-field textarea{resize:vertical;line-height:1.6}
-.admin-field input[dir=ltr]{direction:ltr}
-
-/* Stats row */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
-@media(max-width:520px){.stats-grid{grid-template-columns:1fr 1fr}}
-.stat-field label{font-size:.78rem;font-weight:600;color:#555;margin-bottom:.25rem;display:block}
-.stat-field input{width:100%;padding:.5rem .6rem;border:1.5px solid var(--border);border-radius:7px;
-  font-size:1.1rem;font-weight:700;text-align:center;font-family:inherit;outline:none}
-.stat-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,83,.2)}
-
-/* Testimonial editor */
-.testimonial-editor-row{border:1.5px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:.75rem;
-  position:relative;background:#fafbfc}
-.testimonial-editor-row .t-num{font-size:.75rem;font-weight:700;color:var(--gold);margin-bottom:.6rem}
-.testimonial-editor-row .t-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
-@media(max-width:520px){.testimonial-editor-row .t-grid{grid-template-columns:1fr}}
-.testimonial-editor-row .t-full{grid-column:1/-1}
-.btn-remove{position:absolute;top:.6rem;left:.6rem;background:#fdecea;color:var(--red);border:none;
-  border-radius:5px;padding:.25rem .55rem;font-size:.78rem;cursor:pointer;font-family:inherit}
-.btn-remove:hover{background:var(--red);color:#fff}
-.btn-add-testimonial{background:var(--navy);color:#fff;border:none;border-radius:7px;
-  padding:.55rem 1.2rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
-  margin-top:.25rem;transition:background .2s}
-.btn-add-testimonial:hover{background:var(--navy-mid)}
-
-/* Account settings */
-.btn-action{background:var(--navy);color:#fff;border:none;border-radius:7px;
-  padding:.5rem 1.1rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
-  transition:background .2s}
-.btn-action:hover{background:var(--navy-mid)}
-.btn-action.danger{background:var(--red)}
-.btn-action.danger:hover{opacity:.85}
-.inline-form{display:flex;gap:.6rem;align-items:flex-end;flex-wrap:wrap}
-.inline-form input{flex:1;min-width:160px;padding:.55rem .75rem;border:1.5px solid var(--border);
-  border-radius:7px;font-size:.9rem;font-family:inherit;outline:none}
-.inline-form input:focus{border-color:var(--navy-mid)}
-.inline-msg{font-size:.82rem;margin-top:.5rem;display:none}
-.inline-msg.ok{color:var(--green)}
-.inline-msg.err{color:var(--red)}
-.account-row{margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #eee}
-.account-row:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
-.account-row-label{font-size:.82rem;font-weight:600;color:#444;margin-bottom:.5rem}
-
-/* Setup steps */
-.setup-step{margin-bottom:1.1rem;padding:.9rem 1rem;background:#f8f7f4;
-  border-radius:9px;border:1.5px solid #e4ddd4}
-.setup-step-label{font-size:.82rem;font-weight:700;color:var(--navy);
-  margin-bottom:.65rem;display:flex;align-items:center;gap:.4rem}
-.setup-step-num{width:20px;height:20px;border-radius:50%;background:var(--navy);
-  color:#fff;font-size:.72rem;font-weight:800;display:inline-flex;
-  align-items:center;justify-content:center;flex-shrink:0}
-
-/* ─── Media uploader widget ─── */
-.media-upload-wrap{border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:#fafbfc}
-.media-drop-zone{min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:.3rem;cursor:pointer;padding:.85rem 1rem;transition:background .15s}
-.media-drop-zone:hover,.media-drop-zone.drag-over{background:#eef3ff}
-.media-drop-icon{color:#bbc;transition:color .15s}
-.media-drop-zone:hover .media-drop-icon,.media-drop-zone.drag-over .media-drop-icon{color:var(--navy-mid)}
-.media-drop-label{font-size:.8rem;color:#666;font-weight:600}
-.media-drop-sub{font-size:.7rem;color:#aab}
-.media-preview{position:relative;background:#111;display:none}
-.media-preview.visible{display:block}
-.media-preview img,.media-preview video{width:100%;height:150px;object-fit:cover;display:block}
-.media-preview-clear{position:absolute;top:.35rem;left:.35rem;background:rgba(0,0,0,.65);color:#fff;
-  border:none;border-radius:4px;padding:.2rem .45rem;font-size:.72rem;cursor:pointer;font-family:inherit}
-.media-url-bar{display:flex;align-items:center;gap:.4rem;padding:.4rem .6rem;
-  border-top:1px solid var(--border);background:#fff}
-.media-url-bar input{flex:1;border:none;outline:none;font-size:.77rem;direction:ltr;
-  font-family:inherit;color:#555;background:transparent;min-width:0}
-.media-field-label{font-size:.8rem;font-weight:600;color:#555;margin-bottom:.4rem}
-.media-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-@media(max-width:560px){.media-grid{grid-template-columns:1fr}}
-.media-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem}
-@media(max-width:700px){.media-grid-3{grid-template-columns:1fr}}
-
-/* Status bar — sticky inside form panel */
-#status-bar{position:sticky;bottom:0;flex-shrink:0;
-  background:var(--navy-dark);color:#fff;padding:.7rem 1.2rem;
-  font-size:.88rem;font-weight:600;display:none;align-items:center;
-  justify-content:center;gap:.5rem;z-index:50;
-  box-shadow:0 -3px 12px rgba(0,0,0,.18)}
-#status-bar.visible{display:flex}
-#status-bar.success{background:var(--green)}
-#status-bar.error{background:var(--red)}
-
-/* Spinner */
-.spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);
-  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-.preview-link{display:inline-flex;align-items:center;gap:.4rem;
-  font-size:.82rem;color:var(--gold);text-decoration:none}
-.preview-link:hover{text-decoration:underline}
 </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════
-     LOGIN
-════════════════════════════════ -->
-<div id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">
-      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- ═══════════ LOGIN ═══════════ -->
+<div id="login-wrap">
+  <div class="lcard">
+    <div class="lcard-logo">
+      <svg width="52" height="52" viewBox="0 0 60 60" fill="none">
         <circle cx="30" cy="30" r="30" fill="#1B2A4A"/>
         <path d="M30 48V28M30 28C30 20 22 14 14 18M30 28C30 20 38 14 46 18M30 28C30 22 26 18 22 20M30 28C30 22 34 18 38 20" stroke="#D4A853" stroke-width="2.2" stroke-linecap="round"/>
       </svg>
     </div>
-    <h1 class="login-title">ממשק ניהול — שורשים</h1>
-
-    <div id="login-error" class="login-error"></div>
-
-    <!-- ── First-time setup ── -->
-    <div id="setup-form" style="display:none">
-      <p class="login-sub">הגדרה ראשונה — שני שלבים בלבד</p>
-
-      <div class="setup-step">
-        <div class="setup-step-label">קבעו סיסמת כניסה לממשק</div>
-        <div class="field-group">
-          <input type="password" id="setup-pass" placeholder="סיסמה (לפחות 6 תווים)" autocomplete="new-password">
-        </div>
-        <div class="field-group" style="margin-bottom:0">
-          <input type="password" id="setup-pass2" placeholder="הזינו שוב לאישור" autocomplete="new-password">
-        </div>
-      </div>
-
-      <button class="login-btn" id="setup-btn" onclick="doSetup()">צור חשבון וכנס ←</button>
+    <h1 class="lcard-title">ממשק ניהול — שורשים</h1>
+    <p class="lcard-sub" id="l-sub">הזינו סיסמה להמשך</p>
+    <div class="lerr" id="l-err"></div>
+    <div class="lf"><label>סיסמה</label>
+      <input type="password" id="l-pass" placeholder="••••••" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-
-    <!-- ── Regular login ── -->
-    <div id="login-form" style="display:none">
-      <p class="login-sub">הזינו את סיסמת הניהול</p>
-      <div class="field-group">
-        <input type="password" id="login-pass" placeholder="סיסמה" autocomplete="current-password">
-      </div>
-      <button class="login-btn" id="login-btn" onclick="doLogin()">כניסה</button>
-    </div>
+    <button class="login-btn" onclick="doLogin()">כניסה ←</button>
   </div>
 </div>
 
-<!-- ════════════════════════════════
-     ADMIN
-════════════════════════════════ -->
-<div id="admin-screen">
-  <header class="admin-header">
-    <div class="admin-header-title">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7v10l10 5 10-5V7L12 2Z" stroke="#D4A853" stroke-width="1.8"/><path d="M12 22V12M2 7l10 5 10-5" stroke="#D4A853" stroke-width="1.8"/></svg>
-      ניהול — שורשים
+<!-- ═══════════ APP ═══════════ -->
+<div id="app">
+
+  <!-- Header -->
+  <header class="hdr">
+    <div class="hdr-brand">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L2 7v10l10 5 10-5V7L12 2Z" stroke="#D4A853" stroke-width="1.8"/>
+        <path d="M2 7l10 5 10-5M12 22V12" stroke="#D4A853" stroke-width="1.8"/>
+      </svg>
+      שורשים — ניהול
     </div>
-    <div class="admin-actions">
-      <button class="btn-logout" onclick="doLogout()">יציאה</button>
+    <div class="hdr-space"></div>
+    <div class="hdr-status" id="hdr-status">
+      <svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3.5" fill="currentColor"/></svg>
+      <span id="hdr-status-txt">מוכן</span>
     </div>
+    <button class="hbtn hbtn-pub" id="pub-btn" onclick="publish()">פרסם לאתר ↑</button>
+    <button class="hbtn hbtn-out" onclick="doLogout()">יציאה</button>
   </header>
 
   <!-- Mobile tabs -->
-  <div class="preview-tabs">
-    <button class="preview-tab active" id="tab-form" onclick="switchTab('form')">✏️ עריכה</button>
-    <button class="preview-tab" id="tab-preview" onclick="switchTab('preview')">👁️ תצוגה מקדימה</button>
+  <div class="mob-tabs">
+    <button class="mob-tab on" id="mob-edit-tab" onclick="mobSwitch('edit')">✏ עריכה</button>
+    <button class="mob-tab" id="mob-prev-tab" onclick="mobSwitch('preview')">👁 תצוגה</button>
   </div>
 
-  <div class="admin-split">
+  <!-- Split -->
+  <div class="split">
 
-    <!-- ── FORM PANEL (right) ── -->
-    <div class="admin-form-panel" id="form-panel">
-      <main class="admin-body">
-
-    <!-- ── תוכן עמוד הבית ── -->
-    <div class="section-card">
-      <div class="section-header" data-section="hero" onclick="jumpToSection('hero')">
-        <div class="section-header-left">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          תוכן הירו — כותרת וסרטון
-        </div>
-        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('hero')" title="הצג באתר">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
-          אתר
-        </button>
+    <!-- PREVIEW -->
+    <div class="panel-preview" id="panel-preview">
+      <div class="prev-bar">
+        <span class="prev-bar-lbl">תצוגה מקדימה — האתר החי</span>
+        <button class="prev-reload" onclick="reloadIframe()">⟳ רענן</button>
       </div>
-      <div class="section-body">
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cnt-hero-title">כותרת ראשית</label>
-            <input type="text" id="cnt-hero-title" placeholder="העוצמה, הידע והכח" oninput="liveUpdate('content-hero-title',this.value)">
-          </div>
-        </div>
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cnt-hero-accent">כותרת משנה / accent</label>
-            <input type="text" id="cnt-hero-accent" placeholder="להורים המתמודדים" oninput="liveUpdate('content-hero-accent',this.value)">
-          </div>
-        </div>
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cnt-hero-subtitle">תיאור קצר</label>
-            <textarea id="cnt-hero-subtitle" rows="3" placeholder="המקום בו תמצאו..." oninput="liveUpdate('content-hero-subtitle',this.value)"></textarea>
-          </div>
-        </div>
-
-        <hr style="border:none;border-top:1px solid var(--border);margin:1rem 0">
-
-        <div class="media-grid">
-          <div>
-            <div class="media-field-label">תמונת כרטיס הוידאו בהירו</div>
-            <div class="media-upload-wrap">
-              <div id="prev-hero-thumb" class="media-preview"></div>
-              <div class="media-drop-zone" onclick="document.getElementById('file-hero-thumb').click()"
-                ondragover="event.preventDefault();this.classList.add('drag-over')"
-                ondragleave="this.classList.remove('drag-over')"
-                ondrop="handleDrop(event,'file-hero-thumb','cnt-hero-thumb-url','prev-hero-thumb')">
-                <input type="file" id="file-hero-thumb" accept="image/*" style="display:none"
-                  onchange="handleFileChange(this,'cnt-hero-thumb-url','prev-hero-thumb')">
-                <svg class="media-drop-icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-                <span class="media-drop-label">בחרו תמונה</span>
-                <span class="media-drop-sub">JPG · PNG · WebP</span>
-              </div>
-              <div class="media-url-bar">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>
-                <input type="url" id="cnt-hero-thumb-url" placeholder="או הדביקו URL..." oninput="urlFieldPreview('cnt-hero-thumb-url','prev-hero-thumb')">
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="media-field-label">קישור YouTube לסרטון</div>
-            <div style="background:#fafbfc;border:1.5px solid var(--border);border-radius:10px;padding:1rem">
-              <p style="font-size:.79rem;color:#666;margin-bottom:.75rem;line-height:1.6">כשיש קישור — לחיצה על הכרטיס תפתח את הסרטון בלשונית חדשה</p>
-              <div class="admin-field">
-                <label for="cfg-youtube-in">YouTube URL</label>
-                <input type="url" id="cfg-youtube-in" placeholder="https://youtu.be/..." dir="ltr">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <iframe id="iframe" src="../" loading="lazy"></iframe>
     </div>
 
-    <!-- ── אודות ומשימה ── -->
-    <div class="section-card">
-      <div class="section-header" data-section="about" onclick="jumpToSection('about')">
-        <div class="section-header-left">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          אודות ומשימה
-        </div>
-        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('about')" title="הצג באתר">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
-          אתר
+    <!-- EDIT PANEL -->
+    <div class="panel-edit">
+
+      <!-- Section tabs -->
+      <div class="sec-tabs" id="sec-tabs">
+        <button class="stab on" data-s="hero"         onclick="showSec('hero')">🏠 ראשי</button>
+        <button class="stab"     data-s="about"        onclick="showSec('about')">📖 אודות</button>
+        <button class="stab"     data-s="services"     onclick="showSec('services')">🛠 שירותים</button>
+        <button class="stab"     data-s="team"         onclick="showSec('team')">👥 צוות</button>
+        <button class="stab"     data-s="events"       onclick="showSec('events')">📅 אירועים</button>
+        <button class="stab"     data-s="testimonials" onclick="showSec('testimonials')">💬 עדויות</button>
+        <button class="stab"     data-s="stats"        onclick="showSec('stats')">📊 נתונים</button>
+        <button class="stab"     data-s="contact"      onclick="showSec('contact')">📞 קשר</button>
+      </div>
+
+      <!-- Forms -->
+      <div class="forms" id="forms"></div>
+
+      <!-- Save bar -->
+      <div class="save-bar">
+        <button class="save-btn" id="save-btn" onclick="saveDraft()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          שמור טיוטה
         </button>
+        <button class="dl-btn" id="dl-btn" style="display:none" onclick="downloadFiles()">↓ הורד קבצים</button>
       </div>
-      <div class="section-body">
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cnt-about-body">גוף הטקסט</label>
-            <textarea id="cnt-about-body" rows="4" placeholder="ארגון שורשים..." oninput="liveUpdate('content-mission-body',this.value)"></textarea>
-          </div>
-        </div>
-        <hr style="border:none;border-top:1px solid var(--border);margin:1rem 0">
 
-        <div class="media-grid">
-          <div>
-            <div class="media-field-label">תמונה לאזור האודות</div>
-          <div class="media-upload-wrap">
-            <div id="prev-about-img" class="media-preview"></div>
-            <div class="media-drop-zone" onclick="document.getElementById('file-about-img').click()"
-              ondragover="event.preventDefault();this.classList.add('drag-over')"
-              ondragleave="this.classList.remove('drag-over')"
-              ondrop="handleDrop(event,'file-about-img','cnt-about-img-url','prev-about-img')">
-              <input type="file" id="file-about-img" accept="image/*" style="display:none"
-                onchange="handleFileChange(this,'cnt-about-img-url','prev-about-img')">
-              <svg class="media-drop-icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-              <span class="media-drop-label">בחרו תמונה לאזור אודות</span>
-              <span class="media-drop-sub">JPG · PNG · WebP</span>
-            </div>
-            <div class="media-url-bar">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>
-              <input type="url" id="cnt-about-img-url" placeholder="או הדביקו URL..." oninput="urlFieldPreview('cnt-about-img-url','prev-about-img')">
-            </div>
-          </div>
-          </div>
-          <div>
-            <div class="media-field-label">סרטון YouTube לאזור האודות</div>
-            <div style="background:#fafbfc;border:1.5px solid var(--border);border-radius:10px;padding:1rem;height:100%;box-sizing:border-box">
-              <p style="font-size:.78rem;color:#666;margin-bottom:.75rem;line-height:1.6">הסרטון יוצג בצד הטקסט כקישור עם תמונת thumbnail. לחיצה תפתח את הסרטון בלשונית חדשה.</p>
-              <div class="admin-field">
-                <label for="cnt-about-video-url">YouTube URL</label>
-                <input type="url" id="cnt-about-video-url" placeholder="https://youtu.be/..." dir="ltr">
-              </div>
-              <div style="margin-top:.75rem">
-                <div class="media-field-label">תמונת thumbnail לסרטון (אופציונלי)</div>
-                <div class="media-upload-wrap">
-                  <div id="prev-about-video-thumb" class="media-preview"></div>
-                  <div class="media-drop-zone" onclick="document.getElementById('file-about-video-thumb').click()"
-                    ondragover="event.preventDefault();this.classList.add('drag-over')"
-                    ondragleave="this.classList.remove('drag-over')"
-                    ondrop="handleDrop(event,'file-about-video-thumb','cnt-about-video-thumb-url','prev-about-video-thumb')">
-                    <input type="file" id="file-about-video-thumb" accept="image/*" style="display:none"
-                      onchange="handleFileChange(this,'cnt-about-video-thumb-url','prev-about-video-thumb')">
-                    <svg class="media-drop-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-                    <span class="media-drop-label" style="font-size:.75rem">בחרו תמונה</span>
-                  </div>
-                  <div class="media-url-bar">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>
-                    <input type="url" id="cnt-about-video-thumb-url" placeholder="URL thumbnail..." oninput="urlFieldPreview('cnt-about-video-thumb-url','prev-about-video-thumb')">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </div><!-- /panel-edit -->
+  </div><!-- /split -->
+</div><!-- /app -->
 
-    <!-- ── תמונות שירותים ── -->
-    <div class="section-card">
-      <div class="section-header" data-section="services" onclick="jumpToSection('services')">
-        <div class="section-header-left">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7v10l10 5 10-5V7L12 2Z" stroke="currentColor" stroke-width="1.8"/><path d="M12 22V12M2 7l10 5 10-5" stroke="currentColor" stroke-width="1.8"/></svg>
-          תמונות לאזור השירותים (3 לשוניות)
-        </div>
-        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('services')" title="הצג באתר">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
-          אתר
-        </button>
-      </div>
-      <div class="section-body">
-        <div class="media-grid-3">
-          <div>
-            <div class="media-field-label">סדנאות קבוצתיות</div>
-            <div class="media-upload-wrap">
-              <div id="prev-svc-workshops" class="media-preview"></div>
-              <div class="media-drop-zone" onclick="document.getElementById('file-svc-workshops').click()"
-                ondragover="event.preventDefault();this.classList.add('drag-over')"
-                ondragleave="this.classList.remove('drag-over')"
-                ondrop="handleDrop(event,'file-svc-workshops','cnt-svc-workshops-url','prev-svc-workshops')">
-                <input type="file" id="file-svc-workshops" accept="image/*,video/*" style="display:none"
-                  onchange="handleFileChange(this,'cnt-svc-workshops-url','prev-svc-workshops')">
-                <svg class="media-drop-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-                <span class="media-drop-label">תמונה / וידאו</span>
-              </div>
-              <div class="media-url-bar">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>
-                <input type="url" id="cnt-svc-workshops-url" placeholder="URL..." oninput="urlFieldPreview('cnt-svc-workshops-url','prev-svc-workshops')">
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="media-field-label">הדרכה פרטנית</div>
-            <div class="media-upload-wrap">
-              <div id="prev-svc-coaching" class="media-preview"></div>
-              <div class="media-drop-zone" onclick="document.getElementById('file-svc-coaching').click()"
-                ondragover="event.preventDefault();this.classList.add('drag-over')"
-                ondragleave="this.classList.remove('drag-over')"
-                ondrop="handleDrop(event,'file-svc-coaching','cnt-svc-coaching-url','prev-svc-coaching')">
-                <input type="file" id="file-svc-coaching" accept="image/*,video/*" style="display:none"
-                  onchange="handleFileChange(this,'cnt-svc-coaching-url','prev-svc-coaching')">
-                <svg class="media-drop-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-                <span class="media-drop-label">תמונה / וידאו</span>
-              </div>
-              <div class="media-url-bar">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>
-                <input type="url" id="cnt-svc-coaching-url" placeholder="URL..." oninput="urlFieldPreview('cnt-svc-coaching-url','prev-svc-coaching')">
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="media-field-label">חוסן משפחתי</div>
-            <div class="media-upload-wrap">
-              <div id="prev-svc-resilience" class="media-preview"></div>
-              <div class="media-drop-zone" onclick="document.getElementById('file-svc-resilience').click()"
-                ondragover="event.preventDefault();this.classList.add('drag-over')"
-                ondragleave="this.classList.remove('drag-over')"
-                ondrop="handleDrop(event,'file-svc-resilience','cnt-svc-resilience-url','prev-svc-resilience')">
-                <input type="file" id="file-svc-resilience" accept="image/*,video/*" style="display:none"
-                  onchange="handleFileChange(this,'cnt-svc-resilience-url','prev-svc-resilience')">
-                <svg class="media-drop-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-                <span class="media-drop-label">תמונה / וידאו</span>
-              </div>
-              <div class="media-url-bar">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>
-                <input type="url" id="cnt-svc-resilience-url" placeholder="URL..." oninput="urlFieldPreview('cnt-svc-resilience-url','prev-svc-resilience')">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── ניהול אנשי צוות ── -->
-    <div class="section-card">
-      <div class="section-header" data-section="team" onclick="jumpToSection('team')">
-        <div class="section-header-left">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.87" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          אנשי הצוות (תמונה + פרטים)
-        </div>
-        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('team')" title="הצג באתר">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
-          אתר
-        </button>
-      </div>
-      <div class="section-body">
-        <div id="team-editor"></div>
-        <button class="btn-add-testimonial" onclick="addTeamMemberRow()" style="margin-top:.5rem">הוסף איש צוות +</button>
-      </div>
-    </div>
-
-    <!-- ── כנסים ואירועים ── -->
-    <div class="section-card">
-      <div class="section-header" data-section="events-section" onclick="jumpToSection('events-section')">
-        <div class="section-header-left">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          כנסים ואירועים — גלריית פוסטרים
-        </div>
-        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('events-section')" title="הצג באתר">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
-          אתר
-        </button>
-      </div>
-      <div class="section-body">
-        <p style="font-size:.8rem;color:#666;margin-bottom:.9rem">כל תמונה שתעלו תופיע כפוסטר בקרוסלת האירועים באתר. ניתן להוסיף כותרת וקישור לכל פוסטר.</p>
-        <div id="events-editor"></div>
-        <button class="btn-add-testimonial" onclick="addEventRow()" style="margin-top:.5rem">הוסף אירוע / פוסטר +</button>
-      </div>
-    </div>
-
-    <!-- ── עדויות הורים ── -->
-    <div class="section-card">
-      <div class="section-header" data-section="testimonials" onclick="jumpToSection('testimonials')">
-        <div class="section-header-left">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          עדויות הורים
-        </div>
-        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('testimonials')" title="הצג באתר">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
-          אתר
-        </button>
-      </div>
-      <div class="section-body">
-        <div id="testimonials-editor"></div>
-        <button class="btn-add-testimonial" onclick="addTestimonialRow()">הוסף עדות +</button>
-      </div>
-    </div>
-
-    <!-- ── פרטי התקשרות ── -->
-    <div class="section-card">
-      <div class="section-header" data-section="contact" onclick="jumpToSection('contact')">
-        <div class="section-header-left">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2C7.16 21 3 16.84 3 6a2 2 0 012-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          פרטי התקשרות
-        </div>
-        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('contact')" title="הצג באתר">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
-          אתר
-        </button>
-      </div>
-      <div class="section-body">
-        <div class="field-row">
-          <div class="admin-field">
-            <label for="cfg-phone-in">מספר טלפון (מוצג באתר)</label>
-            <input type="tel" id="cfg-phone-in" placeholder="055-0000000" dir="ltr">
-            <span class="hint">מוצג בכותרת תחתונה ובדף יצירת קשר</span>
-          </div>
-          <div class="admin-field">
-            <label for="cfg-wa-in">WhatsApp (ספרות + קידומת 972)</label>
-            <input type="text" id="cfg-wa-in" placeholder="972501234567" dir="ltr">
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="admin-field">
-            <label for="cfg-email-in">כתובת אימייל</label>
-            <input type="email" id="cfg-email-in" placeholder="contact@shoreshim.org.il" dir="ltr">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── נתוני פעילות ── -->
-    <div class="section-card">
-      <div class="section-header" data-section="stats" onclick="jumpToSection('stats')">
-        <div class="section-header-left">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          נתוני פעילות — המספרים הגדולים
-        </div>
-        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('stats')" title="הצג באתר">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
-          אתר
-        </button>
-      </div>
-      <div class="section-body">
-        <p style="font-size:.79rem;color:#666;margin-bottom:.75rem">ערכו ידנית — <strong>או</strong> הזינו URL ל-JSON שמתעדכן אוטומטית (לדוג׳ Google Sheets JSON, Airtable API):</p>
-        <div class="field-row full" style="margin-bottom:.75rem">
-          <div class="admin-field">
-            <label for="cfg-stats-url">URL לעדכון אוטומטי של נתונים (אופציונלי)</label>
-            <input type="url" id="cfg-stats-url" dir="ltr" placeholder='https://... → JSON עם: {"families":320,"workshops":48,"facilitators":12,"cities":8}'>
-            <span class="hint">האתר ינסה לטעון את הנתונים מ-URL זה בכל כניסה. אם יצליח — יחליף את הערכים הידניים. אם לא — יוצגו הערכים הידניים.</span>
-          </div>
-        </div>
-        <div class="stats-grid">
-          <div class="stat-field">
-            <label>כותרת 1</label>
-            <input type="text" id="cfg-stat-label-1" placeholder="הורים קיבלו ליווי" style="font-size:.82rem;font-weight:600;text-align:center;margin-bottom:.3rem">
-            <input type="number" id="cfg-families" min="0" placeholder="320">
-          </div>
-          <div class="stat-field">
-            <label>כותרת 2</label>
-            <input type="text" id="cfg-stat-label-2" placeholder="סדנאות התקיימו" style="font-size:.82rem;font-weight:600;text-align:center;margin-bottom:.3rem">
-            <input type="number" id="cfg-workshops" min="0" placeholder="48">
-          </div>
-          <div class="stat-field">
-            <label>כותרת 3</label>
-            <input type="text" id="cfg-stat-label-3" placeholder="מנחים מוסמכים" style="font-size:.82rem;font-weight:600;text-align:center;margin-bottom:.3rem">
-            <input type="number" id="cfg-facilitators" min="0" placeholder="12">
-          </div>
-          <div class="stat-field">
-            <label>כותרת 4</label>
-            <input type="text" id="cfg-stat-label-4" placeholder="ערים ויישובים" style="font-size:.82rem;font-weight:600;text-align:center;margin-bottom:.3rem">
-            <input type="number" id="cfg-cities" min="0" placeholder="8">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── טופס יצירת קשר ── -->
-    <div class="section-card">
-      <div class="section-header" data-section="contact" onclick="jumpToSection('contact')">
-        <div class="section-header-left">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z" stroke="currentColor" stroke-width="1.8"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.8"/></svg>
-          טופס יצירת קשר — קבלת פניות במייל
-        </div>
-        <button class="section-jump" onclick="event.stopPropagation();jumpToSection('contact')" title="הצג באתר">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2.2"/></svg>
-          אתר
-        </button>
-      </div>
-      <div class="section-body">
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cfg-form-endpoint">Formspree Endpoint</label>
-            <input type="url" id="cfg-form-endpoint" placeholder="https://formspree.io/f/xxxxxxxx" dir="ltr">
-            <span class="hint">
-              כל פנייה שתגיע מהאתר תישלח למייל שלכם דרך Formspree.<br>
-              לחיבור: <strong>1.</strong> היכנסו ל-<a href="https://formspree.io" target="_blank" rel="noopener">formspree.io</a>
-              → New Form → הזינו את כתובת המייל שלכם →
-              העתיקו את ה-endpoint (נראה כך: https://formspree.io/f/xxxxxxxx) והדביקו כאן.
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── קישור תרומות ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.403 4.068 2 6.5 2c1.626 0 3.376.557 5.5 2.811C14.124 2.557 15.874 2 17.5 2 19.932 2 23 3.403 23 7.191c0 4.105-5.369 8.863-11 14.402Z" stroke="currentColor" stroke-width="1.8"/></svg>
-        קישור עמוד תרומות
-      </div>
-      <div class="section-body">
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cfg-matara-in">כתובת URL (Matara.pro / Nedarim Plus)</label>
-            <input type="url" id="cfg-matara-in" placeholder="https://matara.pro/nedarimpl/XXXXXX" dir="ltr">
-            <span class="hint">יעדכן אוטומטית את עמוד התרומות עם השמירה</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── הגדרות חשבון ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        הגדרות חשבון
-      </div>
-      <div class="section-body">
-
-        <!-- Change password -->
-        <div class="account-row">
-          <div class="account-row-label">שינוי סיסמה</div>
-          <div class="inline-form">
-            <input type="password" id="chg-old" placeholder="סיסמה נוכחית" autocomplete="current-password">
-            <input type="password" id="chg-new" placeholder="סיסמה חדשה" autocomplete="new-password">
-            <input type="password" id="chg-new2" placeholder="אימות סיסמה חדשה" autocomplete="new-password">
-            <button class="btn-action" onclick="changePassword()">שנה</button>
-          </div>
-          <p id="chg-msg" class="inline-msg"></p>
-        </div>
-
-      </div>
-    </div>
-
-      </main>
-      <div id="download-hint" class="download-hint">
-        לא ניתן לפרסם אוטומטית. הורידו את הקבצים ועלו אותם לשרת:
-      </div>
-      <div class="form-save-bar">
-        <button class="btn-save-form" id="save-btn" onclick="saveChanges()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg>
-          שמירה ופרסום
-        </button>
-        <button class="btn-download" id="dl-btn" onclick="downloadAllFiles()" title="הורד את קבצי התוכן לשרת" style="display:none">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          הורד קבצים
-        </button>
-      </div>
-      <div id="status-bar"></div>
-    </div><!-- /form-panel -->
-
-    <!-- ── PREVIEW PANEL (left) ── -->
-    <div class="admin-preview-panel" id="preview-panel">
-      <div class="admin-preview-label">
-        <span>תצוגה מקדימה — כפי שנראה באתר</span>
-        <span class="preview-url">nir5177.github.io/Sharon/</span>
-      </div>
-      <div class="preview-loading" id="preview-loading">
-        <div class="preview-spinner"></div>
-        <span>טוען תצוגה מקדימה...</span>
-      </div>
-      <iframe id="site-preview"
-        src="https://nir5177.github.io/Sharon/"
-        title="תצוגה מקדימה"
-        onload="onPreviewLoaded()">
-      </iframe>
-    </div><!-- /preview-panel -->
-
-  </div><!-- /admin-split -->
-</div><!-- /admin-screen -->
+<div id="toast"></div>
 
 <script>
-/* ══════════════════════════════════════
-   Config
-══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════ */
 var REPO_OWNER  = 'nir5177';
 var REPO_NAME   = 'Sharon';
 var REPO_BRANCH = 'gh-pages';
+var ADMIN_PAT   = '%%ADMIN_PAT%%';
+var hasPAT      = ADMIN_PAT && ADMIN_PAT !== '%%ADMIN_PAT%%';
 
-/* injected at deploy time by GitHub Actions */
-var ADMIN_PAT  = '%%ADMIN_PAT%%';
-var CLD_CLOUD  = '%%CLD_CLOUD%%';
-var CLD_PRESET = '%%CLD_PRESET%%';
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+function g(id){return document.getElementById(id)}
+function gv(id){var e=g(id);return e?e.value.trim():''}
+function sv(id,v){var e=g(id);if(e)e.value=(v==null?'':v)}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
-/* ══════════════════════════════════════
-   Crypto helpers
-══════════════════════════════════════ */
-async function sha256(str) {
-  var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf), function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+var _tt;
+function toast(msg, cls, ms){
+  var t=g('toast');
+  t.textContent=msg; t.className='on'+(cls?' '+cls:'');
+  clearTimeout(_tt);
+  _tt=setTimeout(function(){t.className=''}, ms||3500);
 }
 
-/* ══════════════════════════════════════
-   Auth — Login
-══════════════════════════════════════ */
-async function doLogin() {
-  var pass  = document.getElementById('login-pass').value;
-  var btn   = document.getElementById('login-btn');
-  var errEl = document.getElementById('login-error');
-  if (!pass) { showLoginError('יש להזין סיסמה'); return; }
-
-  btn.textContent = 'מתחבר...'; btn.disabled = true;
-  errEl.style.display = 'none';
-
-  var hash   = await sha256(pass);
-  var stored = localStorage.getItem('shoreshim_pass_hash');
-  if (hash !== stored) {
-    showLoginError('סיסמה שגויה');
-    btn.textContent = 'כניסה'; btn.disabled = false; return;
-  }
-
-  sessionStorage.setItem('shoreshim_authed', '1');
-  showAdmin();
+/* ═══════════════════════════════════════
+   HEADER STATUS
+═══════════════════════════════════════ */
+function setStatus(cls,txt){
+  var b=g('hdr-status'); b.className='hdr-status '+cls;
+  g('hdr-status-txt').textContent=txt;
 }
 
-/* ── First-time setup ── */
-async function doSetup() {
-  var pass  = document.getElementById('setup-pass').value;
-  var pass2 = document.getElementById('setup-pass2').value;
-  var btn   = document.getElementById('setup-btn');
-
-  if (!pass || !pass2)  { showLoginError('יש למלא את כל השדות'); return; }
-  if (pass !== pass2)   { showLoginError('הסיסמאות אינן תואמות'); return; }
-  if (pass.length < 6)  { showLoginError('הסיסמה חייבת להכיל לפחות 6 תווים'); return; }
-
-  btn.textContent = 'שומר...'; btn.disabled = true;
-  document.getElementById('login-error').style.display = 'none';
-
-  var hash = await sha256(pass);
-  localStorage.setItem('shoreshim_pass_hash', hash);
-  sessionStorage.setItem('shoreshim_authed', '1');
-  showAdmin();
+/* ═══════════════════════════════════════
+   AUTH
+═══════════════════════════════════════ */
+async function sha256(s){
+  var b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
 }
 
-function showLoginError(msg) {
-  var el = document.getElementById('login-error');
-  el.textContent = msg; el.style.display = 'block';
-}
-
-function doLogout() {
-  sessionStorage.removeItem('shoreshim_authed');
-  document.getElementById('admin-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-}
-
-async function handleFileChange(input, urlId, previewId) {
-  var file = input.files[0];
-  if (!file) return;
-  input.value = '';
-
-  var cloudName = CLD_CLOUD;
-  var preset    = CLD_PRESET;
-  if (!cloudName || !preset || cloudName === '%%CLD_CLOUD%%') {
-    showStatus('שירות ההעלאה לא הוגדר — פנה למנהל האתר', 'error');
-    return;
-  }
-
-  var prevWrap = document.getElementById(previewId);
-  if (prevWrap) {
-    prevWrap.classList.add('visible');
-    prevWrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100px;color:#888;font-size:.82rem;gap:.4rem"><div class="spinner" style="border-color:rgba(0,0,0,.15);border-top-color:#4a90d9"></div> מעלה...</div>';
-  }
-
-  var isVideo   = file.type.startsWith('video/');
-  var endpoint  = 'https://api.cloudinary.com/v1_1/' + cloudName + '/' + (isVideo ? 'video' : 'image') + '/upload';
-  var fd        = new FormData();
-  fd.append('file', file);
-  fd.append('upload_preset', preset);
-
-  try {
-    var res  = await fetch(endpoint, {method:'POST', body:fd});
-    var data = await res.json();
-    if (!data.secure_url) throw new Error(data.error && data.error.message || 'שגיאה');
-    set(urlId, data.secure_url);
-    renderPreview(previewId, data.secure_url, urlId, isVideo);
-    sendLiveImage(urlId, data.secure_url);
-    showStatus('הועלה בהצלחה ✓', 'success');
-  } catch(e) {
-    if (prevWrap) { prevWrap.innerHTML = ''; prevWrap.classList.remove('visible'); }
-    showStatus('שגיאת העלאה: ' + e.message, 'error');
-  }
-}
-
-function handleDrop(event, fileInputId, urlId, previewId) {
-  event.preventDefault();
-  var dropZone = event.currentTarget;
-  dropZone.classList.remove('drag-over');
-  var file = event.dataTransfer.files[0];
-  if (!file) return;
-  var fakeInput = {files:[file], value:''};
-  handleFileChange(fakeInput, urlId, previewId);
-}
-
-function renderPreview(previewId, url, urlId, isVideo) {
-  var wrap = document.getElementById(previewId);
-  if (!wrap) return;
-  wrap.classList.add('visible');
-  var safeUrl   = url.replace(/"/g, '%22');
-  var safePrev  = previewId.replace(/'/g, "\\'");
-  var safeField = (urlId || '').replace(/'/g, "\\'");
-  wrap.innerHTML = (isVideo
-    ? '<video src="'+safeUrl+'" controls style="width:100%;height:150px;object-fit:cover;display:block"></video>'
-    : '<img src="'+safeUrl+'" alt="" style="width:100%;height:150px;object-fit:cover;display:block">'
-  ) + '<button class="media-preview-clear" onclick="clearMedia(\''+safePrev+'\',\''+safeField+'\')">✕ הסר</button>';
-}
-
-function clearMedia(previewId, urlId) {
-  var wrap = document.getElementById(previewId);
-  if (wrap) { wrap.innerHTML = ''; wrap.classList.remove('visible'); }
-  if (urlId) set(urlId, '');
-}
-
-var _liveImgMap = {
-  'cnt-hero-thumb-url':        {act:'hero-thumb'},
-  'cnt-about-img-url':         {act:'set-img', id:'mission-visual',    h:'340px'},
-  'cnt-about-video-thumb-url': {act:'set-img', id:'mission-visual',    h:'340px'},
-  'cnt-svc-workshops-url':     {act:'set-img', id:'svc-img-workshops', h:'260px'},
-  'cnt-svc-coaching-url':      {act:'set-img', id:'svc-img-coaching',  h:'260px'},
-  'cnt-svc-resilience-url':    {act:'set-img', id:'svc-img-resilience','h':'260px'}
-};
-
-function sendLiveImage(urlId, url) {
-  var m = _liveImgMap[urlId];
-  if (!m) return;
-  previewMsg({type:'set-img', act:m.act, id:m.id, h:m.h, url:url||''});
-}
-
-/* maps admin field IDs → preview element to highlight on focus */
-var _fieldHighlightMap = {
-  'cnt-hero-title':            {id:'content-hero-title'},
-  'cnt-hero-accent':           {id:'content-hero-accent'},
-  'cnt-hero-subtitle':         {id:'content-hero-subtitle'},
-  'cnt-hero-thumb-url':        {sel:'.hero-video-thumbnail'},
-  'cnt-about-body':            {id:'content-mission-body'},
-  'cnt-about-img-url':         {id:'mission-visual'},
-  'cnt-about-video-url':       {id:'mission-visual'},
-  'cnt-about-video-thumb-url': {id:'mission-visual'},
-  'cnt-svc-workshops-url':     {id:'svc-img-workshops'},
-  'cnt-svc-coaching-url':      {id:'svc-img-coaching'},
-  'cnt-svc-resilience-url':    {id:'svc-img-resilience'},
-  'cfg-phone-in':              {id:'cfg-phone'},
-  'cfg-email-in':              {id:'cfg-email'},
-  'cfg-wa-in':                 {id:'contact'},
-  'cfg-families':              {id:'cfg-stat-families'},
-  'cfg-workshops':             {id:'cfg-stat-workshops'},
-  'cfg-facilitators':          {id:'cfg-stat-facilitators'},
-  'cfg-cities':                {id:'cfg-stat-cities'},
-  'cfg-stat-label-1':          {id:'cfg-stat-families'},
-  'cfg-stat-label-2':          {id:'cfg-stat-workshops'},
-  'cfg-stat-label-3':          {id:'cfg-stat-facilitators'},
-  'cfg-stat-label-4':          {id:'cfg-stat-cities'}
-};
-/* section → container element for dynamic rows (team / events / testimonials) */
-var _sectionContainerMap = {
-  'team':           'team-carousel',
-  'events-section': 'events-track',
-  'testimonials':   'testimonials-slider'
-};
-
-function highlightPreviewField(fieldId, sectionId) {
-  var m = _fieldHighlightMap[fieldId];
-  if (m) {
-    previewMsg({type:'highlight-element', id: m.id || null, sel: m.sel || null});
-    return;
-  }
-  /* dynamic row fields: prefix match */
-  var dynPrefixes = {'cnt-quote-':1,'cnt-body-':1,'cnt-author-':1,'cnt-role-':1,'cnt-photo-':1,
-                     'team-name-':1,'team-role-':1,'team-bio-':1,'team-photo-url-':1,
-                     'ev-title-':1,'ev-link-':1,'ev-img-url-':1};
-  for (var pfx in dynPrefixes) {
-    if (fieldId.indexOf(pfx) === 0) {
-      var cid = _sectionContainerMap[sectionId];
-      if (cid) previewMsg({type:'highlight-element', id: cid});
-      return;
+function doLogin(){
+  var pass=g('l-pass').value;
+  if(!pass){showLErr('הזינו סיסמה');return}
+  var stored=localStorage.getItem('shoreshim_phash');
+  sha256(pass).then(function(h){
+    if(!stored){
+      if(pass.length<6){showLErr('סיסמה — לפחות 6 תווים');return}
+      localStorage.setItem('shoreshim_phash',h);
+      sessionStorage.setItem('shoreshim_auth','1');
+      launchApp();
+    } else if(h===stored){
+      sessionStorage.setItem('shoreshim_auth','1');
+      launchApp();
+    } else {
+      showLErr('סיסמה שגויה');
     }
-  }
+  });
 }
 
-function urlFieldPreview(urlId, previewId) {
-  var url = get(urlId);
-  if (!url) { clearMedia(previewId, null); sendLiveImage(urlId, ''); return; }
-  var isVideo = /\.(mp4|webm|ogg|mov)$/i.test(url) || url.includes('/video/upload/');
-  renderPreview(previewId, url, urlId, isVideo);
-  sendLiveImage(urlId, url);
+function showLErr(m){
+  var e=g('l-err'); e.textContent=m; e.style.display='block';
+  setTimeout(function(){e.style.display='none'},3000);
 }
 
-function restorePreview(urlId, previewId) {
-  var url = get(urlId);
-  if (url) urlFieldPreview(urlId, previewId);
+function doLogout(){
+  sessionStorage.removeItem('shoreshim_auth');
+  location.reload();
 }
 
-/* ══════════════════════════════════════
-   Account settings
-══════════════════════════════════════ */
-async function changePassword() {
-  var oldPass = document.getElementById('chg-old').value;
-  var newPass = document.getElementById('chg-new').value;
-  var newPass2= document.getElementById('chg-new2').value;
-  var msg     = document.getElementById('chg-msg');
+/* ═══════════════════════════════════════
+   SECTION TABS
+═══════════════════════════════════════ */
+var _curSec = 'hero';
+var _secPreviewId = {
+  hero:'hero', about:'about', services:'services', team:'team',
+  events:'events-section', testimonials:'testimonials', stats:'stats', contact:'contact'
+};
 
-  if (!oldPass || !newPass || !newPass2) { return showInlineMsg(msg, 'יש למלא את כל השדות', false); }
-  if (newPass !== newPass2)              { return showInlineMsg(msg, 'הסיסמאות החדשות אינן תואמות', false); }
-  if (newPass.length < 6)               { return showInlineMsg(msg, 'הסיסמה חייבת להכיל לפחות 6 תווים', false); }
-
-  var oldHash = await sha256(oldPass);
-  if (oldHash !== localStorage.getItem('shoreshim_pass_hash')) {
-    return showInlineMsg(msg, 'הסיסמה הנוכחית שגויה', false);
-  }
-  var newHash = await sha256(newPass);
-  localStorage.setItem('shoreshim_pass_hash', newHash);
-  ['chg-old','chg-new','chg-new2'].forEach(function(id){ document.getElementById(id).value=''; });
-  showInlineMsg(msg, 'הסיסמה שונתה בהצלחה ✓', true);
+function showSec(s){
+  _curSec = s;
+  document.querySelectorAll('.stab').forEach(function(b){
+    b.classList.toggle('on', b.dataset.s===s);
+  });
+  document.querySelectorAll('.sf').forEach(function(f){
+    f.classList.toggle('on', f.id==='sf-'+s);
+  });
+  pmsg({type:'scroll-to', id:_secPreviewId[s]||s});
+  // Mobile: switch to preview briefly then back
 }
 
-function showInlineMsg(el, msg, ok) {
-  el.textContent = msg;
-  el.className   = 'inline-msg ' + (ok ? 'ok' : 'err');
-  el.style.display = 'block';
-  setTimeout(function(){ el.style.display='none'; }, 4000);
+/* ═══════════════════════════════════════
+   PREVIEW postMessage
+═══════════════════════════════════════ */
+function pmsg(data){
+  var f=g('iframe');
+  if(!f||!f.contentWindow) return;
+  try{f.contentWindow.postMessage(data,'*')}catch(e){}
 }
 
-
-/* ══════════════════════════════════════
-   Show admin + load config
-══════════════════════════════════════ */
-async function showAdmin() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('admin-screen').style.display = 'flex';
-  await loadConfig();
+function liveText(previewId, val){
+  pmsg({type:'update-text', id:previewId, value:val});
+  scheduleAS();
 }
 
-async function loadConfig() {
-  var base = 'https://raw.githubusercontent.com/'+REPO_OWNER+'/'+REPO_NAME+'/'+REPO_BRANCH+'/';
-  /* Prefer local draft (unsaved/unpublished edits) over committed GitHub content */
-  var cfgDraft = null, cntDraft = null;
-  try { cfgDraft = localStorage.getItem('shoreshim_cfg_draft'); } catch(e) {}
-  try { cntDraft = localStorage.getItem('shoreshim_cnt_draft'); } catch(e) {}
-  if (cfgDraft) {
-    try { populateForm(JSON.parse(cfgDraft)); } catch(e) {}
+function reloadIframe(){
+  var f=g('iframe');
+  if(f) f.src=f.src.split('?')[0]+'?_='+Date.now();
+}
+
+/* ═══════════════════════════════════════
+   MOBILE TABS
+═══════════════════════════════════════ */
+function mobSwitch(mode){
+  var pp=g('panel-preview');
+  var et=g('mob-edit-tab'), pt=g('mob-prev-tab');
+  if(mode==='preview'){
+    pp.classList.add('mob-show'); et.classList.remove('on'); pt.classList.add('on');
   } else {
-    try { var r = await fetch(base+'config.json?_='+Date.now()); if(r.ok) populateForm(await r.json()); } catch(e) {}
+    pp.classList.remove('mob-show'); pt.classList.remove('on'); et.classList.add('on');
   }
-  if (cntDraft) {
-    try { populateContentForm(JSON.parse(cntDraft)); } catch(e) {}
+}
+
+/* ═══════════════════════════════════════
+   IMAGE WIDGET
+═══════════════════════════════════════ */
+function imgw(key){
+  /* returns HTML string for an image upload widget */
+  var uid='img-url-'+key, pid='img-prev-'+key, fid='img-file-'+key, eid='img-el-'+key;
+  return '<div class="imgw" id="imgw-'+key+'">'
+    +'<div class="imgw-prev" id="'+pid+'">'
+      +'<img id="'+eid+'" src="" alt="">'
+      +'<button class="imgw-clear" onclick="clearImgW(\''+key+'\')">✕ הסר</button>'
+    +'</div>'
+    +'<div class="imgw-drop" id="imgw-drop-'+key+'"'
+      +' onclick="g(\''+fid+'\').click()"'
+      +' ondragover="event.preventDefault();this.classList.add(\'drag\')"'
+      +' ondragleave="this.classList.remove(\'drag\')"'
+      +' ondrop="event.preventDefault();this.classList.remove(\'drag\');dropFile(\''+key+'\',event)">'
+      +'<div class="imgw-icon">🖼</div>'
+      +'<div class="imgw-txt">לחצו לבחירת קובץ</div>'
+      +'<div class="imgw-sub">או גררו תמונה לכאן</div>'
+    +'</div>'
+    +'<div class="imgw-url">'
+      +'<span>URL:</span>'
+      +'<input type="url" id="'+uid+'" dir="ltr" placeholder="https://..."'
+        +' oninput="onUrlInput(\''+key+'\',this.value)">'
+    +'</div>'
+    +'<input type="file" id="'+fid+'" accept="image/*" style="display:none"'
+      +' onchange="onFileInput(\''+key+'\',this)">'
+  +'</div>';
+}
+
+function setImgW(key, url){
+  var p=g('img-prev-'+key), el=g('img-el-'+key), uw=g('img-url-'+key);
+  if(!p||!el) return;
+  if(url){el.src=url; p.classList.add('on')} else {el.src=''; p.classList.remove('on')}
+  if(uw && url!==undefined) uw.value=url||'';
+}
+
+function clearImgW(key){
+  setImgW(key,'');
+  scheduleAS();
+  sendImgToPreview(key,'');
+}
+
+function onUrlInput(key, url){
+  setImgW(key, url);
+  sendImgToPreview(key, url);
+  scheduleAS();
+}
+
+function dropFile(key, event){
+  var file = event.dataTransfer.files[0];
+  if(file) processFile(key, file);
+}
+
+function onFileInput(key, input){
+  var file = input.files[0];
+  if(file) processFile(key, file);
+  input.value=''; /* allow re-select same file */
+}
+
+function processFile(key, file){
+  /* Show local preview immediately */
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var dataUrl = e.target.result;
+    setImgW(key, dataUrl);
+    sendImgToPreview(key, dataUrl);
+  };
+  reader.readAsDataURL(file);
+
+  /* Upload to GitHub if PAT available */
+  if(hasPAT){
+    setStatus('saving','מעלה תמונה...');
+    uploadImgToGH(file).then(function(url){
+      setImgW(key, url);
+      sendImgToPreview(key, url);
+      scheduleAS();
+      setStatus('saved','הועלה ✓');
+      toast('תמונה הועלתה ✓','ok');
+    }).catch(function(err){
+      toast('שגיאת העלאה: '+err.message+'\nהתמונה נשמרה בטיוטה מקומית','err',6000);
+      var dataUrl = g('img-el-'+key) && g('img-el-'+key).src;
+      if(dataUrl) sv('img-url-'+key, dataUrl);
+      scheduleAS();
+      setStatus('','מוכן');
+    });
   } else {
-    try { var rc = await fetch(base+'content.json?_='+Date.now()); if(rc.ok) populateContentForm(await rc.json()); } catch(e) {}
+    /* No PAT: store data URL in draft only */
+    var dataUrl = g('img-el-'+key) && g('img-el-'+key).src;
+    if(dataUrl) sv('img-url-'+key, dataUrl);
+    scheduleAS();
+    toast('התמונה מוצגת בתצוגה מקדימה.\nלהעלאה קבועה לאתר — הגדירו ADMIN_PAT ב-GitHub Secrets.','',6000);
   }
 }
 
-function populateForm(cfg) {
-  set('cfg-phone-in',       cfg.phone         || '');
-  set('cfg-wa-in',          cfg.whatsapp      || '');
-  set('cfg-email-in',       cfg.email         || '');
-  set('cfg-form-endpoint',  cfg.formEndpoint  || '');
-  set('cfg-matara-in',      cfg.mataraUrl     || '');
-  set('cfg-youtube-in',     cfg.youtubeUrl    || '');
+/* preview postMessage for images */
+var _imgMap = {
+  'hero-thumb':      {act:'hero-thumb'},
+  'about-img':       {act:'set-img', id:'mission-visual',    h:'340px'},
+  'about-vid':       {act:'set-img', id:'mission-visual',    h:'340px'},
+  'svc-workshops':   {act:'set-img', id:'svc-img-workshops', h:'260px'},
+  'svc-coaching':    {act:'set-img', id:'svc-img-coaching',  h:'260px'},
+  'svc-resilience':  {act:'set-img', id:'svc-img-resilience','h':'260px'},
+};
 
-  var s = cfg.stats || {};
-  set('cfg-families',      s.families     || '');
-  set('cfg-workshops',     s.workshops    || '');
-  set('cfg-facilitators',  s.facilitators || '');
-  set('cfg-cities',        s.cities       || '');
-
-  var l = cfg.statLabels || {};
-  set('cfg-stat-label-1', l['1'] || '');
-  set('cfg-stat-label-2', l['2'] || '');
-  set('cfg-stat-label-3', l['3'] || '');
-  set('cfg-stat-label-4', l['4'] || '');
-  set('cfg-stats-url', cfg.statsUrl || '');
+function sendImgToPreview(key, url){
+  var m = _imgMap[key];
+  if(!m) return;
+  pmsg({type:'set-img', act:m.act, id:m.id, h:m.h, url:url||''});
 }
 
-function populateContentForm(cnt) {
-  set('cnt-hero-title',            cnt['hero.title']           || '');
-  set('cnt-hero-accent',           cnt['hero.accent']          || '');
-  set('cnt-hero-subtitle',         cnt['hero.subtitle']        || '');
-  set('cnt-hero-thumb-url',        cnt['hero.thumbUrl']        || '');
-  set('cnt-about-body',            cnt['about.body']           || '');
-  set('cnt-about-img-url',         cnt['about.imageUrl']       || '');
-  set('cnt-about-video-url',       cnt['about.videoUrl']       || '');
-  set('cnt-about-video-thumb-url', cnt['about.videoThumbUrl']  || '');
-  set('cnt-svc-workshops-url',     cnt['svc.workshops.imgUrl'] || '');
-  set('cnt-svc-coaching-url',      cnt['svc.coaching.imgUrl']  || '');
-  set('cnt-svc-resilience-url',    cnt['svc.resilience.imgUrl']|| '');
-
-  /* restore previews */
-  restorePreview('cnt-hero-thumb-url',        'prev-hero-thumb');
-  restorePreview('cnt-about-img-url',         'prev-about-img');
-  restorePreview('cnt-about-video-thumb-url', 'prev-about-video-thumb');
-  restorePreview('cnt-svc-workshops-url',     'prev-svc-workshops');
-  restorePreview('cnt-svc-coaching-url',      'prev-svc-coaching');
-  restorePreview('cnt-svc-resilience-url',    'prev-svc-resilience');
-
-  renderTeamList(cnt.team || []);
-  renderEventsList(cnt.events || []);
-  renderTestimonialsList(cnt.testimonials || []);
-}
-
-/* ══════════════════════════════════════
-   Testimonials editor (with photo)
-══════════════════════════════════════ */
-var _testimonialIdx = 0;
-
-function renderTestimonialsList(arr) {
-  var container = document.getElementById('testimonials-editor');
-  container.innerHTML = ''; _testimonialIdx = 0;
-  arr.forEach(function(t){ addTestimonialRow(t); });
-}
-
-function addTestimonialRow(data) {
-  var container = document.getElementById('testimonials-editor');
-  if (!container) return;
-  if (container.querySelectorAll('.testimonial-editor-row').length >= 12) {
-    showStatus('מקסימום 12 עדויות', 'error'); return;
-  }
-  var i = _testimonialIdx++;
-  var d = (data && typeof data === 'object') ? data : {};
-  var row = document.createElement('div');
-  row.className = 'testimonial-editor-row';
-  row.dataset.idx = i;
-
-  var photoUrl = d.photoUrl || '';
-  row.innerHTML =
-    '<div class="t-num">עדות 1</div>'+
-    '<button class="btn-remove" onclick="removeTestimonialRow(this)">הסר</button>'+
-    '<div class="t-grid">'+
-      '<div class="admin-field t-full"><label>ציטוט קצר</label>'+
-        '<input type="text" id="cnt-quote-'+i+'" value="'+esc(d.quote||'')+'" placeholder="ציטוט קצר (מופיע בבלון)"></div>'+
-      '<div class="admin-field t-full"><label>תוכן מלא (אופציונלי)</label>'+
-        '<textarea id="cnt-body-'+i+'" rows="2" placeholder="הרחבה...">'+esc(d.body||'')+'</textarea></div>'+
-      '<div class="admin-field"><label>שם</label>'+
-        '<input type="text" id="cnt-author-'+i+'" value="'+esc(d.author||'')+'" placeholder="שם"></div>'+
-      '<div class="admin-field"><label>תפקיד</label>'+
-        '<input type="text" id="cnt-role-'+i+'" value="'+esc(d.role||'')+'" placeholder="הורה מתמודד"></div>'+
-      '<div class="admin-field t-full"><label>תמונת הורה / תמונה לצרף לעדות</label>'+
-        '<div class="media-upload-wrap">'+
-          '<div id="prev-t-'+i+'" class="media-preview">'+(photoUrl?'<img src="'+esc(photoUrl)+'" style="width:100%;height:100px;object-fit:cover;display:block">':'')+'</div>'+
-          '<div class="media-drop-zone" style="min-height:55px" onclick="document.getElementById(\'file-t-'+i+'\').click()">'+
-            '<input type="file" id="file-t-'+i+'" accept="image/*" style="display:none" onchange="handleFileChange(this,\'cnt-photo-'+i+'\',\'prev-t-'+i+'\')">'+
-            '<svg class="media-drop-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'+
-            '<span class="media-drop-label" style="font-size:.75rem">העלו תמונה</span>'+
-          '</div>'+
-          '<div class="media-url-bar">'+
-            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>'+
-            '<input type="url" id="cnt-photo-'+i+'" value="'+esc(photoUrl)+'" placeholder="URL תמונה..." oninput="urlFieldPreview(\'cnt-photo-'+i+'\',\'prev-t-'+i+'\')">'+
-          '</div>'+
-        '</div>'+
-      '</div>'+
-    '</div>';
-
-  container.appendChild(row);
-  if (photoUrl) document.getElementById('prev-t-'+i).classList.add('visible');
-  renumberTestimonials();
-  row.scrollIntoView({behavior:'smooth', block:'nearest'});
-}
-
-function removeTestimonialRow(btn) {
-  btn.closest('.testimonial-editor-row').remove();
-  renumberTestimonials();
-}
-
-function renumberTestimonials() {
-  document.querySelectorAll('.testimonial-editor-row').forEach(function(row, idx) {
-    var num = row.querySelector('.t-num');
-    if (num) num.textContent = 'עדות ' + (idx + 1);
+/* ═══════════════════════════════════════
+   GITHUB IMAGE UPLOAD
+═══════════════════════════════════════ */
+async function uploadImgToGH(file){
+  var ext = (file.name.split('.').pop()||'jpg').toLowerCase();
+  var path = 'images/'+Date.now()+'.'+ext;
+  var b64 = await new Promise(function(res,rej){
+    var r=new FileReader();
+    r.onload=function(e){res(e.target.result.split(',')[1])};
+    r.onerror=rej;
+    r.readAsDataURL(file);
   });
-}
-
-/* ══════════════════════════════════════
-   Team editor
-══════════════════════════════════════ */
-var _teamIdx = 0;
-
-function renderTeamList(arr) {
-  var c = document.getElementById('team-editor');
-  c.innerHTML = ''; _teamIdx = 0;
-  arr.forEach(function(m){ addTeamMemberRow(m); });
-}
-
-function addTeamMemberRow(data) {
-  var container = document.getElementById('team-editor');
-  if (!container) return;
-  if (container.querySelectorAll('.testimonial-editor-row').length >= 10) {
-    showStatus('מקסימום 10 אנשי צוות', 'error'); return;
-  }
-  var i = _teamIdx++;
-  var d = (data && typeof data === 'object') ? data : {};
-  var photoUrl = d.photoUrl || '';
-  var row = document.createElement('div');
-  row.className = 'testimonial-editor-row';
-  row.dataset.idx = i;
-  row.innerHTML =
-    '<div class="t-num">איש צוות 1</div>'+
-    '<button class="btn-remove" onclick="removeTeamRow(this)">הסר</button>'+
-    '<div class="t-grid">'+
-      '<div class="admin-field"><label>שם מלא</label>'+
-        '<input type="text" id="team-name-'+i+'" value="'+esc(d.name||'')+'" placeholder="שם מלא"></div>'+
-      '<div class="admin-field"><label>תפקיד</label>'+
-        '<input type="text" id="team-role-'+i+'" value="'+esc(d.role||'')+'" placeholder="מנחת קבוצה"></div>'+
-      '<div class="admin-field t-full"><label>תיאור קצר</label>'+
-        '<textarea id="team-bio-'+i+'" rows="2" placeholder="תיאור קצר...">'+esc(d.bio||'')+'</textarea></div>'+
-      '<div class="admin-field t-full"><label>תמונת פרופיל</label>'+
-        '<div class="media-upload-wrap">'+
-          '<div id="prev-team-'+i+'" class="media-preview">'+(photoUrl?'<img src="'+esc(photoUrl)+'" style="width:100%;height:140px;object-fit:cover;object-position:top;display:block">':'')+'</div>'+
-          '<div class="media-drop-zone" style="min-height:60px" onclick="document.getElementById(\'file-team-'+i+'\').click()">'+
-            '<input type="file" id="file-team-'+i+'" accept="image/*" style="display:none" onchange="handleFileChange(this,\'team-photo-url-'+i+'\',\'prev-team-'+i+'\')">'+
-            '<svg class="media-drop-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'+
-            '<span class="media-drop-label" style="font-size:.75rem">העלו תמונת פרופיל</span>'+
-          '</div>'+
-          '<div class="media-url-bar">'+
-            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>'+
-            '<input type="url" id="team-photo-url-'+i+'" value="'+esc(photoUrl)+'" placeholder="URL תמונה..." oninput="urlFieldPreview(\'team-photo-url-'+i+'\',\'prev-team-'+i+'\')">'+
-          '</div>'+
-        '</div>'+
-      '</div>'+
-    '</div>';
-  container.appendChild(row);
-  if (photoUrl) document.getElementById('prev-team-'+i).classList.add('visible');
-  renumberTeam();
-  row.scrollIntoView({behavior:'smooth', block:'nearest'});
-}
-
-function removeTeamRow(btn) {
-  btn.closest('.testimonial-editor-row').remove();
-  renumberTeam();
-}
-
-function renumberTeam() {
-  document.querySelectorAll('#team-editor .testimonial-editor-row').forEach(function(row, idx) {
-    var num = row.querySelector('.t-num');
-    if (num) num.textContent = 'איש צוות ' + (idx + 1);
+  var resp = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path,{
+    method:'PUT',
+    headers:{'Authorization':'token '+ADMIN_PAT,'Content-Type':'application/json'},
+    body:JSON.stringify({message:'Upload image',content:b64,branch:REPO_BRANCH})
   });
+  if(!resp.ok){var e=await resp.json();throw new Error(e.message||resp.status)}
+  var d=await resp.json();
+  return d.content.download_url;
 }
 
-/* ══════════════════════════════════════
-   Events (conferences) editor
-══════════════════════════════════════ */
-var _eventIdx = 0;
+/* ═══════════════════════════════════════
+   COLLECT / POPULATE
+═══════════════════════════════════════ */
+function collectData(){
+  var team=[], events=[], testimonials=[];
 
-function renderEventsList(arr) {
-  var c = document.getElementById('events-editor');
-  c.innerHTML = ''; _eventIdx = 0;
-  arr.forEach(function(e){ addEventRow(e); });
-}
-
-function addEventRow(data) {
-  var container = document.getElementById('events-editor');
-  if (!container) return;
-  if (container.querySelectorAll('.testimonial-editor-row').length >= 20) {
-    showStatus('מקסימום 20 אירועים', 'error'); return;
-  }
-  var i = _eventIdx++;
-  var d = (data && typeof data === 'object') ? data : {};
-  var imgUrl = d.imgUrl || '';
-  var row = document.createElement('div');
-  row.className = 'testimonial-editor-row';
-  row.dataset.idx = i;
-  row.innerHTML =
-    '<div class="t-num">אירוע 1</div>'+
-    '<button class="btn-remove" onclick="removeEventRow(this)">הסר</button>'+
-    '<div class="t-grid">'+
-      '<div class="admin-field"><label>כותרת האירוע</label>'+
-        '<input type="text" id="ev-title-'+i+'" value="'+esc(d.title||'')+'" placeholder="שם הכנס / אירוע"></div>'+
-      '<div class="admin-field"><label>קישור (אופציונלי)</label>'+
-        '<input type="url" id="ev-link-'+i+'" value="'+esc(d.link||'')+'" placeholder="https://..." dir="ltr"></div>'+
-      '<div class="admin-field t-full"><label>פוסטר / תמונת האירוע</label>'+
-        '<div class="media-upload-wrap">'+
-          '<div id="prev-ev-'+i+'" class="media-preview">'+(imgUrl?'<img src="'+esc(imgUrl)+'" style="width:100%;height:160px;object-fit:cover;display:block">':'')+'</div>'+
-          '<div class="media-drop-zone" onclick="document.getElementById(\'file-ev-'+i+'\').click()"'+
-            ' ondragover="event.preventDefault();this.classList.add(\'drag-over\')"'+
-            ' ondragleave="this.classList.remove(\'drag-over\')"'+
-            ' ondrop="handleDrop(event,\'file-ev-'+i+'\',\'ev-img-url-'+i+'\',\'prev-ev-'+i+'\')">' +
-            '<input type="file" id="file-ev-'+i+'" accept="image/*" style="display:none" onchange="handleFileChange(this,\'ev-img-url-'+i+'\',\'prev-ev-'+i+'\')">'+
-            '<svg class="media-drop-icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'+
-            '<span class="media-drop-label">גרור פוסטר לכאן או לחצו לבחירה</span>'+
-            '<span class="media-drop-sub">JPG · PNG · WebP</span>'+
-          '</div>'+
-          '<div class="media-url-bar">'+
-            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>'+
-            '<input type="url" id="ev-img-url-'+i+'" value="'+esc(imgUrl)+'" placeholder="URL פוסטר..." oninput="urlFieldPreview(\'ev-img-url-'+i+'\',\'prev-ev-'+i+'\')">'+
-          '</div>'+
-        '</div>'+
-      '</div>'+
-    '</div>';
-  container.appendChild(row);
-  if (imgUrl) document.getElementById('prev-ev-'+i).classList.add('visible');
-  renumberEvents();
-  row.scrollIntoView({behavior:'smooth', block:'nearest'});
-}
-
-function removeEventRow(btn) {
-  btn.closest('.testimonial-editor-row').remove();
-  renumberEvents();
-}
-
-function renumberEvents() {
-  document.querySelectorAll('#events-editor .testimonial-editor-row').forEach(function(row, idx) {
-    var num = row.querySelector('.t-num');
-    if (num) num.textContent = 'אירוע ' + (idx + 1);
+  document.querySelectorAll('#team-list .di').forEach(function(r){
+    var i=r.dataset.i;
+    team.push({name:gv('tm-n-'+i),role:gv('tm-r-'+i),bio:gv('tm-b-'+i),photoUrl:gv('img-url-tm-'+i)});
   });
-}
-
-/* ══════════════════════════════════════
-   Form helpers
-══════════════════════════════════════ */
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function set(id, val) { var el=document.getElementById(id); if(el) el.value=val; }
-function get(id)      { var el=document.getElementById(id); return el ? el.value.trim() : ''; }
-
-function getContentFromForm() {
-  var testimonials = [];
-  document.querySelectorAll('#testimonials-editor .testimonial-editor-row').forEach(function(row) {
-    var i = row.dataset.idx;
-    var q=get('cnt-quote-'+i), b=get('cnt-body-'+i), a=get('cnt-author-'+i), r=get('cnt-role-'+i), p=get('cnt-photo-'+i);
-    if (q || b || a) testimonials.push({quote:q, body:b, author:a, role:r, photoUrl:p});
+  document.querySelectorAll('#ev-list .di').forEach(function(r){
+    var i=r.dataset.i;
+    events.push({title:gv('ev-t-'+i),link:gv('ev-l-'+i),imgUrl:gv('img-url-ev-'+i)});
+  });
+  document.querySelectorAll('#tst-list .di').forEach(function(r){
+    var i=r.dataset.i;
+    testimonials.push({quote:gv('tst-q-'+i),body:gv('tst-b-'+i),author:gv('tst-a-'+i),role:gv('tst-r-'+i),photoUrl:gv('img-url-tst-'+i)});
   });
 
-  var team = [];
-  document.querySelectorAll('#team-editor .testimonial-editor-row').forEach(function(row) {
-    var i = row.dataset.idx;
-    var n=get('team-name-'+i), r=get('team-role-'+i), bio=get('team-bio-'+i), p=get('team-photo-url-'+i);
-    if (n || p) team.push({name:n, role:r, bio:bio, photoUrl:p});
-  });
-
-  var events = [];
-  document.querySelectorAll('#events-editor .testimonial-editor-row').forEach(function(row) {
-    var i = row.dataset.idx;
-    var t=get('ev-title-'+i), l=get('ev-link-'+i), img=get('ev-img-url-'+i);
-    if (img || t) events.push({title:t, link:l, imgUrl:img});
-  });
-
-  return {
-    'hero.title':           get('cnt-hero-title'),
-    'hero.accent':          get('cnt-hero-accent'),
-    'hero.subtitle':        get('cnt-hero-subtitle'),
-    'hero.thumbUrl':        get('cnt-hero-thumb-url'),
-    'about.body':           get('cnt-about-body'),
-    'about.imageUrl':       get('cnt-about-img-url'),
-    'about.videoUrl':       get('cnt-about-video-url'),
-    'about.videoThumbUrl':  get('cnt-about-video-thumb-url'),
-    'svc.workshops.imgUrl': get('cnt-svc-workshops-url'),
-    'svc.coaching.imgUrl':  get('cnt-svc-coaching-url'),
-    'svc.resilience.imgUrl':get('cnt-svc-resilience-url'),
-    'team':         team,
-    'events':       events,
-    'testimonials': testimonials
-  };
-}
-
-/* ══════════════════════════════════════
-   Save
-══════════════════════════════════════ */
-function collectConfig() {
-  return {
-    phone:        get('cfg-phone-in'),
-    whatsapp:     get('cfg-wa-in').replace(/\D/g,''),
-    email:        get('cfg-email-in'),
-    formEndpoint: get('cfg-form-endpoint'),
-    stats: {
-      families:     parseInt(get('cfg-families'),10)    || 0,
-      workshops:    parseInt(get('cfg-workshops'),10)   || 0,
-      facilitators: parseInt(get('cfg-facilitators'),10)|| 0,
-      cities:       parseInt(get('cfg-cities'),10)      || 0
+  var cfg = {
+    phone:       gv('cfg-phone'),
+    whatsapp:    gv('cfg-wa').replace(/\D/g,''),
+    email:       gv('cfg-email'),
+    formEndpoint:gv('cfg-formsep'),
+    mataraUrl:   gv('cfg-matara'),
+    youtubeUrl:  gv('cfg-youtube'),
+    statsUrl:    gv('cfg-statsurl'),
+    stats:{
+      families:    +gv('cfg-s1')||0,
+      workshops:   +gv('cfg-s2')||0,
+      facilitators:+gv('cfg-s3')||0,
+      cities:      +gv('cfg-s4')||0
     },
-    statLabels: {
-      '1': get('cfg-stat-label-1'), '2': get('cfg-stat-label-2'),
-      '3': get('cfg-stat-label-3'), '4': get('cfg-stat-label-4')
-    },
-    mataraUrl:  get('cfg-matara-in'),
-    youtubeUrl: get('cfg-youtube-in'),
-    statsUrl:   get('cfg-stats-url')
+    statLabels:{'1':gv('cfg-l1'),'2':gv('cfg-l2'),'3':gv('cfg-l3'),'4':gv('cfg-l4')}
   };
+
+  var cnt = {
+    'hero.title':           gv('cnt-ht'),
+    'hero.accent':          gv('cnt-ha'),
+    'hero.subtitle':        gv('cnt-hs'),
+    'hero.thumbUrl':        gv('img-url-hero-thumb'),
+    'about.body':           gv('cnt-ab'),
+    'about.imageUrl':       gv('img-url-about-img'),
+    'about.videoThumbUrl':  gv('img-url-about-vid'),
+    'about.videoUrl':       gv('cnt-avurl'),
+    'svc.workshops.imgUrl': gv('img-url-svc-workshops'),
+    'svc.coaching.imgUrl':  gv('img-url-svc-coaching'),
+    'svc.resilience.imgUrl':gv('img-url-svc-resilience'),
+    team:         team,
+    events:       events,
+    testimonials: testimonials
+  };
+
+  return {cfg:cfg, cnt:cnt};
 }
 
-var _SAVE_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg>';
+function populateData(cfg, cnt){
+  if(cfg){
+    sv('cfg-phone',    cfg.phone);
+    sv('cfg-wa',       cfg.whatsapp);
+    sv('cfg-email',    cfg.email);
+    sv('cfg-formsep',  cfg.formEndpoint);
+    sv('cfg-matara',   cfg.mataraUrl);
+    sv('cfg-youtube',  cfg.youtubeUrl);
+    sv('cfg-statsurl', cfg.statsUrl);
+    var s=cfg.stats||{};
+    sv('cfg-s1',s.families); sv('cfg-s2',s.workshops);
+    sv('cfg-s3',s.facilitators); sv('cfg-s4',s.cities);
+    var l=cfg.statLabels||{};
+    sv('cfg-l1',l['1']); sv('cfg-l2',l['2']);
+    sv('cfg-l3',l['3']); sv('cfg-l4',l['4']);
+  }
+  if(cnt){
+    sv('cnt-ht', cnt['hero.title']);
+    sv('cnt-ha', cnt['hero.accent']);
+    sv('cnt-hs', cnt['hero.subtitle']);
+    sv('cnt-ab', cnt['about.body']);
+    sv('cnt-avurl', cnt['about.videoUrl']);
+    setImgW('hero-thumb',    cnt['hero.thumbUrl']||'');
+    setImgW('about-img',     cnt['about.imageUrl']||'');
+    setImgW('about-vid',     cnt['about.videoThumbUrl']||'');
+    setImgW('svc-workshops', cnt['svc.workshops.imgUrl']||'');
+    setImgW('svc-coaching',  cnt['svc.coaching.imgUrl']||'');
+    setImgW('svc-resilience',cnt['svc.resilience.imgUrl']||'');
+    renderTeam(cnt.team||[]);
+    renderEvents(cnt.events||[]);
+    renderTestimonials(cnt.testimonials||[]);
+  }
+}
 
-async function saveChanges() {
-  var btn = document.getElementById('save-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:18px;height:18px"></div> שומר...';
+/* ═══════════════════════════════════════
+   AUTOSAVE
+═══════════════════════════════════════ */
+var _asT;
+function scheduleAS(){
+  setStatus('saving','שומר...');
+  clearTimeout(_asT);
+  _asT=setTimeout(function(){
+    var d=collectData();
+    try{localStorage.setItem('shoreshim_cfg_draft',JSON.stringify(d.cfg))}catch(e){}
+    try{localStorage.setItem('shoreshim_cnt_draft',JSON.stringify(d.cnt))}catch(e){}
+    setStatus('saved','נשמר ✓');
+  },700);
+}
 
-  var cfg = collectConfig();
-  var cnt = getContentFromForm();
+/* ═══════════════════════════════════════
+   LOAD
+═══════════════════════════════════════ */
+async function loadData(){
+  setStatus('','טוען...');
+  var cs=localStorage.getItem('shoreshim_cfg_draft');
+  var ns=localStorage.getItem('shoreshim_cnt_draft');
+  if(cs||ns){
+    try{
+      populateData(cs?JSON.parse(cs):null, ns?JSON.parse(ns):null);
+      setStatus('saved','טיוטה מקומית ✓');
+      return;
+    }catch(e){}
+  }
+  /* fallback: fetch from GitHub */
+  var base='https://raw.githubusercontent.com/'+REPO_OWNER+'/'+REPO_NAME+'/'+REPO_BRANCH+'/';
+  var cfg=null, cnt=null;
+  try{var r=await fetch(base+'config.json?_='+Date.now());  if(r.ok)cfg=await r.json()}catch(e){}
+  try{var r=await fetch(base+'content.json?_='+Date.now()); if(r.ok)cnt=await r.json()}catch(e){}
+  populateData(cfg,cnt);
+  setStatus('saved','נטען מהשרת ✓');
+}
 
-  /* Always persist locally — works as draft even without GitHub */
-  try { localStorage.setItem('shoreshim_cfg_draft', makeConfigJson(cfg)); } catch(e) {}
-  try { localStorage.setItem('shoreshim_cnt_draft', makeContentJson(cnt)); } catch(e) {}
+/* ═══════════════════════════════════════
+   SAVE DRAFT (local)
+═══════════════════════════════════════ */
+function saveDraft(){
+  var btn=g('save-btn');
+  btn.disabled=true;
+  var d=collectData();
+  try{localStorage.setItem('shoreshim_cfg_draft',JSON.stringify(d.cfg))}catch(e){}
+  try{localStorage.setItem('shoreshim_cnt_draft',JSON.stringify(d.cnt))}catch(e){}
+  setStatus('saved','נשמר ✓');
+  toast('הטיוטה נשמרה בהצלחה ✓','ok');
+  if(!hasPAT) g('dl-btn').style.display='';
+  setTimeout(function(){btn.disabled=false},400);
+}
 
-  var pat = ADMIN_PAT;
-  if (!pat || pat === '%%ADMIN_PAT%%') {
-    /* No GitHub token injected — offer download */
-    showStatus('נשמר מקומית ✓ — לפרסום הורד את הקבצים ↓', 'success');
-    btn.disabled = false;
-    btn.innerHTML = _SAVE_SVG + ' שמירה ופרסום';
-    showDownloadOption(cfg, cnt);
+/* ═══════════════════════════════════════
+   PUBLISH TO GITHUB
+═══════════════════════════════════════ */
+async function publish(){
+  if(!hasPAT){
+    g('dl-btn').style.display='';
+    toast('אין ADMIN_PAT מוגדר.\nהורידו את הקבצים ועלו ידנית, או הגדירו ADMIN_PAT ב-GitHub Secrets.','',7000);
     return;
   }
+  var btn=g('pub-btn');
+  btn.disabled=true;
+  btn.innerHTML='<span class="spin"></span> מפרסם...';
+  setStatus('saving','מפרסם...');
 
-  try {
-    var tasks = [
-      commitFile('config.json',  makeConfigJson(cfg),  pat),
-      commitFile('config.js',    makeConfigJs(cfg),    pat),
-      commitFile('content.json', makeContentJson(cnt), pat),
-      commitFile('content.js',   makeContentJs(cnt),   pat)
+  try{
+    var d=collectData();
+    var tasks=[
+      ghPut('config.json',  JSON.stringify(d.cfg,null,2)+'\n'),
+      ghPut('config.js',    makeConfigJs(d.cfg)),
+      ghPut('content.json', JSON.stringify(d.cnt,null,2)+'\n'),
+      ghPut('content.js',   makeContentJs(d.cnt)),
     ];
-    if (cfg.mataraUrl) {
-      tasks.push(patchDonate(cfg.mataraUrl, pat).then(function(html){
-        if (html) return commitFile('donate.html', html, pat);
-      }));
+    if(d.cfg.mataraUrl){
+      var dhtml=await patchDonate(d.cfg.mataraUrl);
+      if(dhtml) tasks.push(ghPut('donate.html',dhtml));
     }
     await Promise.all(tasks);
-    showStatus('האתר עודכן ויפורסם תוך כ-2 דקות ✓', 'success');
-    document.getElementById('dl-btn').style.display = 'none';
-    document.getElementById('download-hint').style.display = 'none';
-  } catch(e) {
-    showStatus('שגיאה בשמירה: ' + e.message, 'error');
-    showDownloadOption(cfg, cnt);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = _SAVE_SVG + ' שמירה ופרסום';
+    setStatus('saved','פורסם ✓');
+    toast('האתר פורסם! יתעדכן תוך ~2 דקות ✓','ok',5000);
+  }catch(err){
+    setStatus('','שגיאה');
+    toast('שגיאה בפרסום:\n'+err.message,'err',8000);
+    g('dl-btn').style.display='';
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='פרסם לאתר ↑';
   }
 }
 
-function showDownloadOption(cfg, cnt) {
-  document.getElementById('dl-btn').style.display = '';
-  document.getElementById('download-hint').style.display = 'block';
-}
-
-function downloadAllFiles() {
-  var cfg = collectConfig();
-  var cnt = getContentFromForm();
-  var files = [
-    {name:'config.json',  text: makeConfigJson(cfg)},
-    {name:'config.js',    text: makeConfigJs(cfg)},
-    {name:'content.json', text: makeContentJson(cnt)},
-    {name:'content.js',   text: makeContentJs(cnt)}
-  ];
-  files.forEach(function(f, i) {
-    setTimeout(function() {
-      var blob = new Blob([f.text], {type:'text/plain;charset=utf-8'});
-      var url  = URL.createObjectURL(blob);
-      var a    = document.createElement('a');
-      a.href = url; a.download = f.name; a.style.display = 'none';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
-    }, i * 250);
-  });
-  showStatus('מוריד 4 קבצים — העלה אותם לתיקייה הראשית של האתר ✓', 'success');
-}
-
-async function commitFile(path, content, pat) {
-  var sha = null;
-  try {
-    var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path+'?ref='+REPO_BRANCH, {
-      headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
-    });
-    if (r.ok) { var d = await r.json(); sha = d.sha; }
-  } catch(e) {}
-
-  var body = {message:'Update '+path+' via admin panel', content:btoa(unescape(encodeURIComponent(content))), branch:REPO_BRANCH};
-  if (sha) body.sha = sha;
-
-  var res = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path, {
+/* ═══════════════════════════════════════
+   GITHUB API
+═══════════════════════════════════════ */
+async function ghPut(path, content){
+  var sha=null;
+  try{
+    var r=await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path+'?ref='+REPO_BRANCH,
+      {headers:{'Authorization':'token '+ADMIN_PAT}});
+    if(r.ok){var d=await r.json(); sha=d.sha}
+  }catch(e){}
+  var body={message:'Update '+path,content:btoa(unescape(encodeURIComponent(content))),branch:REPO_BRANCH};
+  if(sha)body.sha=sha;
+  var res=await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path,{
     method:'PUT',
-    headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+    headers:{'Authorization':'token '+ADMIN_PAT,'Content-Type':'application/json'},
     body:JSON.stringify(body)
   });
-  if (!res.ok) { var err = await res.json(); throw new Error(err.message || res.status); }
+  if(!res.ok){var e=await res.json(); throw new Error(e.message||res.status)}
 }
 
-async function patchDonate(mataraUrl, pat) {
-  try { new URL(mataraUrl); } catch(e) { throw new Error('כתובת URL לא תקינה'); }
-  if (!/^https:\/\//.test(mataraUrl)) throw new Error('URL חייב להתחיל ב-https://');
-  var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/donate.html?ref='+REPO_BRANCH, {
-    headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
+async function patchDonate(url){
+  try{
+    var r=await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/donate.html?ref='+REPO_BRANCH,
+      {headers:{'Authorization':'token '+ADMIN_PAT}});
+    if(!r.ok)return null;
+    var d=await r.json();
+    var html=decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
+    return html.replace(/var MATARA_URL\s*=\s*'[^']*'/,"var MATARA_URL = '"+url.replace(/'/g,'%27')+"'");
+  }catch(e){return null}
+}
+
+/* ═══════════════════════════════════════
+   FILE GENERATORS
+═══════════════════════════════════════ */
+function makeConfigJs(c){
+  var data={phone:c.phone,whatsapp:c.whatsapp,email:c.email,formEndpoint:c.formEndpoint||'',
+    stats:c.stats,statLabels:c.statLabels||{},youtubeUrl:c.youtubeUrl||'',statsUrl:c.statsUrl||''};
+  return '/* שורשים — config.js */\nvar SHORESHIM='+JSON.stringify(data,null,2)+';\n'+
+  '(function(c){\n'+
+  '  var p=document.getElementById("cfg-phone");if(p)p.textContent=c.phone;\n'+
+  '  var em=document.getElementById("cfg-email");if(em)em.textContent=c.email;\n'+
+  '  var ids=["cfg-stat-families","cfg-stat-workshops","cfg-stat-facilitators","cfg-stat-cities"];\n'+
+  '  var vals=[c.stats.families,c.stats.workshops,c.stats.facilitators,c.stats.cities];\n'+
+  '  ids.forEach(function(id,i){var el=document.getElementById(id);if(el)el.setAttribute("data-target",vals[i]||0)});\n'+
+  '  var lb=c.statLabels||{};var lels=document.querySelectorAll(".stat-label");\n'+
+  '  [lb["1"],lb["2"],lb["3"],lb["4"]].forEach(function(t,i){if(t&&lels[i])lels[i].textContent=t});\n'+
+  '  var wa=encodeURIComponent("שלום, הגעתי מאתר שורשים ואשמח לפרטים בדיסקרטיות");\n'+
+  '  document.querySelectorAll(\'a[href^="https://wa.me/"]\').forEach(function(a){\n'+
+  '    var h=a.getAttribute("href").indexOf("?text=")!==-1;\n'+
+  '    a.href="https://wa.me/"+c.whatsapp+(h?"?text="+wa:"");\n'+
+  '  });\n'+
+  '  var yt=document.getElementById("hero-video-link");\n'+
+  '  if(yt){if(c.youtubeUrl){yt.href=c.youtubeUrl;yt.style.pointerEvents=""}else{yt.style.pointerEvents="none";yt.removeAttribute("href");}}\n'+
+  '  if(c.statsUrl)fetch(c.statsUrl+"?_="+Date.now()).then(function(r){return r.json()}).then(function(d){\n'+
+  '    if(d&&d.families)ids.forEach(function(id,i){var el=document.getElementById(id);if(el)el.setAttribute("data-target",[d.families,d.workshops,d.facilitators,d.cities][i]||0)});\n'+
+  '  }).catch(function(){});\n'+
+  '}(SHORESHIM));\n';
+}
+
+function makeContentJs(c){
+  return '/* שורשים — content.js */\nvar SHORESHIM_CONTENT='+JSON.stringify(c)+';\n'+
+  '(function(c){\n'+
+  '  function st(id,v){var el=document.getElementById(id);if(el&&v!=null)el.textContent=String(v)}\n'+
+  '  function si(id,url,h){var el=document.getElementById(id);if(el&&url)el.innerHTML=\'<img src="\'+url.replace(/"/g,\'%22\')+\'" alt="" style="width:100%;height:\'+(h||"100%")+\';object-fit:cover;border-radius:inherit;display:block">\'}\n'+
+  '  st("content-hero-title",c["hero.title"]);\n'+
+  '  st("content-hero-accent",c["hero.accent"]);\n'+
+  '  st("content-hero-subtitle",c["hero.subtitle"]);\n'+
+  '  st("content-mission-body",c["about.body"]);\n'+
+  '  var ht=document.querySelector(".hero-video-thumbnail");\n'+
+  '  if(ht&&c["hero.thumbUrl"])ht.innerHTML=\'<img src="\'+c["hero.thumbUrl"].replace(/"/g,\'%22\')+\'" alt="" style="width:100%;height:200px;object-fit:cover">\';\n'+
+  '  si("mission-visual",c["about.imageUrl"],"340px");\n'+
+  '  si("svc-img-workshops",c["svc.workshops.imgUrl"],"260px");\n'+
+  '  si("svc-img-coaching",c["svc.coaching.imgUrl"],"260px");\n'+
+  '  si("svc-img-resilience",c["svc.resilience.imgUrl"],"260px");\n'+
+  '  var tc=document.getElementById("team-carousel");\n'+
+  '  if(tc&&c.team&&c.team.length){tc.innerHTML=c.team.map(function(m){\n'+
+  '    return\'<div class="team-card fade-in-up"><div class="team-photo">\'+\n'+
+  '    (m.photoUrl?\'<img src="\'+m.photoUrl.replace(/"/g,\'%22\')+\'" alt="" style="width:100%;height:100%;object-fit:cover">\':\'\' )+\n'+
+  '    \'</div><h3 class="team-name">\'+m.name+\'</h3><p class="team-role">\'+m.role+\'</p><p class="team-bio">\'+m.bio+\'</p></div>\';\n'+
+  '  }).join(""); }\n'+
+  '  var ev=document.getElementById("events-track");\n'+
+  '  var es=document.getElementById("events-section");\n'+
+  '  if(ev&&c.events&&c.events.length){\n'+
+  '    ev.innerHTML=c.events.map(function(e){return\'<a class="event-card" href="\'+e.link+\'" target="_blank" rel="noopener">\'+\n'+
+  '      (e.imgUrl?\'<img class="event-poster" src="\'+e.imgUrl.replace(/"/g,\'%22\')+\'" alt="">\':\'\' )+\n'+
+  '      \'<div class="event-info"><h3>\'+e.title+\'</h3></div></a>\';}).join("");\n'+
+  '    if(es)es.style.display=""; }else if(es)es.style.display="none";\n'+
+  '  var ts=document.getElementById("testimonials-slider");\n'+
+  '  if(ts&&c.testimonials&&c.testimonials.length){ts.innerHTML=c.testimonials.map(function(t){\n'+
+  '    return\'<div class="testimonial-card fade-in-up"><p class="testimonial-quote">"\'+t.quote+\'"</p>\'+\n'+
+  '    \'<p class="testimonial-body">\'+t.body+\'</p><div class="testimonial-author">\'+\n'+
+  '    (t.photoUrl?\'<img src="\'+t.photoUrl.replace(/"/g,\'%22\')+\'" alt="" class="testimonial-photo">\':\'\' )+\n'+
+  '    \'<div><strong>\'+t.author+\'</strong><span>\'+t.role+\'</span></div></div></div>\';\n'+
+  '  }).join(""); }\n'+
+  '}(SHORESHIM_CONTENT));\n';
+}
+
+/* ═══════════════════════════════════════
+   DOWNLOAD FILES
+═══════════════════════════════════════ */
+function downloadFiles(){
+  var d=collectData();
+  [
+    {name:'config.json',  c:JSON.stringify(d.cfg,null,2)+'\n'},
+    {name:'config.js',    c:makeConfigJs(d.cfg)},
+    {name:'content.json', c:JSON.stringify(d.cnt,null,2)+'\n'},
+    {name:'content.js',   c:makeContentJs(d.cnt)},
+  ].forEach(function(f){
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([f.c],{type:'text/plain;charset=utf-8'}));
+    a.download=f.name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
   });
-  if (!r.ok) return null;
-  var d    = await r.json();
-  var html = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
-  var safeUrl = mataraUrl.replace(/'/g,'%27');
-  html = html.replace(/var MATARA_URL\s*=\s*'[^']*'/, "var MATARA_URL = '" + safeUrl + "'");
-  return html;
+  toast('4 קבצים הורדו. העלו אותם לשרת לידי הפעלה.','ok',5000);
 }
 
-/* ══════════════════════════════════════
-   Templates
-══════════════════════════════════════ */
-function makeConfigJson(cfg) { return JSON.stringify(cfg, null, 2) + '\n'; }
+/* ═══════════════════════════════════════
+   DYNAMIC LISTS
+═══════════════════════════════════════ */
+var _ti=0,_ei=0,_qi=0;
 
-function makeConfigJs(cfg) {
-  var data = { phone:cfg.phone, whatsapp:cfg.whatsapp, email:cfg.email, formEndpoint:cfg.formEndpoint||'', stats:cfg.stats, statLabels:cfg.statLabels||{}, youtubeUrl:cfg.youtubeUrl||'', statsUrl:cfg.statsUrl||'' };
-  return '/* שורשים — config.js  (edit via /admin/) */\n'+
-    'var SHORESHIM = '+JSON.stringify(data, null, 2)+';\n\n'+
-    "(function (cfg) {\n"+
-    "  var p = document.getElementById('cfg-phone');\n"+
-    "  if (p) p.textContent = cfg.phone;\n\n"+
-    "  var em = document.getElementById('cfg-email');\n"+
-    "  if (em) em.textContent = cfg.email;\n\n"+
-    "  function applyStats(s) {\n"+
-    "    var ids=['cfg-stat-families','cfg-stat-workshops','cfg-stat-facilitators','cfg-stat-cities'];\n"+
-    "    var vals=[s.families,s.workshops,s.facilitators,s.cities];\n"+
-    "    ids.forEach(function(id,i){var el=document.getElementById(id);if(el)el.setAttribute('data-target',vals[i]||0);});\n"+
-    "    var lbls=cfg.statLabels||{};\n"+
-    "    var lblEls=document.querySelectorAll('.stat-label');\n"+
-    "    [lbls['1'],lbls['2'],lbls['3'],lbls['4']].forEach(function(txt,i){if(txt&&lblEls[i])lblEls[i].textContent=txt;});\n"+
-    "  }\n"+
-    "  applyStats(cfg.stats);\n"+
-    "  if(cfg.statsUrl){\n"+
-    "    fetch(cfg.statsUrl+'?_='+Date.now()).then(function(r){return r.json()}).then(function(d){if(d&&d.families)applyStats(d);}).catch(function(){});\n"+
-    "  }\n\n"+
-    "  var waMsg = encodeURIComponent('שלום, הגעתי מאתר שורשים ואשמח לפרטים בדיסקרטיות');\n"+
-    "  document.querySelectorAll('a[href^=\"https://wa.me/\"]').forEach(function (a) {\n"+
-    "    var hasText = a.getAttribute('href').indexOf('?text=') !== -1;\n"+
-    "    a.href = 'https://wa.me/' + cfg.whatsapp + (hasText ? '?text=' + waMsg : '');\n"+
-    "  });\n\n"+
-    "  var ytLink = document.getElementById('hero-video-link');\n"+
-    "  if (ytLink) {\n"+
-    "    if (cfg.youtubeUrl) {\n"+
-    "      ytLink.href = cfg.youtubeUrl;\n"+
-    "      ytLink.style.display = '';\n"+
-    "    } else {\n"+
-    "      ytLink.style.pointerEvents = 'none';\n"+
-    "      ytLink.removeAttribute('href');\n"+
-    "    }\n"+
-    "  }\n"+
-    "}(SHORESHIM));\n";
+function renderTeam(arr){ g('team-list').innerHTML=''; _ti=0; arr.forEach(addTeamMember); }
+function addTeamMember(d){
+  d=d||{}; var i=_ti++;
+  var el=document.createElement('div');
+  el.className='di'; el.dataset.i=i;
+  el.innerHTML=
+    '<div class="di-num">איש צוות '+(i+1)+'</div>'+
+    '<button class="di-rm" onclick="this.closest(\'.di\').remove();scheduleAS()">הסר</button>'+
+    '<div class="f"><label>שם מלא</label><input type="text" id="tm-n-'+i+'" value="'+esc(d.name||'')+'" placeholder="שם" oninput="scheduleAS()"></div>'+
+    '<div class="f"><label>תפקיד</label><input type="text" id="tm-r-'+i+'" value="'+esc(d.role||'')+'" placeholder="מנחה" oninput="scheduleAS()"></div>'+
+    '<div class="f"><label>ביו קצרה</label><textarea id="tm-b-'+i+'" rows="2" placeholder="כמה מילים על הרקע..." oninput="scheduleAS()">'+esc(d.bio||'')+'</textarea></div>'+
+    '<div class="f"><label>תמונה</label>'+imgw('tm-'+i)+'</div>';
+  g('team-list').appendChild(el);
+  if(d.photoUrl){ sv('img-url-tm-'+i,d.photoUrl); setImgW('tm-'+i,d.photoUrl); }
 }
 
-function makeContentJson(cnt) { return JSON.stringify(cnt, null, 2) + '\n'; }
-
-function makeContentJs(cnt) {
-  return '/* שורשים — content.js  (edit via /admin/) */\n'+
-    'var SHORESHIM_CONTENT = '+JSON.stringify(cnt)+';\n\n'+
-    "(function (c) {\n"+
-    "  function setText(id,val){var el=document.getElementById(id);if(el&&val!=null)el.textContent=String(val);}\n"+
-    "  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}\n"+
-    "  function escU(s){return String(s).replace(/\"/g,'%22');}\n"+
-    "  function setImg(id,url,h){\n"+
-    "    var el=document.getElementById(id);\n"+
-    "    if(el&&url)el.innerHTML='<img src=\"'+escU(url)+'\" alt=\"\" style=\"width:100%;height:'+(h||'100%')+';object-fit:cover;border-radius:inherit;display:block\">';\n"+
-    "  }\n"+
-    "\n"+
-    "  setText('content-hero-title',    c['hero.title']);\n"+
-    "  setText('content-hero-accent',   c['hero.accent']);\n"+
-    "  setText('content-hero-subtitle', c['hero.subtitle']);\n"+
-    "  setText('content-mission-body',  c['about.body']);\n"+
-    "\n"+
-    "  /* hero video thumbnail */\n"+
-    "  if(c['hero.thumbUrl']){\n"+
-    "    var ht=document.querySelector('.hero-video-thumbnail');\n"+
-    "    if(ht)ht.innerHTML='<img src=\"'+escU(c['hero.thumbUrl'])+'\" alt=\"\" style=\"width:100%;height:100%;object-fit:cover;display:block\">';\n"+
-    "  }\n"+
-    "\n"+
-    "  /* about image / video */\n"+
-    "  if(c['about.videoUrl']){\n"+
-    "    var mv=document.getElementById('mission-visual');\n"+
-    "    if(mv){\n"+
-    "      var vThumb=c['about.videoThumbUrl']||'';\n"+
-    "      mv.innerHTML='<a href=\"'+escU(c['about.videoUrl'])+'\" target=\"_blank\" rel=\"noopener\" class=\"about-video-card\">'+\n"+
-    "        (vThumb?'<img src=\"'+escU(vThumb)+'\" alt=\"\" style=\"width:100%;height:100%;object-fit:cover\">':'')+\n"+
-    "        '<div class=\"about-video-play\"><svg width=\"52\" height=\"52\" viewBox=\"0 0 52 52\" fill=\"none\"><circle cx=\"26\" cy=\"26\" r=\"26\" fill=\"rgba(255,255,255,.9)\"/><path d=\"M21 18l16 8-16 8V18Z\" fill=\"#1A4080\"/></svg></div>'+\n"+
-    "        '</a>';\n"+
-    "    }\n"+
-    "  } else if(c['about.imageUrl']){\n"+
-    "    setImg('mission-visual',c['about.imageUrl'],'340px');\n"+
-    "  }\n"+
-    "\n"+
-    "  /* service panel images */\n"+
-    "  [['workshops','svc.workshops.imgUrl'],['coaching','svc.coaching.imgUrl'],['resilience','svc.resilience.imgUrl']].forEach(function(pair){\n"+
-    "    var url=c[pair[1]];\n"+
-    "    if(url)setImg('svc-img-'+pair[0],url,'260px');\n"+
-    "  });\n"+
-    "\n"+
-    "  /* team cards */\n"+
-    "  if(Array.isArray(c.team)&&c.team.length){\n"+
-    "    var carousel=document.getElementById('team-carousel');\n"+
-    "    if(carousel){\n"+
-    "      carousel.innerHTML=c.team.map(function(m){\n"+
-    "        var photo=m.photoUrl?'<img src=\"'+escU(m.photoUrl)+'\" alt=\"'+esc(m.name||'')+'\" style=\"width:100%;height:240px;object-fit:cover;object-position:top\">':"+
-    "          '<svg viewBox=\"0 0 280 300\" fill=\"none\" width=\"100%\" height=\"240\"><rect width=\"280\" height=\"300\" fill=\"#EDE8E0\"/><circle cx=\"140\" cy=\"110\" r=\"58\" fill=\"#C8B090\" opacity=\".5\"/><path d=\"M50 260c0-50 40-82 90-82s90 32 90 82\" fill=\"#C8B090\" opacity=\".4\"/></svg>';\n"+
-    "        return '<div class=\"team-card\">'+\n"+
-    "          '<div class=\"team-card-photo\">'+photo+'</div>'+\n"+
-    "          '<div class=\"team-card-body\">'+\n"+
-    "          '<h3>'+esc(m.name||'')+'</h3>'+\n"+
-    "          '<p class=\"team-role\">'+esc(m.role||'')+'</p>'+\n"+
-    "          '<p>'+esc(m.bio||'')+'</p>'+\n"+
-    "          '</div></div>';\n"+
-    "      }).join('');\n"+
-    "    }\n"+
-    "  }\n"+
-    "\n"+
-    "  /* events carousel */\n"+
-    "  if(Array.isArray(c.events)&&c.events.length){\n"+
-    "    var evSection=document.getElementById('events-section');\n"+
-    "    if(evSection)evSection.style.display='';\n"+
-    "    var evTrack=document.getElementById('events-track');\n"+
-    "    if(evTrack){\n"+
-    "      evTrack.innerHTML=c.events.map(function(ev){\n"+
-    "        var inner='<img src=\"'+escU(ev.imgUrl||'')+'\" alt=\"'+esc(ev.title||'')+'\" style=\"width:100%;height:100%;object-fit:cover;display:block\">';\n"+
-    "        return ev.link?'<a class=\"event-poster\" href=\"'+escU(ev.link)+'\" target=\"_blank\" rel=\"noopener\">'+inner+'</a>':"+
-    "          '<div class=\"event-poster\">'+inner+'</div>';\n"+
-    "      }).join('');\n"+
-    "    }\n"+
-    "  }\n"+
-    "\n"+
-    "  /* testimonials */\n"+
-    "  if(Array.isArray(c.testimonials)&&c.testimonials.length){\n"+
-    "    var slider=document.getElementById('testimonials-slider');\n"+
-    "    if(slider){\n"+
-    "      slider.innerHTML=c.testimonials.map(function(t,i){\n"+
-    "        var avatar=t.photoUrl?'<img src=\"'+escU(t.photoUrl)+'\" alt=\"'+esc(t.author||'')+'\" style=\"width:48px;height:48px;border-radius:50%;object-fit:cover\">':"+
-    "          '<div class=\"testimonial-avatar\">'+esc((t.author||'?').charAt(0))+'</div>';\n"+
-    "        return '<div class=\"testimonial-slide'+(i===0?' active':'')+'\">'+\n"+
-    "          '<blockquote class=\"testimonial-quote\">\\u201c'+esc(t.quote)+'\\u201d</blockquote>'+\n"+
-    "          '<p class=\"testimonial-body\">'+esc(t.body)+'</p>'+\n"+
-    "          '<div class=\"testimonial-author\">'+avatar+\n"+
-    "          '<div><strong>'+esc(t.author)+'</strong><span>'+esc(t.role)+'</span></div>'+\n"+
-    "          '</div></div>';\n"+
-    "      }).join('');\n"+
-    "    }\n"+
-    "  }\n"+
-    "\n"+
-    "}(SHORESHIM_CONTENT));\n";
+function renderEvents(arr){ g('ev-list').innerHTML=''; _ei=0; arr.forEach(addEvent); }
+function addEvent(d){
+  d=d||{}; var i=_ei++;
+  var el=document.createElement('div');
+  el.className='di'; el.dataset.i=i;
+  el.innerHTML=
+    '<div class="di-num">אירוע '+(i+1)+'</div>'+
+    '<button class="di-rm" onclick="this.closest(\'.di\').remove();scheduleAS()">הסר</button>'+
+    '<div class="f"><label>כותרת האירוע</label><input type="text" id="ev-t-'+i+'" value="'+esc(d.title||'')+'" placeholder="שם הכנס / אירוע" oninput="scheduleAS()"></div>'+
+    '<div class="f"><label>קישור (URL)</label><input type="url" id="ev-l-'+i+'" dir="ltr" value="'+esc(d.link||'')+'" placeholder="https://..." oninput="scheduleAS()"></div>'+
+    '<div class="f"><label>תמונת פוסטר</label>'+imgw('ev-'+i)+'</div>';
+  g('ev-list').appendChild(el);
+  if(d.imgUrl){ sv('img-url-ev-'+i,d.imgUrl); setImgW('ev-'+i,d.imgUrl); }
 }
 
-/* ══════════════════════════════════════
-   Split-screen preview
-══════════════════════════════════════ */
-function onPreviewLoaded() {
-  var loading = document.getElementById('preview-loading');
-  if (loading) loading.classList.add('hidden');
+function renderTestimonials(arr){ g('tst-list').innerHTML=''; _qi=0; arr.forEach(addTestimonial); }
+function addTestimonial(d){
+  d=d||{}; var i=_qi++;
+  var el=document.createElement('div');
+  el.className='di'; el.dataset.i=i;
+  el.innerHTML=
+    '<div class="di-num">עדות '+(i+1)+'</div>'+
+    '<button class="di-rm" onclick="this.closest(\'.di\').remove();scheduleAS()">הסר</button>'+
+    '<div class="f"><label>ציטוט קצר (מופיע בבלון)</label><input type="text" id="tst-q-'+i+'" value="'+esc(d.quote||'')+'" placeholder="משפט קצר..." oninput="scheduleAS()"></div>'+
+    '<div class="f"><label>תוכן מלא (אופציונלי)</label><textarea id="tst-b-'+i+'" rows="2" placeholder="הרחבה על הסיפור..." oninput="scheduleAS()">'+esc(d.body||'')+'</textarea></div>'+
+    '<div class="frow">'+
+      '<div class="f"><label>שם</label><input type="text" id="tst-a-'+i+'" value="'+esc(d.author||'')+'" placeholder="שם" oninput="scheduleAS()"></div>'+
+      '<div class="f"><label>תפקיד / הגדרה</label><input type="text" id="tst-r-'+i+'" value="'+esc(d.role||'')+'" placeholder="הורה מתמודד" oninput="scheduleAS()"></div>'+
+    '</div>'+
+    '<div class="f"><label>תמונה</label>'+imgw('tst-'+i)+'</div>';
+  g('tst-list').appendChild(el);
+  if(d.photoUrl){ sv('img-url-tst-'+i,d.photoUrl); setImgW('tst-'+i,d.photoUrl); }
 }
 
-function previewMsg(data) {
-  var iframe = document.getElementById('site-preview');
-  if (!iframe || !iframe.contentWindow) return;
-  try { iframe.contentWindow.postMessage(data, 'https://nir5177.github.io'); } catch(e) {}
+/* ═══════════════════════════════════════
+   BUILD FORMS HTML
+═══════════════════════════════════════ */
+function buildForms(){
+  var h='';
+
+  /* HERO */
+  h+='<div class="sf on" id="sf-hero">'+
+    '<div class="sf-title">תוכן דף הבית — הירו</div>'+
+    '<div class="f"><label>כותרת ראשית <span style="font-size:.68rem;color:var(--gold)">★ מרכזי</span></label>'+
+      '<input type="text" id="cnt-ht" placeholder="הבית הוא העוגן..." oninput="liveText(\'content-hero-title\',this.value)"></div>'+
+    '<div class="f"><label>טקסט הדגשה (זהב)</label>'+
+      '<input type="text" id="cnt-ha" placeholder="גם כשהדרך משתנה" oninput="liveText(\'content-hero-accent\',this.value)"></div>'+
+    '<div class="f"><label>תת-כותרת</label>'+
+      '<textarea id="cnt-hs" rows="3" placeholder="תיאור קצר תחת הכותרת..." oninput="liveText(\'content-hero-subtitle\',this.value)"></textarea></div>'+
+    '<div class="f"><label>קישור יוטיוב לסרטון</label>'+
+      '<input type="url" id="cfg-youtube" dir="ltr" placeholder="https://youtu.be/...">'+
+      '<div class="hint">הכרטיס יהפוך ללחיץ עם קישור זה</div></div>'+
+    '<div class="f"><label>תמונת כרטיס הסרטון</label>'+imgw('hero-thumb')+'</div>'+
+  '</div>';
+
+  /* ABOUT */
+  h+='<div class="sf" id="sf-about">'+
+    '<div class="sf-title">סעיף אודות / מי אנחנו</div>'+
+    '<div class="f"><label>טקסט "מי אנחנו"</label>'+
+      '<textarea id="cnt-ab" rows="7" placeholder="תיאור הארגון, המשימה, הגישה..." oninput="liveText(\'content-mission-body\',this.value)"></textarea></div>'+
+    '<div class="f"><label>תמונת הארגון / הצוות</label>'+imgw('about-img')+'</div>'+
+    '<div class="f"><label>קישור יוטיוב — "אודות"</label>'+
+      '<input type="url" id="cnt-avurl" dir="ltr" placeholder="https://youtu.be/..."></div>'+
+    '<div class="f"><label>תמונת כרטיס הסרטון "אודות"</label>'+imgw('about-vid')+'</div>'+
+  '</div>';
+
+  /* SERVICES */
+  h+='<div class="sf" id="sf-services">'+
+    '<div class="sf-title">שירותים — תמונות</div>'+
+    '<div class="f"><label>סדנאות הורים — תמונה</label>'+imgw('svc-workshops')+'</div>'+
+    '<div class="f"><label>ליווי ואימון — תמונה</label>'+imgw('svc-coaching')+'</div>'+
+    '<div class="f"><label>חוסן משפחתי — תמונה</label>'+imgw('svc-resilience')+'</div>'+
+  '</div>';
+
+  /* TEAM */
+  h+='<div class="sf" id="sf-team">'+
+    '<div class="sf-title">אנשי הצוות</div>'+
+    '<div id="team-list"></div>'+
+    '<button class="btn-add" onclick="addTeamMember()">+ הוסף איש צוות</button>'+
+  '</div>';
+
+  /* EVENTS */
+  h+='<div class="sf" id="sf-events">'+
+    '<div class="sf-title">כנסים ואירועים</div>'+
+    '<div id="ev-list"></div>'+
+    '<button class="btn-add" onclick="addEvent()">+ הוסף אירוע</button>'+
+  '</div>';
+
+  /* TESTIMONIALS */
+  h+='<div class="sf" id="sf-testimonials">'+
+    '<div class="sf-title">עדויות הורים</div>'+
+    '<div id="tst-list"></div>'+
+    '<button class="btn-add" onclick="addTestimonial()">+ הוסף עדות</button>'+
+  '</div>';
+
+  /* STATS */
+  h+='<div class="sf" id="sf-stats">'+
+    '<div class="sf-title">מספרי סטטיסטיקה</div>'+
+    '<p style="font-size:.78rem;color:var(--sub);margin-bottom:.85rem">המספרים המופיעים בדף הבית</p>'+
+    '<div class="stats4">'+
+      '<div class="stat-box"><label>משפחות / הורים</label><input type="number" id="cfg-s1" placeholder="320" oninput="scheduleAS()"></div>'+
+      '<div class="stat-box"><label>סדנאות</label><input type="number" id="cfg-s2" placeholder="48" oninput="scheduleAS()"></div>'+
+      '<div class="stat-box"><label>מנחים</label><input type="number" id="cfg-s3" placeholder="12" oninput="scheduleAS()"></div>'+
+      '<div class="stat-box"><label>ערים</label><input type="number" id="cfg-s4" placeholder="8" oninput="scheduleAS()"></div>'+
+    '</div>'+
+    '<p style="font-size:.78rem;font-weight:600;color:var(--sub);margin:.5rem 0">תוויות מתחת למספרים</p>'+
+    '<div class="frow" style="margin-bottom:.65rem">'+
+      '<div class="f"><label>תווית 1</label><input type="text" id="cfg-l1" placeholder="הורים קיבלו ליווי" oninput="scheduleAS()"></div>'+
+      '<div class="f"><label>תווית 2</label><input type="text" id="cfg-l2" placeholder="סדנאות" oninput="scheduleAS()"></div>'+
+    '</div>'+
+    '<div class="frow" style="margin-bottom:.85rem">'+
+      '<div class="f"><label>תווית 3</label><input type="text" id="cfg-l3" placeholder="מנחים מוסמכים" oninput="scheduleAS()"></div>'+
+      '<div class="f"><label>תווית 4</label><input type="text" id="cfg-l4" placeholder="ערים" oninput="scheduleAS()"></div>'+
+    '</div>'+
+    '<div class="f"><label>URL לעדכון אוטומטי (אופציונלי)</label>'+
+      '<input type="url" id="cfg-statsurl" dir="ltr" placeholder="https://..." oninput="scheduleAS()">'+
+      '<div class="hint">JSON עם שדות families, workshops, facilitators, cities</div></div>'+
+  '</div>';
+
+  /* CONTACT */
+  h+='<div class="sf" id="sf-contact">'+
+    '<div class="sf-title">פרטי יצירת קשר</div>'+
+    '<div class="frow">'+
+      '<div class="f"><label>טלפון</label><input type="tel" id="cfg-phone" dir="ltr" placeholder="055-0000000" oninput="scheduleAS()"></div>'+
+      '<div class="f"><label>וואטסאפ (בינ"ל)</label><input type="tel" id="cfg-wa" dir="ltr" placeholder="972500000000" oninput="scheduleAS()"></div>'+
+    '</div>'+
+    '<div class="f"><label>אימייל</label><input type="email" id="cfg-email" dir="ltr" placeholder="contact@example.org.il" oninput="scheduleAS()"></div>'+
+    '<div class="f"><label>Formspree Endpoint (טופס קשר)</label>'+
+      '<input type="url" id="cfg-formsep" dir="ltr" placeholder="https://formspree.io/f/xxxxx" oninput="scheduleAS()">'+
+      '<div class="hint">ניתן לפתוח חשבון חינם בכתובת formspree.io</div></div>'+
+    '<div class="f"><label>קישור תרומות — Matara / Nedarim Plus</label>'+
+      '<input type="url" id="cfg-matara" dir="ltr" placeholder="https://matara.pro/..." oninput="scheduleAS()"></div>'+
+  '</div>';
+
+  return h;
 }
 
-function jumpToSection(sectionId) {
-  previewMsg({type: 'scroll-to', id: sectionId});
-  /* highlight active card in form panel (no scrollIntoView — too disruptive) */
-  document.querySelectorAll('.section-card').forEach(function(c){ c.classList.remove('active-section'); });
-  var h = document.querySelector('.section-header[data-section="'+sectionId+'"]');
-  if (h) h.closest('.section-card').classList.add('active-section');
-  if (window.innerWidth <= 900) switchTab('preview');
+/* ═══════════════════════════════════════
+   LAUNCH APP
+═══════════════════════════════════════ */
+function launchApp(){
+  g('login-wrap').style.display='none';
+  g('app').style.display='flex';
+  g('forms').innerHTML = buildForms();
+  loadData();
 }
 
-function switchTab(tab) {
-  var previewPanel = document.getElementById('preview-panel');
-  var tabForm = document.getElementById('tab-form');
-  var tabPrev = document.getElementById('tab-preview');
-  if (tab === 'form') {
-    previewPanel.classList.remove('show-mobile');
-    tabForm.classList.add('active'); tabPrev.classList.remove('active');
-  } else {
-    previewPanel.classList.add('show-mobile');
-    tabPrev.classList.add('active'); tabForm.classList.remove('active');
+/* ═══════════════════════════════════════
+   BOOT
+═══════════════════════════════════════ */
+(function(){
+  var stored=localStorage.getItem('shoreshim_phash');
+  if(!stored){
+    g('l-sub').textContent='הגדרה ראשונה — בחרו סיסמה (לפחות 6 תווים)';
   }
-}
-
-function liveUpdate(domId, value) {
-  previewMsg({type: 'update-text', id: domId, value: value});
-}
-
-/* ══════════════════════════════════════
-   Status
-══════════════════════════════════════ */
-var _statusTimer;
-function showStatus(msg, type) {
-  var bar = document.getElementById('status-bar');
-  bar.textContent = msg;
-  bar.className   = 'visible ' + (type || '');
-  clearTimeout(_statusTimer);
-  _statusTimer = setTimeout(function(){ bar.className = ''; }, 4000);
-}
-
-/* ══════════════════════════════════════
-   Boot
-══════════════════════════════════════ */
-var _lastSection = null;
-document.addEventListener('focusin', function(e) {
-  var card = e.target.closest && e.target.closest('.section-card');
-  if (!card) return;
-  var header = card.querySelector('.section-header[data-section]');
-  if (!header) return;
-  var sid = header.dataset.section;
-  /* section jump only when entering a new section */
-  if (sid !== _lastSection) {
-    _lastSection = sid;
-    jumpToSection(sid);
+  if(sessionStorage.getItem('shoreshim_auth')==='1'){
+    launchApp();
+    return;
   }
-  /* always highlight the specific element for the focused field */
-  if (e.target.id) highlightPreviewField(e.target.id, sid);
-});
-
-(function() {
-  if (sessionStorage.getItem('shoreshim_authed') === '1') { showAdmin(); return; }
-
-  var hasPass = !!localStorage.getItem('shoreshim_pass_hash');
-
-  if (!hasPass) {
-    document.getElementById('setup-form').style.display = 'block';
-    ['setup-pass','setup-pass2'].forEach(function(id){
-      document.getElementById(id).addEventListener('keydown', function(e){ if(e.key==='Enter') doSetup(); });
-    });
-  } else {
-    document.getElementById('login-form').style.display = 'block';
-    document.getElementById('login-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
-  }
+  g('l-pass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
 })();
 </script>
 </body>
