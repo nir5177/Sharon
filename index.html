@@ -823,9 +823,82 @@
 <script src="config.js"></script>
 <script src="script.js"></script>
 <script>
+/* ── Apply admin localStorage draft (same origin as /admin/) ──
+   Runs after content.js / config.js so draft overrides committed values.
+   Only the admin's browser has these keys; regular visitors have nothing. */
+(function(){
+  function si(id,url,h){
+    var el=document.getElementById(id);
+    if(el&&url)el.innerHTML='<img src="'+url.replace(/"/g,'%22')+'" alt="" style="width:100%;height:'+(h||'100%')+';object-fit:cover;border-radius:inherit;display:block">';
+  }
+  function st(id,v){var el=document.getElementById(id);if(el&&v)el.textContent=v}
+
+  var cfg=null,cnt=null;
+  try{cfg=JSON.parse(localStorage.getItem('shoreshim_cfg_draft')||'null')}catch(e){}
+  try{cnt=JSON.parse(localStorage.getItem('shoreshim_cnt_draft')||'null')}catch(e){}
+
+  if(cfg){
+    st('cfg-phone',cfg.phone);
+    st('cfg-email',cfg.email);
+    var ids=['cfg-stat-families','cfg-stat-workshops','cfg-stat-facilitators','cfg-stat-cities'];
+    var vals=cfg.stats?[cfg.stats.families,cfg.stats.workshops,cfg.stats.facilitators,cfg.stats.cities]:[];
+    ids.forEach(function(id,i){var el=document.getElementById(id);if(el&&vals[i]!=null)el.setAttribute('data-target',vals[i])});
+    var lb=cfg.statLabels||{};
+    var lels=document.querySelectorAll('.stat-label');
+    [lb['1'],lb['2'],lb['3'],lb['4']].forEach(function(t,i){if(t&&lels[i])lels[i].textContent=t});
+    var wa=encodeURIComponent('שלום, הגעתי מאתר שורשים ואשמח לפרטים בדיסקרטיות');
+    if(cfg.whatsapp){document.querySelectorAll('a[href^="https://wa.me/"]').forEach(function(a){
+      a.href='https://wa.me/'+cfg.whatsapp+(a.getAttribute('href').indexOf('?text=')!==-1?'?text='+wa:'');
+    });}
+    var yt=document.getElementById('hero-video-link');
+    if(yt){if(cfg.youtubeUrl){yt.href=cfg.youtubeUrl;yt.style.pointerEvents=''}
+           else{yt.style.pointerEvents='none';yt.removeAttribute('href');}}
+  }
+
+  if(cnt){
+    st('content-hero-title',    cnt['hero.title']);
+    st('content-hero-accent',   cnt['hero.accent']);
+    st('content-hero-subtitle', cnt['hero.subtitle']);
+    st('content-mission-body',  cnt['about.body']);
+    var ht=document.querySelector('.hero-video-thumbnail');
+    if(ht&&cnt['hero.thumbUrl'])ht.innerHTML='<img src="'+cnt['hero.thumbUrl'].replace(/"/g,'%22')+'" alt="" style="width:100%;height:200px;object-fit:cover">';
+    si('mission-visual',         cnt['about.imageUrl'],       '340px');
+    si('svc-img-workshops',      cnt['svc.workshops.imgUrl'], '260px');
+    si('svc-img-coaching',       cnt['svc.coaching.imgUrl'],  '260px');
+    si('svc-img-resilience',     cnt['svc.resilience.imgUrl'],'260px');
+
+    var tc=document.getElementById('team-carousel');
+    if(tc&&cnt.team&&cnt.team.length){tc.innerHTML=cnt.team.map(function(m){
+      return '<div class="team-card fade-in-up"><div class="team-photo">'
+        +(m.photoUrl?'<img src="'+m.photoUrl.replace(/"/g,'%22')+'" alt="" style="width:100%;height:100%;object-fit:cover">':'')
+        +'</div><h3 class="team-name">'+m.name+'</h3><p class="team-role">'+m.role+'</p><p class="team-bio">'+m.bio+'</p></div>';
+    }).join('');}
+
+    var ev=document.getElementById('events-track');
+    var es=document.getElementById('events-section');
+    if(ev&&cnt.events){
+      if(cnt.events.length){
+        ev.innerHTML=cnt.events.map(function(e){
+          return '<a class="event-card" href="'+e.link+'" target="_blank" rel="noopener">'
+            +(e.imgUrl?'<img class="event-poster" src="'+e.imgUrl.replace(/"/g,'%22')+'" alt="">':'')
+            +'<div class="event-info"><h3>'+e.title+'</h3></div></a>';
+        }).join('');
+        if(es)es.style.display='';
+      } else if(es){es.style.display='none';}
+    }
+
+    var ts=document.getElementById('testimonials-slider');
+    if(ts&&cnt.testimonials&&cnt.testimonials.length){ts.innerHTML=cnt.testimonials.map(function(t){
+      return '<div class="testimonial-card fade-in-up"><p class="testimonial-quote">"'+t.quote+'"</p>'
+        +'<p class="testimonial-body">'+t.body+'</p><div class="testimonial-author">'
+        +(t.photoUrl?'<img src="'+t.photoUrl.replace(/"/g,'%22')+'" alt="" class="testimonial-photo">':'')
+        +'<div><strong>'+t.author+'</strong><span>'+t.role+'</span></div></div></div>';
+    }).join('');}
+  }
+})();
+
 /* Admin live-preview postMessage receiver */
 window.addEventListener('message', function(e) {
-  /* Accept only from parent frame (admin panel) — same-origin or trusted */
   if (e.source !== window.parent) return;
   var d = e.data;
   if (!d || !d.type) return;
@@ -842,15 +915,7 @@ window.addEventListener('message', function(e) {
       if (el) el.innerHTML = imgHtml;
     } else if (d.act === 'set-img') {
       var el = document.getElementById(d.id);
-      if (el) { el.innerHTML = imgHtml; el.classList.add('_admin-highlight'); setTimeout(function(){el.classList.remove('_admin-highlight');},2200); }
-    }
-  } else if (d.type === 'highlight-element') {
-    var hl = d.sel ? document.querySelector(d.sel) : (d.id ? document.getElementById(d.id) : null);
-    if (hl) {
-      hl.classList.remove('_admin-highlight');
-      void hl.offsetWidth;
-      hl.classList.add('_admin-highlight');
-      setTimeout(function(){ hl.classList.remove('_admin-highlight'); }, 2200);
+      if (el) { el.innerHTML = imgHtml; }
     }
   }
 });
