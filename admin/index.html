@@ -963,20 +963,19 @@ async function showAdmin() {
 
 async function loadConfig() {
   var base = 'https://raw.githubusercontent.com/'+REPO_OWNER+'/'+REPO_NAME+'/'+REPO_BRANCH+'/';
-  var cfgOk = false, cntOk = false;
-  try {
-    var r = await fetch(base + 'config.json?_=' + Date.now());
-    if (r.ok) { populateForm(await r.json()); cfgOk = true; }
-  } catch(e) {}
-  if (!cfgOk) {
-    try { var d=localStorage.getItem('shoreshim_cfg_draft'); if(d) populateForm(JSON.parse(d)); } catch(e) {}
+  /* Prefer local draft (unsaved/unpublished edits) over committed GitHub content */
+  var cfgDraft = null, cntDraft = null;
+  try { cfgDraft = localStorage.getItem('shoreshim_cfg_draft'); } catch(e) {}
+  try { cntDraft = localStorage.getItem('shoreshim_cnt_draft'); } catch(e) {}
+  if (cfgDraft) {
+    try { populateForm(JSON.parse(cfgDraft)); } catch(e) {}
+  } else {
+    try { var r = await fetch(base+'config.json?_='+Date.now()); if(r.ok) populateForm(await r.json()); } catch(e) {}
   }
-  try {
-    var rc = await fetch(base + 'content.json?_=' + Date.now());
-    if (rc.ok) { populateContentForm(await rc.json()); cntOk = true; }
-  } catch(e) {}
-  if (!cntOk) {
-    try { var d=localStorage.getItem('shoreshim_cnt_draft'); if(d) populateContentForm(JSON.parse(d)); } catch(e) {}
+  if (cntDraft) {
+    try { populateContentForm(JSON.parse(cntDraft)); } catch(e) {}
+  } else {
+    try { var rc = await fetch(base+'content.json?_='+Date.now()); if(rc.ok) populateContentForm(await rc.json()); } catch(e) {}
   }
 }
 
@@ -1343,6 +1342,9 @@ async function saveChanges() {
       }));
     }
     await Promise.all(tasks);
+    /* Published successfully — clear local drafts so next load reads from GitHub */
+    try { localStorage.removeItem('shoreshim_cfg_draft'); } catch(e) {}
+    try { localStorage.removeItem('shoreshim_cnt_draft'); } catch(e) {}
     showStatus('האתר עודכן ויפורסם תוך כ-2 דקות ✓', 'success');
     document.getElementById('dl-btn').style.display = 'none';
     document.getElementById('download-hint').style.display = 'none';
