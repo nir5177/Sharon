@@ -468,10 +468,15 @@ function setImgW(key, url){
   if(uw && url!==undefined) uw.value=url||'';
 }
 
+/* original image URLs — populated at loadData/populateData time */
+var _origImgs = {};
+
 function clearImgW(key){
-  setImgW(key,'');
+  var orig = _origImgs[key] || '';
+  setImgW(key, orig);
+  sv('img-url-'+key, orig);
+  sendImgToPreview(key, orig);
   scheduleAS();
-  sendImgToPreview(key,'');
 }
 
 function onUrlInput(key, url){
@@ -528,9 +533,9 @@ function processFile(key, file){
 
 /* preview postMessage for images */
 var _imgMap = {
-  'hero-thumb':      {act:'hero-thumb'},
+  'hero-thumb':      {act:'hero-thumb', id:'', h:'200px'},
   'about-img':       {act:'set-img', id:'mission-visual',    h:'340px'},
-  'about-vid':       {act:'set-img', id:'mission-visual',    h:'340px'},
+  'about-vid':       {act:'about-vid', id:'mission-visual',  h:'340px'},
   'svc-workshops':   {act:'set-img', id:'svc-img-workshops', h:'260px'},
   'svc-coaching':    {act:'set-img', id:'svc-img-coaching',  h:'260px'},
   'svc-resilience':  {act:'set-img', id:'svc-img-resilience','h':'260px'},
@@ -645,11 +650,20 @@ function populateData(cfg, cnt){
     /* hero thumb: use stored URL, or auto-generate from YouTube */
     var heroThumb = cnt['hero.thumbUrl'] ||
       (ytId(cnt['hero.youtubeUrl']||'') ? 'https://img.youtube.com/vi/'+ytId(cnt['hero.youtubeUrl']||'')+'/hqdefault.jpg' : '');
-    setImgW('hero-thumb', heroThumb);
-    setImgW('about-img',     cnt['about.imageUrl']||'');
     /* about vid thumb: use stored URL, or auto-generate from YouTube */
     var aboutVidThumb = cnt['about.videoThumbUrl'] ||
       (ytId(cnt['about.videoUrl']||'') ? 'https://img.youtube.com/vi/'+ytId(cnt['about.videoUrl']||'')+'/hqdefault.jpg' : '');
+
+    /* Store originals so clearImgW can restore them */
+    _origImgs['hero-thumb']     = heroThumb;
+    _origImgs['about-img']      = cnt['about.imageUrl']||'';
+    _origImgs['about-vid']      = aboutVidThumb;
+    _origImgs['svc-workshops']  = cnt['svc.workshops.imgUrl']||'';
+    _origImgs['svc-coaching']   = cnt['svc.coaching.imgUrl']||'';
+    _origImgs['svc-resilience'] = cnt['svc.resilience.imgUrl']||'';
+
+    setImgW('hero-thumb', heroThumb);
+    setImgW('about-img',     cnt['about.imageUrl']||'');
     setImgW('about-vid', aboutVidThumb);
     setImgW('svc-workshops', cnt['svc.workshops.imgUrl']||'');
     setImgW('svc-coaching',  cnt['svc.coaching.imgUrl']||'');
