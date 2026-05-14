@@ -896,3 +896,168 @@ input, textarea, select { font-family: inherit; }
   html { scroll-behavior: auto; }
   .fade-in-up { opacity: 1 !important; transform: none !important; }
 }
+
+/* ============================================================
+   TORAH / SPIRITUAL ANCHOR SECTION
+   ============================================================ */
+.section-torah {
+  background-color: #F3EFE6;
+  padding: 80px 0;
+  position: relative;
+}
+
+.torah-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.torah-header { text-align: center; }
+
+/* Quote cards */
+.torah-quotes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.torah-quote-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px 28px 24px;
+  box-shadow: 0 2px 16px rgba(44, 30, 10, 0.07);
+  position: relative;
+  border-right: 4px solid #D4A853;
+}
+
+.torah-quote-mark {
+  font-size: 4rem;
+  line-height: 1;
+  color: #D4A853;
+  opacity: .4;
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  font-family: Georgia, serif;
+}
+
+.torah-quote-card blockquote {
+  margin: 0;
+  padding-right: 32px;
+}
+
+.torah-quote-card blockquote p {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: #2A1A10;
+  font-style: italic;
+  margin: 0 0 12px;
+}
+
+.torah-quote-source {
+  font-size: 0.82rem;
+  color: #8A7060;
+  font-weight: 600;
+  padding-right: 32px;
+}
+
+/* Legitimacy badges */
+.torah-legitimacy {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.legitimacy-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 8px rgba(44, 30, 10, 0.06);
+}
+
+.legitimacy-badge svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.legitimacy-badge strong {
+  display: block;
+  font-size: 1rem;
+  color: #1B2A4A;
+  margin-bottom: 4px;
+}
+
+.legitimacy-badge p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #5A4A3A;
+  line-height: 1.55;
+}
+
+/* Contact form enhancements */
+.field-hint {
+  display: block;
+  font-size: 0.78rem;
+  color: #8A7060;
+  margin-top: 4px;
+  padding-right: 2px;
+}
+
+.form-field--checkbox {
+  margin: 4px 0 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  color: #3A2A1A;
+  user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #D4A853;
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color .2s, border-color .2s;
+  background: #fff;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
+  background-color: #D4A853;
+  border-color: #D4A853;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
+  content: '';
+  display: block;
+  width: 5px;
+  height: 9px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-right: none;
+  transform: rotate(-45deg) translateY(-1px);
+}
+
+/* Responsive */
+@media (min-width: 640px) {
+  .torah-quotes { grid-template-columns: repeat(3, 1fr); }
+  .torah-legitimacy { grid-template-columns: repeat(3, 1fr); }
+}
