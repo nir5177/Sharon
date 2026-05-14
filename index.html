@@ -254,7 +254,7 @@
 
       <div class="service-panel service-panel--active" id="tab-workshops">
         <div class="service-panel-grid">
-          <div class="service-panel-text">
+          <div class="service-panel-text" style="order:2">
             <h3>סדנאות קבוצתיות</h3>
             <p>מפגשים קבוצתיים אנונימיים בזום או פרונטלי — שותפים לכאב, לומדים יחד ומחזקים זה את זה, ללא חשיפה של שמות או פרטים.</p>
             <ul class="feature-list">
@@ -265,7 +265,7 @@
             </ul>
             <a href="#contact" class="btn btn-gold">לפרטים ורישום ←</a>
           </div>
-          <div class="service-panel-img" aria-hidden="true">
+          <div class="service-panel-img" id="svc-img-workshops" aria-hidden="true">
             <svg viewBox="0 0 320 260" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%">
               <rect width="320" height="260" rx="20" fill="#EBF2FA"/>
               <circle cx="100" cy="110" r="35" fill="#D4A853" opacity=".2"/>
@@ -295,7 +295,7 @@
             </ul>
             <a href="#contact" class="btn btn-gold">לתיאום פגישה ←</a>
           </div>
-          <div class="service-panel-img" aria-hidden="true">
+          <div class="service-panel-img" id="svc-img-coaching" aria-hidden="true">
             <svg viewBox="0 0 320 260" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%">
               <rect width="320" height="260" rx="20" fill="#EBF2FA"/>
               <circle cx="160" cy="100" r="45" fill="#fff" opacity=".15"/>
@@ -321,7 +321,7 @@
             </ul>
             <a href="#contact" class="btn btn-gold">לפרטים נוספים ←</a>
           </div>
-          <div class="service-panel-img" aria-hidden="true">
+          <div class="service-panel-img" id="svc-img-resilience" aria-hidden="true">
             <svg viewBox="0 0 320 260" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%">
               <rect width="320" height="260" rx="20" fill="#EBF2FA"/>
               <path d="M160 50c0 0-55 45-55 95 0 35 24 60 55 70 31-10 55-35 55-70 0-50-55-95-55-95Z" fill="#D4A853" opacity=".18" stroke="#2E6DA8" stroke-width="1.5"/>
@@ -351,7 +351,7 @@
       <p class="mission-body" id="content-mission-body">ארגון שורשים, מבית עמותת התקשרות, מספק תמיכה, ידע וכלים מעשיים להורים חרדים המתמודדים עם פערים השקפתיים ונתק מול ילדיהם. אנחנו מאמינים שהקשר בין הורים לילדיהם קדוש ובלתי ניתן לניתוק — גם כשהדרכים נפרדות.</p>
       <a href="#team" class="btn btn-gold">עוד עלינו ←</a>
     </div>
-    <div class="mission-visual fade-in-up" aria-hidden="true">
+    <div class="mission-visual fade-in-up" id="mission-visual" aria-hidden="true">
       <svg viewBox="0 0 280 340" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%">
         <ellipse cx="140" cy="120" rx="90" ry="78" fill="rgba(212,168,83,0.12)"/>
         <ellipse cx="96" cy="142" rx="60" ry="52" fill="rgba(212,168,83,0.1)"/>
@@ -575,6 +575,19 @@
       <button class="carousel-btn" id="test-next" aria-label="הבא">→</button>
     </div>
 
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     7b. EVENTS / CONFERENCES
+══════════════════════════════════════════ -->
+<section class="section-events" id="events-section" style="display:none">
+  <div class="container">
+    <div class="section-label fade-in-up">פעילות ואירועים</div>
+    <h2 class="section-title fade-in-up">כנסים ואירועים<span class="text-gold"> לאורך השנה</span></h2>
+  </div>
+  <div class="events-carousel-wrap">
+    <div class="events-track" id="events-track"></div>
   </div>
 </section>
 

@@ -126,6 +126,39 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
   color:#fff;font-size:.72rem;font-weight:800;display:inline-flex;
   align-items:center;justify-content:center;flex-shrink:0}
 
+/* ─── Media uploader widget ─── */
+.media-upload-wrap{border:1.5px solid var(--border);border-radius:10px;overflow:hidden;background:#fafbfc}
+.media-drop-zone{min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:.3rem;cursor:pointer;padding:.85rem 1rem;transition:background .15s}
+.media-drop-zone:hover,.media-drop-zone.drag-over{background:#eef3ff}
+.media-drop-icon{color:#bbc;transition:color .15s}
+.media-drop-zone:hover .media-drop-icon,.media-drop-zone.drag-over .media-drop-icon{color:var(--navy-mid)}
+.media-drop-label{font-size:.8rem;color:#666;font-weight:600}
+.media-drop-sub{font-size:.7rem;color:#aab}
+.media-preview{position:relative;background:#111;display:none}
+.media-preview.visible{display:block}
+.media-preview img,.media-preview video{width:100%;height:150px;object-fit:cover;display:block}
+.media-preview-clear{position:absolute;top:.35rem;left:.35rem;background:rgba(0,0,0,.65);color:#fff;
+  border:none;border-radius:4px;padding:.2rem .45rem;font-size:.72rem;cursor:pointer;font-family:inherit}
+.media-url-bar{display:flex;align-items:center;gap:.4rem;padding:.4rem .6rem;
+  border-top:1px solid var(--border);background:#fff}
+.media-url-bar input{flex:1;border:none;outline:none;font-size:.77rem;direction:ltr;
+  font-family:inherit;color:#555;background:transparent;min-width:0}
+.media-field-label{font-size:.8rem;font-weight:600;color:#555;margin-bottom:.4rem}
+.media-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:560px){.media-grid{grid-template-columns:1fr}}
+.media-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem}
+@media(max-width:700px){.media-grid-3{grid-template-columns:1fr}}
+
+/* ─── Cloudinary info box ─── */
+.cld-info{background:#f0f6ff;border:1.5px solid #c0d8f0;border-radius:9px;padding:.9rem 1rem;
+  font-size:.8rem;line-height:1.7;color:#2a4a6a;margin-bottom:1rem}
+.cld-info strong{color:var(--navy)}
+.cld-info ol{margin:.4rem 0 0 0;padding-right:1.2rem}
+.cld-ok{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:600;
+  color:var(--green);margin-top:.5rem;display:none}
+.cld-ok.visible{display:inline-flex}
+
 /* Token banner */
 #token-banner{background:#fff8e6;border:1.5px solid #f0c040;border-radius:10px;
   padding:1rem 1.25rem;margin-bottom:1.25rem;display:none}
@@ -263,11 +296,46 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
       </div>
     </div>
 
+    <!-- ── הגדרות העלאת מדיה (Cloudinary) ── -->
+    <div class="section-card" id="cloudinary-card">
+      <div class="section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        הגדרות שירות העלאת מדיה (Cloudinary)
+      </div>
+      <div class="section-body">
+        <div class="cld-info">
+          <strong>Cloudinary</strong> הוא שירות חינמי להעלאת תמונות וסרטונים — הגדרה חד-פעמית:
+          <ol>
+            <li>היכנסו ל-<a href="https://cloudinary.com/users/register/free" target="_blank" rel="noopener" style="color:var(--navy-mid)">cloudinary.com</a> → צרו חשבון חינמי</li>
+            <li>בלוח הבקרה: העתיקו את <strong>Cloud Name</strong></li>
+            <li>עברו ל- Settings → Upload → <strong>Add upload preset</strong> → בחרו <strong>Unsigned</strong> → שמרו והעתיקו את שם ה-Preset</li>
+            <li>הדביקו כאן ולחצו שמור:</li>
+          </ol>
+        </div>
+        <div class="field-row">
+          <div class="admin-field">
+            <label for="cld-cloud">Cloud Name</label>
+            <input type="text" id="cld-cloud" dir="ltr" placeholder="my-cloud-name" autocomplete="off">
+          </div>
+          <div class="admin-field">
+            <label for="cld-preset">Upload Preset (Unsigned)</label>
+            <input type="text" id="cld-preset" dir="ltr" placeholder="ml_default" autocomplete="off">
+          </div>
+        </div>
+        <button class="btn-action" onclick="saveCloudinaryConfig()">שמור הגדרות Cloudinary</button>
+        <span class="cld-ok" id="cld-ok">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          מחובר ✓
+        </span>
+        <p id="cld-msg" class="inline-msg"></p>
+      </div>
+    </div>
+
     <!-- ── תוכן עמוד הבית ── -->
     <div class="section-card">
       <div class="section-header">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        תוכן עמוד הבית
+        תוכן הירו — כותרת וסרטון
       </div>
       <div class="section-body">
         <div class="field-row full">
@@ -288,6 +356,41 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
             <textarea id="cnt-hero-subtitle" rows="3" placeholder="המקום בו תמצאו..."></textarea>
           </div>
         </div>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:1rem 0">
+
+        <div class="media-grid">
+          <div>
+            <div class="media-field-label">תמונת כרטיס הוידאו בהירו</div>
+            <div class="media-upload-wrap">
+              <div id="prev-hero-thumb" class="media-preview"></div>
+              <div class="media-drop-zone" onclick="document.getElementById('file-hero-thumb').click()"
+                ondragover="event.preventDefault();this.classList.add('drag-over')"
+                ondragleave="this.classList.remove('drag-over')"
+                ondrop="handleDrop(event,'file-hero-thumb','cnt-hero-thumb-url','prev-hero-thumb')">
+                <input type="file" id="file-hero-thumb" accept="image/*" style="display:none"
+                  onchange="handleFileChange(this,'cnt-hero-thumb-url','prev-hero-thumb')">
+                <svg class="media-drop-icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                <span class="media-drop-label">בחרו תמונה</span>
+                <span class="media-drop-sub">JPG · PNG · WebP</span>
+              </div>
+              <div class="media-url-bar">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <input type="url" id="cnt-hero-thumb-url" placeholder="או הדביקו URL..." oninput="urlFieldPreview('cnt-hero-thumb-url','prev-hero-thumb')">
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="media-field-label">קישור YouTube לסרטון</div>
+            <div style="background:#fafbfc;border:1.5px solid var(--border);border-radius:10px;padding:1rem">
+              <p style="font-size:.79rem;color:#666;margin-bottom:.75rem;line-height:1.6">כשיש קישור — לחיצה על הכרטיס תפתח את הסרטון בלשונית חדשה</p>
+              <div class="admin-field">
+                <label for="cfg-youtube-in">YouTube URL</label>
+                <input type="url" id="cfg-youtube-in" placeholder="https://youtu.be/..." dir="ltr">
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -304,6 +407,153 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
             <textarea id="cnt-about-body" rows="4" placeholder="ארגון שורשים..."></textarea>
           </div>
         </div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:1rem 0">
+
+        <div class="media-grid">
+          <div>
+            <div class="media-field-label">תמונה לאזור האודות</div>
+          <div class="media-upload-wrap">
+            <div id="prev-about-img" class="media-preview"></div>
+            <div class="media-drop-zone" onclick="document.getElementById('file-about-img').click()"
+              ondragover="event.preventDefault();this.classList.add('drag-over')"
+              ondragleave="this.classList.remove('drag-over')"
+              ondrop="handleDrop(event,'file-about-img','cnt-about-img-url','prev-about-img')">
+              <input type="file" id="file-about-img" accept="image/*" style="display:none"
+                onchange="handleFileChange(this,'cnt-about-img-url','prev-about-img')">
+              <svg class="media-drop-icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              <span class="media-drop-label">בחרו תמונה לאזור אודות</span>
+              <span class="media-drop-sub">JPG · PNG · WebP</span>
+            </div>
+            <div class="media-url-bar">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <input type="url" id="cnt-about-img-url" placeholder="או הדביקו URL..." oninput="urlFieldPreview('cnt-about-img-url','prev-about-img')">
+            </div>
+          </div>
+          </div>
+          <div>
+            <div class="media-field-label">סרטון YouTube לאזור האודות</div>
+            <div style="background:#fafbfc;border:1.5px solid var(--border);border-radius:10px;padding:1rem;height:100%;box-sizing:border-box">
+              <p style="font-size:.78rem;color:#666;margin-bottom:.75rem;line-height:1.6">הסרטון יוצג בצד הטקסט כקישור עם תמונת thumbnail. לחיצה תפתח את הסרטון בלשונית חדשה.</p>
+              <div class="admin-field">
+                <label for="cnt-about-video-url">YouTube URL</label>
+                <input type="url" id="cnt-about-video-url" placeholder="https://youtu.be/..." dir="ltr">
+              </div>
+              <div style="margin-top:.75rem">
+                <div class="media-field-label">תמונת thumbnail לסרטון (אופציונלי)</div>
+                <div class="media-upload-wrap">
+                  <div id="prev-about-video-thumb" class="media-preview"></div>
+                  <div class="media-drop-zone" onclick="document.getElementById('file-about-video-thumb').click()"
+                    ondragover="event.preventDefault();this.classList.add('drag-over')"
+                    ondragleave="this.classList.remove('drag-over')"
+                    ondrop="handleDrop(event,'file-about-video-thumb','cnt-about-video-thumb-url','prev-about-video-thumb')">
+                    <input type="file" id="file-about-video-thumb" accept="image/*" style="display:none"
+                      onchange="handleFileChange(this,'cnt-about-video-thumb-url','prev-about-video-thumb')">
+                    <svg class="media-drop-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                    <span class="media-drop-label" style="font-size:.75rem">בחרו תמונה</span>
+                  </div>
+                  <div class="media-url-bar">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>
+                    <input type="url" id="cnt-about-video-thumb-url" placeholder="URL thumbnail..." oninput="urlFieldPreview('cnt-about-video-thumb-url','prev-about-video-thumb')">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── תמונות שירותים ── -->
+    <div class="section-card">
+      <div class="section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7v10l10 5 10-5V7L12 2Z" stroke="currentColor" stroke-width="1.8"/><path d="M12 22V12M2 7l10 5 10-5" stroke="currentColor" stroke-width="1.8"/></svg>
+        תמונות לאזור השירותים (3 לשוניות)
+      </div>
+      <div class="section-body">
+        <div class="media-grid-3">
+          <div>
+            <div class="media-field-label">סדנאות קבוצתיות</div>
+            <div class="media-upload-wrap">
+              <div id="prev-svc-workshops" class="media-preview"></div>
+              <div class="media-drop-zone" onclick="document.getElementById('file-svc-workshops').click()"
+                ondragover="event.preventDefault();this.classList.add('drag-over')"
+                ondragleave="this.classList.remove('drag-over')"
+                ondrop="handleDrop(event,'file-svc-workshops','cnt-svc-workshops-url','prev-svc-workshops')">
+                <input type="file" id="file-svc-workshops" accept="image/*,video/*" style="display:none"
+                  onchange="handleFileChange(this,'cnt-svc-workshops-url','prev-svc-workshops')">
+                <svg class="media-drop-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                <span class="media-drop-label">תמונה / וידאו</span>
+              </div>
+              <div class="media-url-bar">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <input type="url" id="cnt-svc-workshops-url" placeholder="URL..." oninput="urlFieldPreview('cnt-svc-workshops-url','prev-svc-workshops')">
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="media-field-label">הדרכה פרטנית</div>
+            <div class="media-upload-wrap">
+              <div id="prev-svc-coaching" class="media-preview"></div>
+              <div class="media-drop-zone" onclick="document.getElementById('file-svc-coaching').click()"
+                ondragover="event.preventDefault();this.classList.add('drag-over')"
+                ondragleave="this.classList.remove('drag-over')"
+                ondrop="handleDrop(event,'file-svc-coaching','cnt-svc-coaching-url','prev-svc-coaching')">
+                <input type="file" id="file-svc-coaching" accept="image/*,video/*" style="display:none"
+                  onchange="handleFileChange(this,'cnt-svc-coaching-url','prev-svc-coaching')">
+                <svg class="media-drop-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                <span class="media-drop-label">תמונה / וידאו</span>
+              </div>
+              <div class="media-url-bar">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <input type="url" id="cnt-svc-coaching-url" placeholder="URL..." oninput="urlFieldPreview('cnt-svc-coaching-url','prev-svc-coaching')">
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="media-field-label">חוסן משפחתי</div>
+            <div class="media-upload-wrap">
+              <div id="prev-svc-resilience" class="media-preview"></div>
+              <div class="media-drop-zone" onclick="document.getElementById('file-svc-resilience').click()"
+                ondragover="event.preventDefault();this.classList.add('drag-over')"
+                ondragleave="this.classList.remove('drag-over')"
+                ondrop="handleDrop(event,'file-svc-resilience','cnt-svc-resilience-url','prev-svc-resilience')">
+                <input type="file" id="file-svc-resilience" accept="image/*,video/*" style="display:none"
+                  onchange="handleFileChange(this,'cnt-svc-resilience-url','prev-svc-resilience')">
+                <svg class="media-drop-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                <span class="media-drop-label">תמונה / וידאו</span>
+              </div>
+              <div class="media-url-bar">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <input type="url" id="cnt-svc-resilience-url" placeholder="URL..." oninput="urlFieldPreview('cnt-svc-resilience-url','prev-svc-resilience')">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ניהול אנשי צוות ── -->
+    <div class="section-card">
+      <div class="section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.87" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        אנשי הצוות (תמונה + פרטים)
+      </div>
+      <div class="section-body">
+        <div id="team-editor"></div>
+        <button class="btn-add-testimonial" onclick="addTeamMemberRow()" style="margin-top:.5rem">הוסף איש צוות +</button>
+      </div>
+    </div>
+
+    <!-- ── כנסים ואירועים ── -->
+    <div class="section-card">
+      <div class="section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        כנסים ואירועים — גלריית פוסטרים
+      </div>
+      <div class="section-body">
+        <p style="font-size:.8rem;color:#666;margin-bottom:.9rem">כל תמונה שתעלו תופיע כפוסטר בקרוסלת האירועים באתר. ניתן להוסיף כותרת וקישור לכל פוסטר.</p>
+        <div id="events-editor"></div>
+        <button class="btn-add-testimonial" onclick="addEventRow()" style="margin-top:.5rem">הוסף אירוע / פוסטר +</button>
       </div>
     </div>
 
@@ -350,24 +600,36 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
     <div class="section-card">
       <div class="section-header">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        נתוני פעילות (המספרים הגדולים)
+        נתוני פעילות — המספרים הגדולים
       </div>
       <div class="section-body">
+        <p style="font-size:.79rem;color:#666;margin-bottom:.75rem">ערכו ידנית — <strong>או</strong> הזינו URL ל-JSON שמתעדכן אוטומטית (לדוג׳ Google Sheets JSON, Airtable API):</p>
+        <div class="field-row full" style="margin-bottom:.75rem">
+          <div class="admin-field">
+            <label for="cfg-stats-url">URL לעדכון אוטומטי של נתונים (אופציונלי)</label>
+            <input type="url" id="cfg-stats-url" dir="ltr" placeholder='https://... → JSON עם: {"families":320,"workshops":48,"facilitators":12,"cities":8}'>
+            <span class="hint">האתר ינסה לטעון את הנתונים מ-URL זה בכל כניסה. אם יצליח — יחליף את הערכים הידניים. אם לא — יוצגו הערכים הידניים.</span>
+          </div>
+        </div>
         <div class="stats-grid">
           <div class="stat-field">
-            <label>הורים קיבלו ליווי</label>
+            <label>כותרת 1</label>
+            <input type="text" id="cfg-stat-label-1" placeholder="הורים קיבלו ליווי" style="font-size:.82rem;font-weight:600;text-align:center;margin-bottom:.3rem">
             <input type="number" id="cfg-families" min="0" placeholder="320">
           </div>
           <div class="stat-field">
-            <label>סדנאות התקיימו</label>
+            <label>כותרת 2</label>
+            <input type="text" id="cfg-stat-label-2" placeholder="סדנאות התקיימו" style="font-size:.82rem;font-weight:600;text-align:center;margin-bottom:.3rem">
             <input type="number" id="cfg-workshops" min="0" placeholder="48">
           </div>
           <div class="stat-field">
-            <label>מנחים מוסמכים</label>
+            <label>כותרת 3</label>
+            <input type="text" id="cfg-stat-label-3" placeholder="מנחים מוסמכים" style="font-size:.82rem;font-weight:600;text-align:center;margin-bottom:.3rem">
             <input type="number" id="cfg-facilitators" min="0" placeholder="12">
           </div>
           <div class="stat-field">
-            <label>ערים ויישובים</label>
+            <label>כותרת 4</label>
+            <input type="text" id="cfg-stat-label-4" placeholder="ערים ויישובים" style="font-size:.82rem;font-weight:600;text-align:center;margin-bottom:.3rem">
             <input type="number" id="cfg-cities" min="0" placeholder="8">
           </div>
         </div>
@@ -391,23 +653,6 @@ body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
               → New Form → הזינו את כתובת המייל שלכם →
               העתיקו את ה-endpoint (נראה כך: https://formspree.io/f/xxxxxxxx) והדביקו כאן.
             </span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── סרטון יוטיוב ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M10 9l6 3-6 3V9Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        סרטון יוטיוב (כרטיס Hero)
-      </div>
-      <div class="section-body">
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cfg-youtube-in">קישור לסרטון ביוטיוב</label>
-            <input type="url" id="cfg-youtube-in" placeholder="https://www.youtube.com/watch?v=XXXXXXXXX" dir="ltr">
-            <span class="hint">הכרטיס בדף הבית יהפוך ללחיצה שפותחת את הסרטון בלשונית חדשה. השאירו ריק להסתרת כפתור ה-Play.</span>
           </div>
         </div>
       </div>
@@ -540,6 +785,108 @@ function doLogout() {
 }
 
 /* ══════════════════════════════════════
+   Cloudinary
+══════════════════════════════════════ */
+function saveCloudinaryConfig() {
+  var cloud  = document.getElementById('cld-cloud').value.trim();
+  var preset = document.getElementById('cld-preset').value.trim();
+  if (!cloud || !preset) {
+    return showInlineMsg(document.getElementById('cld-msg'), 'יש למלא Cloud Name ו-Preset', false);
+  }
+  localStorage.setItem('cld_cloud_name', cloud);
+  localStorage.setItem('cld_preset', preset);
+  document.getElementById('cld-ok').classList.add('visible');
+  showInlineMsg(document.getElementById('cld-msg'), 'הוגדר בהצלחה ✓', true);
+}
+
+function loadCloudinaryConfig() {
+  var cloud  = localStorage.getItem('cld_cloud_name');
+  var preset = localStorage.getItem('cld_preset');
+  if (cloud)  document.getElementById('cld-cloud').value  = cloud;
+  if (preset) document.getElementById('cld-preset').value = preset;
+  if (cloud && preset) document.getElementById('cld-ok').classList.add('visible');
+}
+
+async function handleFileChange(input, urlId, previewId) {
+  var file = input.files[0];
+  if (!file) return;
+  input.value = '';
+
+  var cloudName = localStorage.getItem('cld_cloud_name');
+  var preset    = localStorage.getItem('cld_preset');
+  if (!cloudName || !preset) {
+    showStatus('יש להגדיר Cloudinary תחילה — ראה "הגדרות שירות העלאת מדיה"', 'error');
+    document.getElementById('cloudinary-card').scrollIntoView({behavior:'smooth', block:'start'});
+    return;
+  }
+
+  var prevWrap = document.getElementById(previewId);
+  if (prevWrap) {
+    prevWrap.classList.add('visible');
+    prevWrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100px;color:#888;font-size:.82rem;gap:.4rem"><div class="spinner" style="border-color:rgba(0,0,0,.15);border-top-color:#4a90d9"></div> מעלה...</div>';
+  }
+
+  var isVideo   = file.type.startsWith('video/');
+  var endpoint  = 'https://api.cloudinary.com/v1_1/' + cloudName + '/' + (isVideo ? 'video' : 'image') + '/upload';
+  var fd        = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', preset);
+
+  try {
+    var res  = await fetch(endpoint, {method:'POST', body:fd});
+    var data = await res.json();
+    if (!data.secure_url) throw new Error(data.error && data.error.message || 'שגיאה');
+    set(urlId, data.secure_url);
+    renderPreview(previewId, data.secure_url, urlId, isVideo);
+    showStatus('הועלה בהצלחה ✓', 'success');
+  } catch(e) {
+    if (prevWrap) { prevWrap.innerHTML = ''; prevWrap.classList.remove('visible'); }
+    showStatus('שגיאת העלאה: ' + e.message, 'error');
+  }
+}
+
+function handleDrop(event, fileInputId, urlId, previewId) {
+  event.preventDefault();
+  var dropZone = event.currentTarget;
+  dropZone.classList.remove('drag-over');
+  var file = event.dataTransfer.files[0];
+  if (!file) return;
+  var fakeInput = {files:[file], value:''};
+  handleFileChange(fakeInput, urlId, previewId);
+}
+
+function renderPreview(previewId, url, urlId, isVideo) {
+  var wrap = document.getElementById(previewId);
+  if (!wrap) return;
+  wrap.classList.add('visible');
+  var safeUrl   = url.replace(/"/g, '%22');
+  var safePrev  = previewId.replace(/'/g, "\\'");
+  var safeField = (urlId || '').replace(/'/g, "\\'");
+  wrap.innerHTML = (isVideo
+    ? '<video src="'+safeUrl+'" controls style="width:100%;height:150px;object-fit:cover;display:block"></video>'
+    : '<img src="'+safeUrl+'" alt="" style="width:100%;height:150px;object-fit:cover;display:block">'
+  ) + '<button class="media-preview-clear" onclick="clearMedia(\''+safePrev+'\',\''+safeField+'\')">✕ הסר</button>';
+}
+
+function clearMedia(previewId, urlId) {
+  var wrap = document.getElementById(previewId);
+  if (wrap) { wrap.innerHTML = ''; wrap.classList.remove('visible'); }
+  if (urlId) set(urlId, '');
+}
+
+function urlFieldPreview(urlId, previewId) {
+  var url = get(urlId);
+  if (!url) { clearMedia(previewId, null); return; }
+  var isVideo = /\.(mp4|webm|ogg|mov)$/i.test(url) || url.includes('/video/upload/');
+  renderPreview(previewId, url, urlId, isVideo);
+}
+
+function restorePreview(urlId, previewId) {
+  var url = get(urlId);
+  if (url) urlFieldPreview(urlId, previewId);
+}
+
+/* ══════════════════════════════════════
    Token management
 ══════════════════════════════════════ */
 function savePat() {
@@ -618,6 +965,7 @@ async function showAdmin() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('admin-screen').style.display = 'block';
   checkTokenBanner();
+  loadCloudinaryConfig();
   await loadConfig();
 }
 
@@ -638,24 +986,51 @@ function populateForm(cfg) {
   set('cfg-wa-in',          cfg.whatsapp      || '');
   set('cfg-email-in',       cfg.email         || '');
   set('cfg-form-endpoint',  cfg.formEndpoint  || '');
-  set('cfg-families',       cfg.stats ? cfg.stats.families     : '');
-  set('cfg-workshops',      cfg.stats ? cfg.stats.workshops    : '');
-  set('cfg-facilitators',   cfg.stats ? cfg.stats.facilitators : '');
-  set('cfg-cities',         cfg.stats ? cfg.stats.cities       : '');
-  set('cfg-matara-in',      cfg.mataraUrl  || '');
-  set('cfg-youtube-in',     cfg.youtubeUrl || '');
+  set('cfg-matara-in',      cfg.mataraUrl     || '');
+  set('cfg-youtube-in',     cfg.youtubeUrl    || '');
+
+  var s = cfg.stats || {};
+  set('cfg-families',      s.families     || '');
+  set('cfg-workshops',     s.workshops    || '');
+  set('cfg-facilitators',  s.facilitators || '');
+  set('cfg-cities',        s.cities       || '');
+
+  var l = cfg.statLabels || {};
+  set('cfg-stat-label-1', l['1'] || '');
+  set('cfg-stat-label-2', l['2'] || '');
+  set('cfg-stat-label-3', l['3'] || '');
+  set('cfg-stat-label-4', l['4'] || '');
+  set('cfg-stats-url', cfg.statsUrl || '');
 }
 
 function populateContentForm(cnt) {
-  set('cnt-hero-title',    cnt['hero.title']    || '');
-  set('cnt-hero-accent',   cnt['hero.accent']   || '');
-  set('cnt-hero-subtitle', cnt['hero.subtitle'] || '');
-  set('cnt-about-body',    cnt['about.body']    || '');
+  set('cnt-hero-title',            cnt['hero.title']           || '');
+  set('cnt-hero-accent',           cnt['hero.accent']          || '');
+  set('cnt-hero-subtitle',         cnt['hero.subtitle']        || '');
+  set('cnt-hero-thumb-url',        cnt['hero.thumbUrl']        || '');
+  set('cnt-about-body',            cnt['about.body']           || '');
+  set('cnt-about-img-url',         cnt['about.imageUrl']       || '');
+  set('cnt-about-video-url',       cnt['about.videoUrl']       || '');
+  set('cnt-about-video-thumb-url', cnt['about.videoThumbUrl']  || '');
+  set('cnt-svc-workshops-url',     cnt['svc.workshops.imgUrl'] || '');
+  set('cnt-svc-coaching-url',      cnt['svc.coaching.imgUrl']  || '');
+  set('cnt-svc-resilience-url',    cnt['svc.resilience.imgUrl']|| '');
+
+  /* restore previews */
+  restorePreview('cnt-hero-thumb-url',        'prev-hero-thumb');
+  restorePreview('cnt-about-img-url',         'prev-about-img');
+  restorePreview('cnt-about-video-thumb-url', 'prev-about-video-thumb');
+  restorePreview('cnt-svc-workshops-url',     'prev-svc-workshops');
+  restorePreview('cnt-svc-coaching-url',      'prev-svc-coaching');
+  restorePreview('cnt-svc-resilience-url',    'prev-svc-resilience');
+
+  renderTeamList(cnt.team || []);
+  renderEventsList(cnt.events || []);
   renderTestimonialsList(cnt.testimonials || []);
 }
 
 /* ══════════════════════════════════════
-   Testimonials editor
+   Testimonials editor (with photo)
 ══════════════════════════════════════ */
 var _testimonialIdx = 0;
 
@@ -666,36 +1041,50 @@ function renderTestimonialsList(arr) {
 }
 
 function addTestimonialRow(data) {
-  try {
-    var container = document.getElementById('testimonials-editor');
-    if (!container) { alert('שגיאה: לא נמצא אזור העדויות'); return; }
-    if (container.querySelectorAll('.testimonial-editor-row').length >= 8) {
-      showStatus('מקסימום 8 עדויות', 'error'); return;
-    }
-    var i = _testimonialIdx++;
-    var d = (data && typeof data === 'object') ? data : {};
-    var row = document.createElement('div');
-    row.className = 'testimonial-editor-row';
-    row.dataset.idx = i;
-    row.innerHTML =
-      '<div class="t-num">עדות 1</div>'+
-      '<button class="btn-remove" onclick="removeTestimonialRow(this)">הסר</button>'+
-      '<div class="t-grid">'+
-        '<div class="admin-field t-full"><label>ציטוט קצר</label>'+
-          '<input type="text" id="cnt-quote-'+i+'" value="'+esc(d.quote||'')+'" placeholder="ציטוט קצר..."></div>'+
-        '<div class="admin-field t-full"><label>תוכן מלא</label>'+
-          '<textarea id="cnt-body-'+i+'" rows="2" placeholder="תוכן מלא...">'+esc(d.body||'')+'</textarea></div>'+
-        '<div class="admin-field"><label>שם</label>'+
-          '<input type="text" id="cnt-author-'+i+'" value="'+esc(d.author||'')+'" placeholder="שם"></div>'+
-        '<div class="admin-field"><label>תפקיד</label>'+
-          '<input type="text" id="cnt-role-'+i+'" value="'+esc(d.role||'')+'" placeholder="הורה מתמודד"></div>'+
-      '</div>';
-    container.appendChild(row);
-    renumberTestimonials();
-    row.scrollIntoView({behavior:'smooth', block:'nearest'});
-  } catch(err) {
-    alert('שגיאה בהוספת עדות: ' + err.message);
+  var container = document.getElementById('testimonials-editor');
+  if (!container) return;
+  if (container.querySelectorAll('.testimonial-editor-row').length >= 12) {
+    showStatus('מקסימום 12 עדויות', 'error'); return;
   }
+  var i = _testimonialIdx++;
+  var d = (data && typeof data === 'object') ? data : {};
+  var row = document.createElement('div');
+  row.className = 'testimonial-editor-row';
+  row.dataset.idx = i;
+
+  var photoUrl = d.photoUrl || '';
+  row.innerHTML =
+    '<div class="t-num">עדות 1</div>'+
+    '<button class="btn-remove" onclick="removeTestimonialRow(this)">הסר</button>'+
+    '<div class="t-grid">'+
+      '<div class="admin-field t-full"><label>ציטוט קצר</label>'+
+        '<input type="text" id="cnt-quote-'+i+'" value="'+esc(d.quote||'')+'" placeholder="ציטוט קצר (מופיע בבלון)"></div>'+
+      '<div class="admin-field t-full"><label>תוכן מלא (אופציונלי)</label>'+
+        '<textarea id="cnt-body-'+i+'" rows="2" placeholder="הרחבה...">'+esc(d.body||'')+'</textarea></div>'+
+      '<div class="admin-field"><label>שם</label>'+
+        '<input type="text" id="cnt-author-'+i+'" value="'+esc(d.author||'')+'" placeholder="שם"></div>'+
+      '<div class="admin-field"><label>תפקיד</label>'+
+        '<input type="text" id="cnt-role-'+i+'" value="'+esc(d.role||'')+'" placeholder="הורה מתמודד"></div>'+
+      '<div class="admin-field t-full"><label>תמונת הורה / תמונה לצרף לעדות</label>'+
+        '<div class="media-upload-wrap">'+
+          '<div id="prev-t-'+i+'" class="media-preview">'+(photoUrl?'<img src="'+esc(photoUrl)+'" style="width:100%;height:100px;object-fit:cover;display:block">':'')+'</div>'+
+          '<div class="media-drop-zone" style="min-height:55px" onclick="document.getElementById(\'file-t-'+i+'\').click()">'+
+            '<input type="file" id="file-t-'+i+'" accept="image/*" style="display:none" onchange="handleFileChange(this,\'cnt-photo-'+i+'\',\'prev-t-'+i+'\')">'+
+            '<svg class="media-drop-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'+
+            '<span class="media-drop-label" style="font-size:.75rem">העלו תמונה</span>'+
+          '</div>'+
+          '<div class="media-url-bar">'+
+            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>'+
+            '<input type="url" id="cnt-photo-'+i+'" value="'+esc(photoUrl)+'" placeholder="URL תמונה..." oninput="urlFieldPreview(\'cnt-photo-'+i+'\',\'prev-t-'+i+'\')">'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+
+  container.appendChild(row);
+  if (photoUrl) document.getElementById('prev-t-'+i).classList.add('visible');
+  renumberTestimonials();
+  row.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 function removeTestimonialRow(btn) {
@@ -711,6 +1100,140 @@ function renumberTestimonials() {
 }
 
 /* ══════════════════════════════════════
+   Team editor
+══════════════════════════════════════ */
+var _teamIdx = 0;
+
+function renderTeamList(arr) {
+  var c = document.getElementById('team-editor');
+  c.innerHTML = ''; _teamIdx = 0;
+  arr.forEach(function(m){ addTeamMemberRow(m); });
+}
+
+function addTeamMemberRow(data) {
+  var container = document.getElementById('team-editor');
+  if (!container) return;
+  if (container.querySelectorAll('.testimonial-editor-row').length >= 10) {
+    showStatus('מקסימום 10 אנשי צוות', 'error'); return;
+  }
+  var i = _teamIdx++;
+  var d = (data && typeof data === 'object') ? data : {};
+  var photoUrl = d.photoUrl || '';
+  var row = document.createElement('div');
+  row.className = 'testimonial-editor-row';
+  row.dataset.idx = i;
+  row.innerHTML =
+    '<div class="t-num">איש צוות 1</div>'+
+    '<button class="btn-remove" onclick="removeTeamRow(this)">הסר</button>'+
+    '<div class="t-grid">'+
+      '<div class="admin-field"><label>שם מלא</label>'+
+        '<input type="text" id="team-name-'+i+'" value="'+esc(d.name||'')+'" placeholder="שם מלא"></div>'+
+      '<div class="admin-field"><label>תפקיד</label>'+
+        '<input type="text" id="team-role-'+i+'" value="'+esc(d.role||'')+'" placeholder="מנחת קבוצה"></div>'+
+      '<div class="admin-field t-full"><label>תיאור קצר</label>'+
+        '<textarea id="team-bio-'+i+'" rows="2" placeholder="תיאור קצר...">'+esc(d.bio||'')+'</textarea></div>'+
+      '<div class="admin-field t-full"><label>תמונת פרופיל</label>'+
+        '<div class="media-upload-wrap">'+
+          '<div id="prev-team-'+i+'" class="media-preview">'+(photoUrl?'<img src="'+esc(photoUrl)+'" style="width:100%;height:140px;object-fit:cover;object-position:top;display:block">':'')+'</div>'+
+          '<div class="media-drop-zone" style="min-height:60px" onclick="document.getElementById(\'file-team-'+i+'\').click()">'+
+            '<input type="file" id="file-team-'+i+'" accept="image/*" style="display:none" onchange="handleFileChange(this,\'team-photo-url-'+i+'\',\'prev-team-'+i+'\')">'+
+            '<svg class="media-drop-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'+
+            '<span class="media-drop-label" style="font-size:.75rem">העלו תמונת פרופיל</span>'+
+          '</div>'+
+          '<div class="media-url-bar">'+
+            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>'+
+            '<input type="url" id="team-photo-url-'+i+'" value="'+esc(photoUrl)+'" placeholder="URL תמונה..." oninput="urlFieldPreview(\'team-photo-url-'+i+'\',\'prev-team-'+i+'\')">'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  container.appendChild(row);
+  if (photoUrl) document.getElementById('prev-team-'+i).classList.add('visible');
+  renumberTeam();
+  row.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function removeTeamRow(btn) {
+  btn.closest('.testimonial-editor-row').remove();
+  renumberTeam();
+}
+
+function renumberTeam() {
+  document.querySelectorAll('#team-editor .testimonial-editor-row').forEach(function(row, idx) {
+    var num = row.querySelector('.t-num');
+    if (num) num.textContent = 'איש צוות ' + (idx + 1);
+  });
+}
+
+/* ══════════════════════════════════════
+   Events (conferences) editor
+══════════════════════════════════════ */
+var _eventIdx = 0;
+
+function renderEventsList(arr) {
+  var c = document.getElementById('events-editor');
+  c.innerHTML = ''; _eventIdx = 0;
+  arr.forEach(function(e){ addEventRow(e); });
+}
+
+function addEventRow(data) {
+  var container = document.getElementById('events-editor');
+  if (!container) return;
+  if (container.querySelectorAll('.testimonial-editor-row').length >= 20) {
+    showStatus('מקסימום 20 אירועים', 'error'); return;
+  }
+  var i = _eventIdx++;
+  var d = (data && typeof data === 'object') ? data : {};
+  var imgUrl = d.imgUrl || '';
+  var row = document.createElement('div');
+  row.className = 'testimonial-editor-row';
+  row.dataset.idx = i;
+  row.innerHTML =
+    '<div class="t-num">אירוע 1</div>'+
+    '<button class="btn-remove" onclick="removeEventRow(this)">הסר</button>'+
+    '<div class="t-grid">'+
+      '<div class="admin-field"><label>כותרת האירוע</label>'+
+        '<input type="text" id="ev-title-'+i+'" value="'+esc(d.title||'')+'" placeholder="שם הכנס / אירוע"></div>'+
+      '<div class="admin-field"><label>קישור (אופציונלי)</label>'+
+        '<input type="url" id="ev-link-'+i+'" value="'+esc(d.link||'')+'" placeholder="https://..." dir="ltr"></div>'+
+      '<div class="admin-field t-full"><label>פוסטר / תמונת האירוע</label>'+
+        '<div class="media-upload-wrap">'+
+          '<div id="prev-ev-'+i+'" class="media-preview">'+(imgUrl?'<img src="'+esc(imgUrl)+'" style="width:100%;height:160px;object-fit:cover;display:block">':'')+'</div>'+
+          '<div class="media-drop-zone" onclick="document.getElementById(\'file-ev-'+i+'\').click()"'+
+            ' ondragover="event.preventDefault();this.classList.add(\'drag-over\')"'+
+            ' ondragleave="this.classList.remove(\'drag-over\')"'+
+            ' ondrop="handleDrop(event,\'file-ev-'+i+'\',\'ev-img-url-'+i+'\',\'prev-ev-'+i+'\')">' +
+            '<input type="file" id="file-ev-'+i+'" accept="image/*" style="display:none" onchange="handleFileChange(this,\'ev-img-url-'+i+'\',\'prev-ev-'+i+'\')">'+
+            '<svg class="media-drop-icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'+
+            '<span class="media-drop-label">גרור פוסטר לכאן או לחצו לבחירה</span>'+
+            '<span class="media-drop-sub">JPG · PNG · WebP</span>'+
+          '</div>'+
+          '<div class="media-url-bar">'+
+            '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="#bbc" stroke-width="1.8" stroke-linecap="round"/></svg>'+
+            '<input type="url" id="ev-img-url-'+i+'" value="'+esc(imgUrl)+'" placeholder="URL פוסטר..." oninput="urlFieldPreview(\'ev-img-url-'+i+'\',\'prev-ev-'+i+'\')">'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  container.appendChild(row);
+  if (imgUrl) document.getElementById('prev-ev-'+i).classList.add('visible');
+  renumberEvents();
+  row.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function removeEventRow(btn) {
+  btn.closest('.testimonial-editor-row').remove();
+  renumberEvents();
+}
+
+function renumberEvents() {
+  document.querySelectorAll('#events-editor .testimonial-editor-row').forEach(function(row, idx) {
+    var num = row.querySelector('.t-num');
+    if (num) num.textContent = 'אירוע ' + (idx + 1);
+  });
+}
+
+/* ══════════════════════════════════════
    Form helpers
 ══════════════════════════════════════ */
 function esc(s) {
@@ -721,17 +1244,41 @@ function get(id)      { var el=document.getElementById(id); return el ? el.value
 
 function getContentFromForm() {
   var testimonials = [];
-  document.querySelectorAll('.testimonial-editor-row').forEach(function(row) {
+  document.querySelectorAll('#testimonials-editor .testimonial-editor-row').forEach(function(row) {
     var i = row.dataset.idx;
-    var q=get('cnt-quote-'+i), b=get('cnt-body-'+i), a=get('cnt-author-'+i), r=get('cnt-role-'+i);
-    if (q || b || a) testimonials.push({quote:q,body:b,author:a,role:r});
+    var q=get('cnt-quote-'+i), b=get('cnt-body-'+i), a=get('cnt-author-'+i), r=get('cnt-role-'+i), p=get('cnt-photo-'+i);
+    if (q || b || a) testimonials.push({quote:q, body:b, author:a, role:r, photoUrl:p});
   });
+
+  var team = [];
+  document.querySelectorAll('#team-editor .testimonial-editor-row').forEach(function(row) {
+    var i = row.dataset.idx;
+    var n=get('team-name-'+i), r=get('team-role-'+i), bio=get('team-bio-'+i), p=get('team-photo-url-'+i);
+    if (n || p) team.push({name:n, role:r, bio:bio, photoUrl:p});
+  });
+
+  var events = [];
+  document.querySelectorAll('#events-editor .testimonial-editor-row').forEach(function(row) {
+    var i = row.dataset.idx;
+    var t=get('ev-title-'+i), l=get('ev-link-'+i), img=get('ev-img-url-'+i);
+    if (img || t) events.push({title:t, link:l, imgUrl:img});
+  });
+
   return {
-    'hero.title':    get('cnt-hero-title'),
-    'hero.accent':   get('cnt-hero-accent'),
-    'hero.subtitle': get('cnt-hero-subtitle'),
-    'about.body':    get('cnt-about-body'),
-    'testimonials':  testimonials
+    'hero.title':           get('cnt-hero-title'),
+    'hero.accent':          get('cnt-hero-accent'),
+    'hero.subtitle':        get('cnt-hero-subtitle'),
+    'hero.thumbUrl':        get('cnt-hero-thumb-url'),
+    'about.body':           get('cnt-about-body'),
+    'about.imageUrl':       get('cnt-about-img-url'),
+    'about.videoUrl':       get('cnt-about-video-url'),
+    'about.videoThumbUrl':  get('cnt-about-video-thumb-url'),
+    'svc.workshops.imgUrl': get('cnt-svc-workshops-url'),
+    'svc.coaching.imgUrl':  get('cnt-svc-coaching-url'),
+    'svc.resilience.imgUrl':get('cnt-svc-resilience-url'),
+    'team':         team,
+    'events':       events,
+    'testimonials': testimonials
   };
 }
 
@@ -756,8 +1303,15 @@ async function saveChanges() {
       facilitators: parseInt(get('cfg-facilitators'),10)|| 0,
       cities:       parseInt(get('cfg-cities'),10)      || 0
     },
+    statLabels: {
+      '1': get('cfg-stat-label-1'),
+      '2': get('cfg-stat-label-2'),
+      '3': get('cfg-stat-label-3'),
+      '4': get('cfg-stat-label-4')
+    },
     mataraUrl:  get('cfg-matara-in'),
-    youtubeUrl: get('cfg-youtube-in')
+    youtubeUrl: get('cfg-youtube-in'),
+    statsUrl:   get('cfg-stats-url')
   };
   var cnt = getContentFromForm();
 
@@ -825,7 +1379,7 @@ async function patchDonate(mataraUrl, pat) {
 function makeConfigJson(cfg) { return JSON.stringify(cfg, null, 2) + '\n'; }
 
 function makeConfigJs(cfg) {
-  var data = { phone:cfg.phone, whatsapp:cfg.whatsapp, email:cfg.email, formEndpoint:cfg.formEndpoint||'', stats:cfg.stats, youtubeUrl:cfg.youtubeUrl||'' };
+  var data = { phone:cfg.phone, whatsapp:cfg.whatsapp, email:cfg.email, formEndpoint:cfg.formEndpoint||'', stats:cfg.stats, statLabels:cfg.statLabels||{}, youtubeUrl:cfg.youtubeUrl||'', statsUrl:cfg.statsUrl||'' };
   return '/* שורשים — config.js  (edit via /admin/) */\n'+
     'var SHORESHIM = '+JSON.stringify(data, null, 2)+';\n\n'+
     "(function (cfg) {\n"+
@@ -833,11 +1387,18 @@ function makeConfigJs(cfg) {
     "  if (p) p.textContent = cfg.phone;\n\n"+
     "  var em = document.getElementById('cfg-email');\n"+
     "  if (em) em.textContent = cfg.email;\n\n"+
-    "  ['cfg-stat-families','cfg-stat-workshops','cfg-stat-facilitators','cfg-stat-cities'].forEach(function (id, i) {\n"+
-    "    var vals = [cfg.stats.families, cfg.stats.workshops, cfg.stats.facilitators, cfg.stats.cities];\n"+
-    "    var el = document.getElementById(id);\n"+
-    "    if (el) el.setAttribute('data-target', vals[i]);\n"+
-    "  });\n\n"+
+    "  function applyStats(s) {\n"+
+    "    var ids=['cfg-stat-families','cfg-stat-workshops','cfg-stat-facilitators','cfg-stat-cities'];\n"+
+    "    var vals=[s.families,s.workshops,s.facilitators,s.cities];\n"+
+    "    ids.forEach(function(id,i){var el=document.getElementById(id);if(el)el.setAttribute('data-target',vals[i]||0);});\n"+
+    "    var lbls=cfg.statLabels||{};\n"+
+    "    var lblEls=document.querySelectorAll('.stat-label');\n"+
+    "    [lbls['1'],lbls['2'],lbls['3'],lbls['4']].forEach(function(txt,i){if(txt&&lblEls[i])lblEls[i].textContent=txt;});\n"+
+    "  }\n"+
+    "  applyStats(cfg.stats);\n"+
+    "  if(cfg.statsUrl){\n"+
+    "    fetch(cfg.statsUrl+'?_='+Date.now()).then(function(r){return r.json()}).then(function(d){if(d&&d.families)applyStats(d);}).catch(function(){});\n"+
+    "  }\n\n"+
     "  var waMsg = encodeURIComponent('שלום, הגעתי מאתר שורשים ואשמח לפרטים בדיסקרטיות');\n"+
     "  document.querySelectorAll('a[href^=\"https://wa.me/\"]').forEach(function (a) {\n"+
     "    var hasText = a.getAttribute('href').indexOf('?text=') !== -1;\n"+
@@ -862,26 +1423,94 @@ function makeContentJs(cnt) {
   return '/* שורשים — content.js  (edit via /admin/) */\n'+
     'var SHORESHIM_CONTENT = '+JSON.stringify(cnt)+';\n\n'+
     "(function (c) {\n"+
-    "  function setText(id, val) { var el=document.getElementById(id); if(el&&val!=null) el.textContent=String(val); }\n"+
-    "  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }\n"+
+    "  function setText(id,val){var el=document.getElementById(id);if(el&&val!=null)el.textContent=String(val);}\n"+
+    "  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}\n"+
+    "  function escU(s){return String(s).replace(/\"/g,'%22');}\n"+
+    "  function setImg(id,url,h){\n"+
+    "    var el=document.getElementById(id);\n"+
+    "    if(el&&url)el.innerHTML='<img src=\"'+escU(url)+'\" alt=\"\" style=\"width:100%;height:'+(h||'100%')+';object-fit:cover;border-radius:inherit;display:block\">';\n"+
+    "  }\n"+
+    "\n"+
     "  setText('content-hero-title',    c['hero.title']);\n"+
     "  setText('content-hero-accent',   c['hero.accent']);\n"+
     "  setText('content-hero-subtitle', c['hero.subtitle']);\n"+
     "  setText('content-mission-body',  c['about.body']);\n"+
-    "  if (Array.isArray(c.testimonials) && c.testimonials.length) {\n"+
-    "    var slider = document.getElementById('testimonials-slider');\n"+
-    "    if (slider) {\n"+
-    "      slider.innerHTML = c.testimonials.map(function (t, i) {\n"+
+    "\n"+
+    "  /* hero video thumbnail */\n"+
+    "  if(c['hero.thumbUrl']){\n"+
+    "    var ht=document.querySelector('.hero-video-thumbnail');\n"+
+    "    if(ht)ht.innerHTML='<img src=\"'+escU(c['hero.thumbUrl'])+'\" alt=\"\" style=\"width:100%;height:100%;object-fit:cover;display:block\">';\n"+
+    "  }\n"+
+    "\n"+
+    "  /* about image / video */\n"+
+    "  if(c['about.videoUrl']){\n"+
+    "    var mv=document.getElementById('mission-visual');\n"+
+    "    if(mv){\n"+
+    "      var vThumb=c['about.videoThumbUrl']||'';\n"+
+    "      mv.innerHTML='<a href=\"'+escU(c['about.videoUrl'])+'\" target=\"_blank\" rel=\"noopener\" class=\"about-video-card\">'+\n"+
+    "        (vThumb?'<img src=\"'+escU(vThumb)+'\" alt=\"\" style=\"width:100%;height:100%;object-fit:cover\">':'')+\n"+
+    "        '<div class=\"about-video-play\"><svg width=\"52\" height=\"52\" viewBox=\"0 0 52 52\" fill=\"none\"><circle cx=\"26\" cy=\"26\" r=\"26\" fill=\"rgba(255,255,255,.9)\"/><path d=\"M21 18l16 8-16 8V18Z\" fill=\"#1A4080\"/></svg></div>'+\n"+
+    "        '</a>';\n"+
+    "    }\n"+
+    "  } else if(c['about.imageUrl']){\n"+
+    "    setImg('mission-visual',c['about.imageUrl'],'340px');\n"+
+    "  }\n"+
+    "\n"+
+    "  /* service panel images */\n"+
+    "  [['workshops','svc.workshops.imgUrl'],['coaching','svc.coaching.imgUrl'],['resilience','svc.resilience.imgUrl']].forEach(function(pair){\n"+
+    "    var url=c[pair[1]];\n"+
+    "    if(url)setImg('svc-img-'+pair[0],url,'260px');\n"+
+    "  });\n"+
+    "\n"+
+    "  /* team cards */\n"+
+    "  if(Array.isArray(c.team)&&c.team.length){\n"+
+    "    var carousel=document.getElementById('team-carousel');\n"+
+    "    if(carousel){\n"+
+    "      carousel.innerHTML=c.team.map(function(m){\n"+
+    "        var photo=m.photoUrl?'<img src=\"'+escU(m.photoUrl)+'\" alt=\"'+esc(m.name||'')+'\" style=\"width:100%;height:240px;object-fit:cover;object-position:top\">':"+
+    "          '<svg viewBox=\"0 0 280 300\" fill=\"none\" width=\"100%\" height=\"240\"><rect width=\"280\" height=\"300\" fill=\"#EDE8E0\"/><circle cx=\"140\" cy=\"110\" r=\"58\" fill=\"#C8B090\" opacity=\".5\"/><path d=\"M50 260c0-50 40-82 90-82s90 32 90 82\" fill=\"#C8B090\" opacity=\".4\"/></svg>';\n"+
+    "        return '<div class=\"team-card\">'+\n"+
+    "          '<div class=\"team-card-photo\">'+photo+'</div>'+\n"+
+    "          '<div class=\"team-card-body\">'+\n"+
+    "          '<h3>'+esc(m.name||'')+'</h3>'+\n"+
+    "          '<p class=\"team-role\">'+esc(m.role||'')+'</p>'+\n"+
+    "          '<p>'+esc(m.bio||'')+'</p>'+\n"+
+    "          '</div></div>';\n"+
+    "      }).join('');\n"+
+    "    }\n"+
+    "  }\n"+
+    "\n"+
+    "  /* events carousel */\n"+
+    "  if(Array.isArray(c.events)&&c.events.length){\n"+
+    "    var evSection=document.getElementById('events-section');\n"+
+    "    if(evSection)evSection.style.display='';\n"+
+    "    var evTrack=document.getElementById('events-track');\n"+
+    "    if(evTrack){\n"+
+    "      evTrack.innerHTML=c.events.map(function(ev){\n"+
+    "        var inner='<img src=\"'+escU(ev.imgUrl||'')+'\" alt=\"'+esc(ev.title||'')+'\" style=\"width:100%;height:100%;object-fit:cover;display:block\">';\n"+
+    "        return ev.link?'<a class=\"event-poster\" href=\"'+escU(ev.link)+'\" target=\"_blank\" rel=\"noopener\">'+inner+'</a>':"+
+    "          '<div class=\"event-poster\">'+inner+'</div>';\n"+
+    "      }).join('');\n"+
+    "    }\n"+
+    "  }\n"+
+    "\n"+
+    "  /* testimonials */\n"+
+    "  if(Array.isArray(c.testimonials)&&c.testimonials.length){\n"+
+    "    var slider=document.getElementById('testimonials-slider');\n"+
+    "    if(slider){\n"+
+    "      slider.innerHTML=c.testimonials.map(function(t,i){\n"+
+    "        var avatar=t.photoUrl?'<img src=\"'+escU(t.photoUrl)+'\" alt=\"'+esc(t.author||'')+'\" style=\"width:48px;height:48px;border-radius:50%;object-fit:cover\">':"+
+    "          '<div class=\"testimonial-avatar\">'+esc((t.author||'?').charAt(0))+'</div>';\n"+
     "        return '<div class=\"testimonial-slide'+(i===0?' active':'')+'\">'+\n"+
     "          '<blockquote class=\"testimonial-quote\">\\u201c'+esc(t.quote)+'\\u201d</blockquote>'+\n"+
     "          '<p class=\"testimonial-body\">'+esc(t.body)+'</p>'+\n"+
-    "          '<div class=\"testimonial-author\">'+\n"+
-    "          '<div class=\"testimonial-avatar\">'+esc((t.author||'?').charAt(0))+'</div>'+\n"+
+    "          '<div class=\"testimonial-author\">'+avatar+\n"+
     "          '<div><strong>'+esc(t.author)+'</strong><span>'+esc(t.role)+'</span></div>'+\n"+
     "          '</div></div>';\n"+
     "      }).join('');\n"+
     "    }\n"+
     "  }\n"+
+    "\n"+
     "}(SHORESHIM_CONTENT));\n";
 }
 
