@@ -257,7 +257,12 @@ tr:hover td{background:#fafbfd}
       <div class="lf-group">
         <label>GitHub Token (לשמירת תוכן)</label>
         <input id="su-pat" placeholder="ghp_xxxxxxxxxxxxxxxx" dir="ltr" autocomplete="off">
-        <small style="font-size:.72rem;color:var(--muted);margin-top:.3rem;display:block">נדרש לשמירת תוכן. צור ב-GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) → עם הרשאת <strong>repo</strong>.</small>
+        <small style="font-size:.72rem;color:var(--muted);margin-top:.3rem;display:block">
+          נדרש לשמירת תוכן.<br>
+          <strong>איך יוצרים:</strong> GitHub.com ← תמונת פרופיל ← Settings ← Developer settings ← Personal access tokens ← Tokens (classic) ← Generate new token ← סמן <strong>repo</strong> ← Generate token.
+        </small>
+        <button type="button" onclick="testToken()" style="margin-top:.6rem;padding:.4rem .9rem;background:#eef2ff;color:#2D4A7A;border:1.5px solid #c7d4f0;border-radius:7px;font-size:.8rem;font-weight:700;cursor:pointer" id="test-tok-btn">בדוק Token ✓</button>
+        <span id="test-tok-res" style="font-size:.78rem;margin-right:.5rem"></span>
       </div>
       <button class="login-btn" id="setup-btn" onclick="doSetup()">צור חשבון וכנס ←</button>
     </div>
@@ -561,6 +566,21 @@ tr:hover td{background:#fafbfd}
             <button class="btn btn-ghost" style="margin-top:1rem" onclick="changeMyPassword()">עדכן סיסמה</button>
           </div>
         </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">GitHub Token (חיבור שמירה)</div></div>
+          <div class="card-body">
+            <div class="field" style="max-width:480px">
+              <label>Token נוכחי</label>
+              <input type="password" id="pat-input" placeholder="ghp_xxxxxxxxxxxxxxxx" dir="ltr" value="">
+              <span class="hint">נשמר רק בדפדפן שלך. אין צורך לשנות אלא אם Token פג תוקף.</span>
+            </div>
+            <div style="display:flex;gap:.6rem;margin-top:.85rem;align-items:center">
+              <button class="btn btn-ghost" onclick="updatePat()">עדכן Token</button>
+              <button class="btn btn-ghost" onclick="testPatFromSettings()">בדוק חיבור</button>
+              <span id="pat-status" style="font-size:.82rem"></span>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div><!-- /content -->
@@ -719,7 +739,7 @@ tr:hover td{background:#fafbfd}
 ══════════════════════════════════════════════════════ */
 var REPO_OWNER  = 'nir5177';
 var REPO_NAME   = 'Sharon';
-var REPO_BRANCH = 'main';
+var REPO_BRANCH = 'gh-pages';
 
 /* ══════════════════════════════════════════════════════
    STATE
@@ -749,7 +769,10 @@ async function sha256(str) {
 /* ══════════════════════════════════════════════════════
    GITHUB API
 ══════════════════════════════════════════════════════ */
-function pat() { return localStorage.getItem('shr_pat') || ''; }
+function pat() {
+  /* support both new key and old key from previous admin version */
+  return localStorage.getItem('shr_pat') || localStorage.getItem('shoreshim_pat') || '';
+}
 
 async function ghGet(path) {
   var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path+'?ref='+REPO_BRANCH+'&_='+Date.now(), {
@@ -788,6 +811,36 @@ async function ghGetJSON(path, fallback) {
 /* ══════════════════════════════════════════════════════
    AUTH — SETUP
 ══════════════════════════════════════════════════════ */
+async function testToken() {
+  var token = document.getElementById('su-pat').value.trim();
+  var res   = document.getElementById('test-tok-res');
+  var btn   = document.getElementById('test-tok-btn');
+  if (!token) { res.style.color='var(--red)'; res.textContent='הכנס Token קודם'; return; }
+  btn.textContent = 'בודק...'; btn.disabled = true;
+  try {
+    var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME, {
+      headers: { 'Authorization': 'token '+token, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (r.ok) {
+      res.style.color = 'var(--green)';
+      res.textContent = '✓ Token תקין! מחובר ל-' + REPO_NAME;
+    } else if (r.status === 401) {
+      res.style.color = 'var(--red)';
+      res.textContent = '✗ Token שגוי או פג תוקף';
+    } else if (r.status === 404) {
+      res.style.color = 'var(--red)';
+      res.textContent = '✗ לא נמצא הרפוזיטורי — בדוק הרשאות';
+    } else {
+      res.style.color = 'var(--red)';
+      res.textContent = '✗ שגיאה: ' + r.status;
+    }
+  } catch(e) {
+    res.style.color = 'var(--red)';
+    res.textContent = '✗ שגיאת רשת';
+  }
+  btn.textContent = 'בדוק Token ✓'; btn.disabled = false;
+}
+
 async function doSetup() {
   var username = v('su-user').trim();
   var name     = v('su-name').trim();
@@ -1388,6 +1441,7 @@ function buildAndSaveContentJs() {
    TEAM
 ══════════════════════════════════════════════════════ */
 function renderTeam() {
+  renderTeamPatField();
   var el = document.getElementById('team-list');
   var roleLabel = { admin:'מנהל', editor:'עורך' };
   el.innerHTML = STATE.users.map(function(u, i){
@@ -1433,6 +1487,33 @@ async function removeUser(idx) {
     await ghPut('admin/users.json', JSON.stringify(STATE.users, null, 2), 'Remove user: '+u.username);
     renderTeam(); toast('המשתמש הוסר ✓', 'ok');
   } catch(e) { toast('שגיאה: '+e.message, 'err'); STATE.users.splice(idx, 0, u); }
+}
+
+function renderTeamPatField() {
+  var el = document.getElementById('pat-input');
+  if (el) el.value = pat() ? '••••••••••••••••' : '';
+}
+
+function updatePat() {
+  var val = document.getElementById('pat-input').value.trim();
+  if (!val || val.startsWith('•')) return toast('הכנס Token חדש', 'err');
+  localStorage.setItem('shr_pat', val);
+  localStorage.setItem('shoreshim_pat', val);
+  document.getElementById('pat-status').textContent = '✓ עודכן';
+  document.getElementById('pat-status').style.color = 'var(--green)';
+  setTimeout(function(){ document.getElementById('pat-status').textContent=''; }, 3000);
+}
+
+async function testPatFromSettings() {
+  var statusEl = document.getElementById('pat-status');
+  statusEl.textContent = 'בודק...'; statusEl.style.color = 'var(--muted)';
+  try {
+    var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME, {
+      headers: { 'Authorization': 'token '+pat(), 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (r.ok) { statusEl.style.color='var(--green)'; statusEl.textContent='✓ חיבור תקין'; }
+    else       { statusEl.style.color='var(--red)';   statusEl.textContent='✗ שגיאה '+r.status; }
+  } catch(e) { statusEl.style.color='var(--red)'; statusEl.textContent='✗ שגיאת רשת'; }
 }
 
 async function changeMyPassword() {
