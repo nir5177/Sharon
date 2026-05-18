@@ -3,792 +3,1534 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ממשק ניהול — שורשים</title>
+<title>ניהול — שורשים</title>
 <meta name="robots" content="noindex,nofollow">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --navy:#1B2A4A;--navy-mid:#2D4A7A;--navy-dark:#0F1B33;
+  --navy:#1B2A4A;--navy2:#2D4A7A;--navy3:#0F1B33;
   --gold:#D4A853;--orange:#E8934A;--cream:#F8F5EE;
-  --green:#2d8a4e;--red:#c0392b;--border:#d0d7e3;
+  --green:#2d8a4e;--red:#c0392b;--blue:#2563eb;
+  --border:#d0d7e3;--bg:#f1f4f9;--sidebar:240px;
+  --text:#1a2030;--muted:#6b7a99;
 }
-body{font-family:'Heebo','Assistant','Rubik','Arial Hebrew',Arial,sans-serif;
-  background:var(--cream);color:var(--navy-dark);direction:rtl;min-height:100vh}
 
-/* ─── Login screen ─── */
-#login-screen{display:flex;align-items:center;justify-content:center;
-  min-height:100vh;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%)}
-.login-card{background:#fff;border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:400px;
-  box-shadow:0 20px 60px rgba(0,0,0,.35)}
+/* ─── Reset & Base ─── */
+body{font-family:'Heebo','Assistant','Rubik',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl}
+input,textarea,select,button{font-family:inherit}
+a{text-decoration:none;color:inherit}
+
+/* ─── Login ─── */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;
+  background:linear-gradient(135deg,var(--navy3) 0%,var(--navy2) 100%)}
+.login-wrap{background:#fff;border-radius:20px;padding:2.75rem 2.25rem;width:100%;max-width:420px;
+  box-shadow:0 24px 64px rgba(0,0,0,.35)}
 .login-logo{text-align:center;margin-bottom:1.5rem}
-.login-logo svg{width:52px;height:52px}
-.login-title{text-align:center;font-size:1.4rem;font-weight:700;color:var(--navy);margin-bottom:.25rem}
-.login-sub{text-align:center;font-size:.85rem;color:#666;margin-bottom:1.75rem}
-.field-group{margin-bottom:1rem}
-.field-group label{display:block;font-size:.82rem;font-weight:600;color:var(--navy);margin-bottom:.35rem}
-.field-group input{width:100%;padding:.65rem .9rem;border:1.5px solid var(--border);
-  border-radius:8px;font-size:.95rem;font-family:inherit;outline:none}
-.field-group input:focus{border-color:var(--navy-mid)}
-.field-hint{font-size:.75rem;color:#888;margin-top:.4rem;line-height:1.5}
-.field-hint a{color:var(--navy-mid)}
-.login-btn{width:100%;padding:.8rem;background:var(--navy);color:#fff;border:none;
-  border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;margin-top:.5rem;
-  font-family:inherit;transition:background .2s}
-.login-btn:hover{background:var(--navy-mid)}
-.login-error{background:#fdecea;color:var(--red);border-radius:6px;padding:.6rem .9rem;
-  font-size:.85rem;margin-bottom:.75rem;display:none}
-.setup-badge{display:inline-block;background:#fff8e6;color:#a07000;border:1px solid #f0d080;
-  border-radius:6px;padding:.3rem .7rem;font-size:.78rem;font-weight:600;margin-bottom:1rem;width:100%;text-align:center}
+.login-logo svg{width:56px;height:56px}
+.login-title{text-align:center;font-size:1.5rem;font-weight:800;color:var(--navy);margin-bottom:.25rem}
+.login-sub{text-align:center;font-size:.85rem;color:var(--muted);margin-bottom:2rem}
+.lf-group{margin-bottom:1.1rem}
+.lf-group label{display:block;font-size:.8rem;font-weight:700;color:var(--navy);margin-bottom:.4rem;letter-spacing:.02em}
+.lf-group input{width:100%;padding:.7rem 1rem;border:1.5px solid var(--border);border-radius:10px;font-size:.95rem;outline:none;transition:border .2s}
+.lf-group input:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(45,74,122,.12)}
+.login-btn{width:100%;padding:.85rem;background:var(--navy);color:#fff;border:none;border-radius:10px;
+  font-size:1rem;font-weight:700;cursor:pointer;margin-top:.5rem;transition:background .2s}
+.login-btn:hover{background:var(--navy2)}
+.login-btn:disabled{opacity:.5;cursor:not-allowed}
+.login-err{background:#fdecea;color:var(--red);border-radius:8px;padding:.65rem 1rem;font-size:.85rem;margin-bottom:1rem;display:none}
 
-/* ─── Admin layout ─── */
-#admin-screen{display:none}
-.admin-header{background:var(--navy-dark);color:#fff;padding:0 1.5rem;
-  display:flex;align-items:center;justify-content:space-between;height:56px;
-  position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.admin-header-title{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
-.admin-header-title svg{flex-shrink:0}
-.admin-actions{display:flex;gap:.5rem;align-items:center}
-.btn-save{background:var(--gold);color:var(--navy-dark);border:none;border-radius:6px;
-  padding:.45rem 1.1rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:inherit;
-  transition:opacity .2s;display:flex;align-items:center;gap:.4rem}
-.btn-save:hover{opacity:.85}
-.btn-save:disabled{opacity:.5;cursor:not-allowed}
-.btn-logout{background:transparent;color:#aab;border:1px solid #445;border-radius:6px;
-  padding:.4rem .8rem;font-size:.82rem;cursor:pointer;font-family:inherit}
-.btn-logout:hover{background:#1a2840}
+/* ─── App Layout ─── */
+#app{display:none;min-height:100vh}
 
-.admin-body{max-width:800px;margin:0 auto;padding:1.5rem 1rem 4rem}
+/* Sidebar */
+.sidebar{position:fixed;top:0;right:0;width:var(--sidebar);height:100vh;background:var(--navy3);
+  color:#fff;display:flex;flex-direction:column;z-index:200;overflow-y:auto}
+.sidebar-logo{padding:1.5rem 1.25rem 1rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:.75rem}
+.sidebar-logo svg{flex-shrink:0}
+.sidebar-logo-text{font-size:1rem;font-weight:800;color:var(--gold)}
+.sidebar-logo-sub{font-size:.72rem;color:rgba(255,255,255,.45);margin-top:.1rem}
+.nav-section{padding:.75rem 0 .25rem 0}
+.nav-label{font-size:.65rem;font-weight:800;letter-spacing:.1em;color:rgba(255,255,255,.3);padding:.4rem 1.25rem .2rem;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:.7rem;padding:.7rem 1.25rem;font-size:.88rem;font-weight:600;
+  color:rgba(255,255,255,.65);cursor:pointer;border-right:3px solid transparent;transition:all .15s;margin:.05rem 0}
+.nav-item svg{flex-shrink:0;opacity:.7}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item:hover svg{opacity:1}
+.nav-item.active{background:rgba(212,168,83,.12);color:var(--gold);border-right-color:var(--gold)}
+.nav-item.active svg{opacity:1}
+.nav-badge{margin-right:auto;background:var(--red);color:#fff;font-size:.65rem;font-weight:800;
+  padding:.1rem .4rem;border-radius:20px;min-width:18px;text-align:center}
+.sidebar-footer{margin-top:auto;padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,.07)}
+.sidebar-user{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:var(--navy2);display:flex;align-items:center;
+  justify-content:center;font-size:.85rem;font-weight:700;color:var(--gold);flex-shrink:0}
+.user-name{font-size:.85rem;font-weight:700;color:#fff}
+.user-role{font-size:.72rem;color:rgba(255,255,255,.4)}
+.btn-logout{width:100%;padding:.5rem;background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);
+  border:1px solid rgba(255,255,255,.1);border-radius:8px;font-size:.82rem;cursor:pointer;transition:all .2s}
+.btn-logout:hover{background:rgba(255,255,255,.12);color:#fff}
 
-.section-card{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06);
-  margin-bottom:1.25rem;overflow:hidden}
-.section-header{background:var(--navy);color:#fff;padding:.75rem 1.25rem;
-  font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:.5rem}
-.section-body{padding:1.25rem}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
-.field-row.full{grid-template-columns:1fr}
-@media(max-width:520px){.field-row{grid-template-columns:1fr}}
-.admin-field{display:flex;flex-direction:column;gap:.3rem}
-.admin-field label{font-size:.8rem;font-weight:600;color:#555}
-.admin-field input,.admin-field textarea{padding:.55rem .75rem;border:1.5px solid var(--border);border-radius:7px;
-  font-size:.95rem;font-family:inherit;outline:none;direction:rtl}
-.admin-field input:focus,.admin-field textarea:focus{border-color:var(--navy-mid);box-shadow:0 0 0 3px rgba(45,74,122,.1)}
-.admin-field .hint{font-size:.73rem;color:#888;margin-top:.2rem}
-.admin-field textarea{resize:vertical;line-height:1.6}
-.admin-field input[dir=ltr]{direction:ltr}
+/* Main */
+.main{margin-right:var(--sidebar);min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 1.75rem;height:60px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.topbar-title{font-size:1.1rem;font-weight:800;color:var(--navy)}
+.topbar-actions{display:flex;gap:.6rem;align-items:center}
+.content{padding:1.75rem;flex:1}
 
-/* Stats row */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}
-@media(max-width:520px){.stats-grid{grid-template-columns:1fr 1fr}}
-.stat-field label{font-size:.78rem;font-weight:600;color:#555;margin-bottom:.25rem;display:block}
-.stat-field input{width:100%;padding:.5rem .6rem;border:1.5px solid var(--border);border-radius:7px;
-  font-size:1.1rem;font-weight:700;text-align:center;font-family:inherit;outline:none}
-.stat-field input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,168,83,.2)}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:.45rem;padding:.55rem 1.1rem;border-radius:9px;
+  font-size:.88rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-primary:hover{background:var(--navy2)}
+.btn-gold{background:var(--gold);color:var(--navy3)}
+.btn-gold:hover{opacity:.88}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{opacity:.88}
+.btn-danger{background:var(--red);color:#fff}
+.btn-danger:hover{opacity:.88}
+.btn-ghost{background:transparent;color:var(--navy);border:1.5px solid var(--border)}
+.btn-ghost:hover{background:var(--bg)}
+.btn-sm{padding:.38rem .75rem;font-size:.8rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
 
-/* Testimonial editor */
-.testimonial-editor-row{border:1.5px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:.75rem;
-  position:relative;background:#fafbfc}
-.testimonial-editor-row .t-num{font-size:.75rem;font-weight:700;color:var(--gold);margin-bottom:.6rem}
-.testimonial-editor-row .t-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
-@media(max-width:520px){.testimonial-editor-row .t-grid{grid-template-columns:1fr}}
-.testimonial-editor-row .t-full{grid-column:1/-1}
-.btn-remove{position:absolute;top:.6rem;left:.6rem;background:#fdecea;color:var(--red);border:none;
-  border-radius:5px;padding:.25rem .55rem;font-size:.78rem;cursor:pointer;font-family:inherit}
-.btn-remove:hover{background:var(--red);color:#fff}
-.btn-add-testimonial{background:var(--navy);color:#fff;border:none;border-radius:7px;
-  padding:.55rem 1.2rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
-  margin-top:.25rem;transition:background .2s}
-.btn-add-testimonial:hover{background:var(--navy-mid)}
+/* Cards */
+.card{background:#fff;border-radius:14px;box-shadow:0 1px 8px rgba(0,0,0,.07);margin-bottom:1.25rem;overflow:hidden}
+.card-header{padding:.9rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:.95rem;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:.5rem}
+.card-body{padding:1.4rem}
 
-/* Account settings */
-.btn-action{background:var(--navy);color:#fff;border:none;border-radius:7px;
-  padding:.5rem 1.1rem;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;
-  transition:background .2s}
-.btn-action:hover{background:var(--navy-mid)}
-.btn-action.danger{background:var(--red)}
-.btn-action.danger:hover{opacity:.85}
-.inline-form{display:flex;gap:.6rem;align-items:flex-end;flex-wrap:wrap}
-.inline-form input{flex:1;min-width:160px;padding:.55rem .75rem;border:1.5px solid var(--border);
-  border-radius:7px;font-size:.9rem;font-family:inherit;outline:none}
-.inline-form input:focus{border-color:var(--navy-mid)}
-.inline-msg{font-size:.82rem;margin-top:.5rem;display:none}
-.inline-msg.ok{color:var(--green)}
-.inline-msg.err{color:var(--red)}
-.account-row{margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #eee}
-.account-row:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
-.account-row-label{font-size:.82rem;font-weight:600;color:#444;margin-bottom:.5rem}
+/* ─── Dashboard ─── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+@media(max-width:900px){.stats-grid{grid-template-columns:1fr 1fr}}
+.stat-card{background:#fff;border-radius:14px;padding:1.25rem 1.4rem;box-shadow:0 1px 8px rgba(0,0,0,.07);display:flex;flex-direction:column;gap:.5rem}
+.stat-card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.stat-card-icon.navy{background:rgba(27,42,74,.1)}
+.stat-card-icon.gold{background:rgba(212,168,83,.15)}
+.stat-card-icon.green{background:rgba(45,138,78,.12)}
+.stat-card-icon.red{background:rgba(192,57,43,.1)}
+.stat-card-label{font-size:.78rem;font-weight:700;color:var(--muted)}
+.stat-card-val{font-size:2rem;font-weight:800;color:var(--navy);line-height:1}
+.stat-card-sub{font-size:.75rem;color:var(--muted)}
 
-/* Setup steps */
-.setup-step{margin-bottom:1.1rem;padding:.9rem 1rem;background:#f8f7f4;
-  border-radius:9px;border:1.5px solid #e4ddd4}
-.setup-step-label{font-size:.82rem;font-weight:700;color:var(--navy);
-  margin-bottom:.65rem;display:flex;align-items:center;gap:.4rem}
-.setup-step-num{width:20px;height:20px;border-radius:50%;background:var(--navy);
-  color:#fff;font-size:.72rem;font-weight:800;display:inline-flex;
-  align-items:center;justify-content:center;flex-shrink:0}
+/* Table */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.875rem}
+th{background:var(--bg);color:var(--muted);font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:.6rem 1rem;text-align:right;border-bottom:1px solid var(--border)}
+td{padding:.75rem 1rem;border-bottom:1px solid #f0f2f7;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbfd}
+.tag{display:inline-flex;align-items:center;padding:.2rem .55rem;border-radius:20px;font-size:.72rem;font-weight:700}
+.tag-green{background:rgba(45,138,78,.1);color:var(--green)}
+.tag-gold{background:rgba(212,168,83,.15);color:#8a6a00}
+.tag-blue{background:rgba(37,99,235,.1);color:var(--blue)}
+.tag-red{background:rgba(192,57,43,.1);color:var(--red)}
+.tag-gray{background:#eef0f5;color:var(--muted)}
+
+/* Forms */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-grid.full{grid-template-columns:1fr}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:.35rem}
+.field.span2{grid-column:1/-1}
+.field label{font-size:.78rem;font-weight:700;color:var(--navy)}
+.field input,.field textarea,.field select{padding:.65rem .9rem;border:1.5px solid var(--border);border-radius:9px;font-size:.9rem;outline:none;transition:border .2s;background:#fff;width:100%}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(45,74,122,.1)}
+.field textarea{resize:vertical;line-height:1.6}
+.field .hint{font-size:.73rem;color:var(--muted)}
+.field input[dir=ltr],.field input[type=url],.field input[type=email],.field input[type=tel]{direction:ltr}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,27,51,.55);z-index:400;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.3)}
+.modal-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.modal-title{font-size:1.05rem;font-weight:800;color:var(--navy)}
+.modal-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted);line-height:1;padding:.15rem .4rem;border-radius:6px}
+.modal-close:hover{background:var(--bg);color:var(--navy)}
+.modal-body{padding:1.5rem}
+.modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.6rem;justify-content:flex-start}
+
+/* Rich text toolbar */
+.rte-bar{display:flex;gap:.3rem;flex-wrap:wrap;padding:.5rem;background:var(--bg);border:1.5px solid var(--border);border-bottom:none;border-radius:9px 9px 0 0}
+.rte-bar button{padding:.3rem .55rem;background:#fff;border:1px solid var(--border);border-radius:5px;font-size:.8rem;cursor:pointer;font-weight:700;color:var(--navy)}
+.rte-bar button:hover{background:var(--navy);color:#fff}
+.rte-area{border:1.5px solid var(--border);border-radius:0 0 9px 9px;min-height:140px;padding:.75rem;outline:none;font-size:.9rem;line-height:1.7;direction:rtl;font-family:inherit}
+.rte-area:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(45,74,122,.1)}
+
+/* Media grid */
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.75rem}
+.media-thumb{border:2px solid var(--border);border-radius:10px;overflow:hidden;position:relative;aspect-ratio:1;cursor:pointer;background:var(--bg)}
+.media-thumb img,.media-thumb video{width:100%;height:100%;object-fit:cover}
+.media-thumb:hover .media-overlay{opacity:1}
+.media-overlay{position:absolute;inset:0;background:rgba(15,27,51,.6);display:flex;align-items:center;justify-content:center;gap:.5rem;opacity:0;transition:opacity .2s}
+.media-thumb .media-type{position:absolute;bottom:.35rem;right:.35rem;background:rgba(0,0,0,.6);color:#fff;font-size:.65rem;font-weight:700;padding:.15rem .4rem;border-radius:5px}
+
+/* Booking card */
+.booking-card{border:1.5px solid var(--border);border-radius:12px;padding:1.1rem 1.25rem;margin-bottom:.75rem;display:flex;align-items:flex-start;gap:1rem;background:#fff}
+.booking-card:hover{border-color:var(--navy2)}
+.booking-card .bc-info{flex:1}
+.booking-card .bc-name{font-size:.95rem;font-weight:800;color:var(--navy)}
+.booking-card .bc-meta{font-size:.78rem;color:var(--muted);margin-top:.25rem;display:flex;gap:.75rem;flex-wrap:wrap}
+.booking-card .bc-note{font-size:.82rem;color:var(--text);margin-top:.5rem;padding:.5rem .75rem;background:var(--bg);border-radius:7px}
+.booking-card .bc-actions{display:flex;gap:.4rem;align-items:flex-start;flex-shrink:0}
 
 /* Status bar */
-#status-bar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);
-  background:var(--navy-dark);color:#fff;padding:.7rem 1.4rem;border-radius:30px;
-  font-size:.88rem;font-weight:600;display:none;align-items:center;gap:.5rem;
-  box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:200}
-#status-bar.visible{display:flex}
-#status-bar.success{background:var(--green)}
-#status-bar.error{background:var(--red)}
+#toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--navy3);color:#fff;
+  padding:.75rem 1.6rem;border-radius:30px;font-size:.88rem;font-weight:700;display:none;align-items:center;gap:.5rem;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:500;white-space:nowrap}
+#toast.show{display:flex}
+#toast.ok{background:var(--green)}
+#toast.err{background:var(--red)}
 
 /* Spinner */
-.spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);
-  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.spin{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.preview-link{display:inline-flex;align-items:center;gap:.4rem;
-  font-size:.82rem;color:var(--gold);text-decoration:none}
-.preview-link:hover{text-decoration:underline}
+/* Empty state */
+.empty{text-align:center;padding:3.5rem 1rem;color:var(--muted)}
+.empty svg{opacity:.3;margin-bottom:.75rem}
+.empty p{font-size:.9rem}
+
+/* Setup screen */
+.setup-info{background:#fff8e6;border:1px solid #f0d080;border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.25rem;font-size:.85rem;color:#7a5500;line-height:1.6}
+.setup-info strong{display:block;margin-bottom:.25rem;font-size:.9rem}
+
+/* Section pages */
+.page{display:none}
+.page.active{display:block}
+
+/* Pagination */
+.pagination{display:flex;gap:.4rem;align-items:center;justify-content:center;margin-top:1.25rem}
+.pagination button{padding:.4rem .75rem;border:1.5px solid var(--border);border-radius:7px;background:#fff;font-size:.82rem;cursor:pointer;font-weight:600;color:var(--navy)}
+.pagination button:hover{background:var(--bg)}
+.pagination button.active-page{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pagination button:disabled{opacity:.4;cursor:not-allowed}
+
+/* Search bar */
+.search-row{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1.25rem}
+.search-input{flex:1;min-width:200px;padding:.6rem 1rem;border:1.5px solid var(--border);border-radius:9px;font-size:.88rem;outline:none;font-family:inherit}
+.search-input:focus{border-color:var(--navy2)}
+.filter-select{padding:.6rem .85rem;border:1.5px solid var(--border);border-radius:9px;font-size:.85rem;outline:none;font-family:inherit;background:#fff;cursor:pointer}
+
+/* User list */
+.user-row{display:flex;align-items:center;gap:1rem;padding:.85rem 1.1rem;border:1.5px solid var(--border);border-radius:11px;margin-bottom:.6rem;background:#fff}
+.user-row .ur-avatar{width:38px;height:38px;border-radius:50%;background:var(--navy2);color:var(--gold);font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.user-row .ur-info{flex:1}
+.user-row .ur-name{font-size:.9rem;font-weight:700;color:var(--navy)}
+.user-row .ur-meta{font-size:.75rem;color:var(--muted);margin-top:.15rem}
+
+/* Responsive */
+@media(max-width:768px){
+  .sidebar{width:0;overflow:hidden}
+  .sidebar.open{width:var(--sidebar)}
+  .main{margin-right:0}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .content{padding:1rem}
+}
 </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════
-     LOGIN
-════════════════════════════════ -->
+<!-- ══════════════════ LOGIN ══════════════════ -->
 <div id="login-screen">
-  <div class="login-card">
+  <div class="login-wrap">
     <div class="login-logo">
-      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="30" cy="30" r="30" fill="#1B2A4A"/>
+      <svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="30" fill="#1B2A4A"/>
         <path d="M30 48V28M30 28C30 20 22 14 14 18M30 28C30 20 38 14 46 18M30 28C30 22 26 18 22 20M30 28C30 22 34 18 38 20" stroke="#D4A853" stroke-width="2.2" stroke-linecap="round"/>
       </svg>
     </div>
-    <h1 class="login-title">ממשק ניהול — שורשים</h1>
+    <h1 class="login-title">ממשק ניהול</h1>
+    <p class="login-sub">שורשים — כניסת צוות</p>
+    <div id="login-err" class="login-err"></div>
 
-    <div id="login-error" class="login-error"></div>
-
-    <!-- ── First-time setup ── -->
-    <div id="setup-form" style="display:none">
-      <p class="login-sub">הגדרה ראשונה — שני שלבים בלבד</p>
-
-      <div class="setup-step">
-        <div class="setup-step-label">קבעו סיסמת כניסה לממשק</div>
-        <div class="field-group">
-          <input type="password" id="setup-pass" placeholder="סיסמה (לפחות 6 תווים)" autocomplete="new-password">
-        </div>
-        <div class="field-group" style="margin-bottom:0">
-          <input type="password" id="setup-pass2" placeholder="הזינו שוב לאישור" autocomplete="new-password">
-        </div>
+    <!-- First-time setup -->
+    <div id="setup-panel" style="display:none">
+      <div class="setup-info">
+        <strong>הגדרה ראשונה</strong>
+        צור חשבון מנהל ראשי. לאחר מכן תוכל להוסיף חברי צוות נוספים מתוך הממשק.
       </div>
-
+      <div class="lf-group"><label>שם משתמש</label><input id="su-user" placeholder="admin" autocomplete="username"></div>
+      <div class="lf-group"><label>שם מלא</label><input id="su-name" placeholder="שם מלא"></div>
+      <div class="lf-group"><label>סיסמה (6+ תווים)</label><input type="password" id="su-pass" autocomplete="new-password"></div>
+      <div class="lf-group"><label>אישור סיסמה</label><input type="password" id="su-pass2" autocomplete="new-password"></div>
+      <div class="lf-group">
+        <label>GitHub Token (לשמירת תוכן)</label>
+        <input id="su-pat" placeholder="ghp_xxxxxxxxxxxxxxxx" dir="ltr" autocomplete="off">
+        <small style="font-size:.72rem;color:var(--muted);margin-top:.3rem;display:block">נדרש לשמירת תוכן. צור ב-GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) → עם הרשאת <strong>repo</strong>.</small>
+      </div>
       <button class="login-btn" id="setup-btn" onclick="doSetup()">צור חשבון וכנס ←</button>
     </div>
 
-    <!-- ── Regular login ── -->
-    <div id="login-form" style="display:none">
-      <p class="login-sub">הזינו את סיסמת הניהול</p>
-      <div class="field-group">
-        <input type="password" id="login-pass" placeholder="סיסמה" autocomplete="current-password">
-      </div>
-      <button class="login-btn" id="login-btn" onclick="doLogin()">כניסה</button>
+    <!-- Regular login -->
+    <div id="login-panel" style="display:none">
+      <div class="lf-group"><label>שם משתמש</label><input id="l-user" autocomplete="username"></div>
+      <div class="lf-group"><label>סיסמה</label><input type="password" id="l-pass" autocomplete="current-password"></div>
+      <button class="login-btn" id="login-btn" onclick="doLogin()">כניסה →</button>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════════════════
-     ADMIN
-════════════════════════════════ -->
-<div id="admin-screen">
-  <header class="admin-header">
-    <div class="admin-header-title">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7v10l10 5 10-5V7L12 2Z" stroke="#D4A853" stroke-width="1.8"/><path d="M12 22V12M2 7l10 5 10-5" stroke="#D4A853" stroke-width="1.8"/></svg>
-      ממשק ניהול — שורשים
-    </div>
-    <div class="admin-actions">
-      <a href="https://nir5177.github.io/Sharon/" target="_blank" class="preview-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        צפייה באתר
-      </a>
-      <button class="btn-save" id="save-btn" onclick="saveChanges()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg>
-        שמירה ופרסום
-      </button>
-      <button class="btn-logout" onclick="doLogout()">יציאה</button>
-    </div>
-  </header>
+<!-- ══════════════════ APP ══════════════════ -->
+<div id="app">
 
-  <main class="admin-body">
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <svg width="28" height="28" viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="30" fill="#2D4A7A"/>
+        <path d="M30 46V28M30 28C30 21 22 15 14 19M30 28C30 21 38 15 46 19" stroke="#D4A853" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      <div><div class="sidebar-logo-text">שורשים</div><div class="sidebar-logo-sub">ממשק ניהול</div></div>
+    </div>
 
-    <!-- ── תוכן עמוד הבית ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        תוכן עמוד הבית
-      </div>
-      <div class="section-body">
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cnt-hero-title">כותרת ראשית</label>
-            <input type="text" id="cnt-hero-title" placeholder="העוצמה, הידע והכח">
-          </div>
-        </div>
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cnt-hero-accent">כותרת משנה / accent</label>
-            <input type="text" id="cnt-hero-accent" placeholder="להורים המתמודדים">
-          </div>
-        </div>
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cnt-hero-subtitle">תיאור קצר</label>
-            <textarea id="cnt-hero-subtitle" rows="3" placeholder="המקום בו תמצאו..."></textarea>
-          </div>
-        </div>
+    <div class="nav-section">
+      <div class="nav-label">ראשי</div>
+      <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.8"/></svg>
+        דשבורד
       </div>
     </div>
 
-    <!-- ── אודות ומשימה ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        אודות ומשימה
+    <div class="nav-section">
+      <div class="nav-label">תוכן</div>
+      <div class="nav-item" data-page="blog" onclick="navigate('blog',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        בלוג ומאמרים
       </div>
-      <div class="section-body">
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cnt-about-body">גוף הטקסט</label>
-            <textarea id="cnt-about-body" rows="4" placeholder="ארגון שורשים..."></textarea>
-          </div>
-        </div>
+      <div class="nav-item" data-page="events" onclick="navigate('events',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        אירועים
       </div>
-    </div>
-
-    <!-- ── עדויות הורים ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        עדויות הורים
-      </div>
-      <div class="section-body">
-        <div id="testimonials-editor"></div>
-        <button class="btn-add-testimonial" onclick="addTestimonialRow()">הוסף עדות +</button>
+      <div class="nav-item" data-page="media" onclick="navigate('media',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        מדיה
       </div>
     </div>
 
-    <!-- ── פרטי התקשרות ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2C7.16 21 3 16.84 3 6a2 2 0 012-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        פרטי התקשרות
+    <div class="nav-section">
+      <div class="nav-label">פעילות</div>
+      <div class="nav-item" data-page="bookings" onclick="navigate('bookings',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        פניות והרשמות
+        <span class="nav-badge" id="badge-bookings" style="display:none">0</span>
       </div>
-      <div class="section-body">
-        <div class="field-row">
-          <div class="admin-field">
-            <label for="cfg-phone-in">מספר טלפון (מוצג באתר)</label>
-            <input type="tel" id="cfg-phone-in" placeholder="055-0000000" dir="ltr">
-            <span class="hint">מוצג בכותרת תחתונה ובדף יצירת קשר</span>
-          </div>
-          <div class="admin-field">
-            <label for="cfg-wa-in">WhatsApp (ספרות + קידומת 972)</label>
-            <input type="text" id="cfg-wa-in" placeholder="972501234567" dir="ltr">
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="admin-field">
-            <label for="cfg-email-in">כתובת אימייל</label>
-            <input type="email" id="cfg-email-in" placeholder="contact@shoreshim.org.il" dir="ltr">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── נתוני פעילות ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        נתוני פעילות (המספרים הגדולים)
-      </div>
-      <div class="section-body">
-        <div class="stats-grid">
-          <div class="stat-field">
-            <label>הורים קיבלו ליווי</label>
-            <input type="number" id="cfg-families" min="0" placeholder="320">
-          </div>
-          <div class="stat-field">
-            <label>סדנאות התקיימו</label>
-            <input type="number" id="cfg-workshops" min="0" placeholder="48">
-          </div>
-          <div class="stat-field">
-            <label>מנחים מוסמכים</label>
-            <input type="number" id="cfg-facilitators" min="0" placeholder="12">
-          </div>
-          <div class="stat-field">
-            <label>ערים ויישובים</label>
-            <input type="number" id="cfg-cities" min="0" placeholder="8">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── טופס יצירת קשר ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z" stroke="currentColor" stroke-width="1.8"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="1.8"/></svg>
-        טופס יצירת קשר — קבלת פניות במייל
-      </div>
-      <div class="section-body">
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cfg-form-endpoint">Formspree Endpoint</label>
-            <input type="url" id="cfg-form-endpoint" placeholder="https://formspree.io/f/xxxxxxxx" dir="ltr">
-            <span class="hint">
-              כל פנייה שתגיע מהאתר תישלח למייל שלכם דרך Formspree.<br>
-              לחיבור: <strong>1.</strong> היכנסו ל-<a href="https://formspree.io" target="_blank" rel="noopener">formspree.io</a>
-              → New Form → הזינו את כתובת המייל שלכם →
-              העתיקו את ה-endpoint (נראה כך: https://formspree.io/f/xxxxxxxx) והדביקו כאן.
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── קישור תרומות ── -->
-    <div class="section-card">
-      <div class="section-header">
+      <div class="nav-item" data-page="donations" onclick="navigate('donations',this)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.403 4.068 2 6.5 2c1.626 0 3.376.557 5.5 2.811C14.124 2.557 15.874 2 17.5 2 19.932 2 23 3.403 23 7.191c0 4.105-5.369 8.863-11 14.402Z" stroke="currentColor" stroke-width="1.8"/></svg>
-        קישור עמוד תרומות
-      </div>
-      <div class="section-body">
-        <div class="field-row full">
-          <div class="admin-field">
-            <label for="cfg-matara-in">כתובת URL (Matara.pro / Nedarim Plus)</label>
-            <input type="url" id="cfg-matara-in" placeholder="https://matara.pro/nedarimpl/XXXXXX" dir="ltr">
-            <span class="hint">יעדכן אוטומטית את עמוד התרומות עם השמירה</span>
-          </div>
-        </div>
+        תרומות
       </div>
     </div>
 
-    <!-- ── הגדרות חשבון ── -->
-    <div class="section-card">
-      <div class="section-header">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        הגדרות חשבון
+    <div class="nav-section">
+      <div class="nav-label">הגדרות</div>
+      <div class="nav-item" data-page="settings" onclick="navigate('settings',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1Z" stroke="currentColor" stroke-width="1.8"/></svg>
+        הגדרות אתר
       </div>
-      <div class="section-body">
-
-        <!-- Change password -->
-        <div class="account-row">
-          <div class="account-row-label">שינוי סיסמה</div>
-          <div class="inline-form">
-            <input type="password" id="chg-old" placeholder="סיסמה נוכחית" autocomplete="current-password">
-            <input type="password" id="chg-new" placeholder="סיסמה חדשה" autocomplete="new-password">
-            <input type="password" id="chg-new2" placeholder="אימות סיסמה חדשה" autocomplete="new-password">
-            <button class="btn-action" onclick="changePassword()">שנה</button>
-          </div>
-          <p id="chg-msg" class="inline-msg"></p>
-        </div>
-
+      <div class="nav-item" data-page="team" onclick="navigate('team',this)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/><line x1="19" y1="8" x2="23" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="21" y1="6" x2="21" y2="10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        ניהול צוות
       </div>
     </div>
 
-  </main>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="user-avatar" id="av-char">?</div>
+        <div><div class="user-name" id="av-name">—</div><div class="user-role" id="av-role">—</div></div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">התנתק</button>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">דשבורד</div>
+      <div class="topbar-actions">
+        <a href="https://nir5177.github.io/Sharon/" target="_blank" class="btn btn-ghost btn-sm">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          צפייה באתר
+        </a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-grid" id="dash-stats"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+          <div class="card">
+            <div class="card-header"><div class="card-title">פניות אחרונות</div><span class="btn btn-ghost btn-sm" onclick="navigate('bookings',document.querySelector('[data-page=bookings]'))">הכל</span></div>
+            <div class="card-body" id="dash-recent-bookings"><div class="empty"><p>אין פניות חדשות</p></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">פוסטים אחרונים</div><span class="btn btn-ghost btn-sm" onclick="navigate('blog',document.querySelector('[data-page=blog]'))">הכל</span></div>
+            <div class="card-body" id="dash-recent-posts"><div class="empty"><p>אין פוסטים</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BLOG ── -->
+      <div class="page" id="page-blog">
+        <div class="search-row">
+          <input class="search-input" id="blog-search" placeholder="חיפוש מאמרים..." oninput="renderBlog()">
+          <select class="filter-select" id="blog-filter" onchange="renderBlog()">
+            <option value="">כל הסטטוסים</option>
+            <option value="published">פורסם</option>
+            <option value="draft">טיוטה</option>
+          </select>
+          <button class="btn btn-primary" onclick="openPostModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            מאמר חדש
+          </button>
+        </div>
+        <div class="card">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>כותרת</th><th>קטגוריה</th><th>תאריך</th><th>סטטוס</th><th>פעולות</th></tr></thead>
+              <tbody id="blog-tbody"></tbody>
+            </table>
+          </div>
+          <div id="blog-empty" class="empty" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6Z" stroke="currentColor" stroke-width="1.5"/></svg>
+            <p>אין מאמרים עדיין. לחץ "מאמר חדש" להתחלה.</p>
+          </div>
+        </div>
+        <div id="blog-pagination" class="pagination"></div>
+      </div>
+
+      <!-- ── EVENTS ── -->
+      <div class="page" id="page-events">
+        <div class="search-row">
+          <input class="search-input" id="events-search" placeholder="חיפוש אירועים..." oninput="renderEvents()">
+          <button class="btn btn-primary" onclick="openEventModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            אירוע חדש
+          </button>
+        </div>
+        <div class="card">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>שם האירוע</th><th>תאריך</th><th>מיקום</th><th>סטטוס</th><th>פעולות</th></tr></thead>
+              <tbody id="events-tbody"></tbody>
+            </table>
+          </div>
+          <div id="events-empty" class="empty" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <p>אין אירועים עדיין.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MEDIA ── -->
+      <div class="page" id="page-media">
+        <div class="search-row">
+          <input class="search-input" id="media-search" placeholder="חיפוש לפי שם..." oninput="renderMedia()">
+          <select class="filter-select" id="media-type-filter" onchange="renderMedia()">
+            <option value="">כל הסוגים</option>
+            <option value="image">תמונות</option>
+            <option value="video">סרטונים</option>
+          </select>
+          <button class="btn btn-primary" onclick="openMediaModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            הוסף מדיה
+          </button>
+        </div>
+        <div id="media-grid-wrap">
+          <div class="media-grid" id="media-grid"></div>
+          <div id="media-empty" class="empty" style="display:none">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M21 15l-5-5L5 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <p>אין פריטי מדיה עדיין.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BOOKINGS ── -->
+      <div class="page" id="page-bookings">
+        <div class="search-row">
+          <input class="search-input" id="bk-search" placeholder="חיפוש לפי שם או נושא..." oninput="renderBookings()">
+          <select class="filter-select" id="bk-filter" onchange="renderBookings()">
+            <option value="">כל הסטטוסים</option>
+            <option value="new">חדש</option>
+            <option value="handled">טופל</option>
+            <option value="archived">ארכיון</option>
+          </select>
+        </div>
+        <div id="bookings-list"></div>
+        <div id="bookings-empty" class="empty" style="display:none">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/></svg>
+          <p>אין פניות עדיין.</p>
+        </div>
+      </div>
+
+      <!-- ── DONATIONS ── -->
+      <div class="page" id="page-donations">
+        <div class="card">
+          <div class="card-header"><div class="card-title">הגדרות עמוד תרומות</div></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="field span2">
+                <label>כתובת URL לתרומה (Matara / Nedarim Plus)</label>
+                <input type="url" id="don-url" placeholder="https://matara.pro/nedarimpl/XXXXXX">
+                <span class="hint">הכתובת תוצג בכפתורי התרומה באתר</span>
+              </div>
+              <div class="field span2">
+                <label>כותרת עמוד התרומות</label>
+                <input type="text" id="don-title" placeholder="תמכו בשורשים">
+              </div>
+              <div class="field span2">
+                <label>תיאור עמוד התרומות</label>
+                <textarea id="don-desc" rows="3" placeholder="כל תרומה מסייעת לנו..."></textarea>
+              </div>
+            </div>
+            <div style="margin-top:1.25rem">
+              <button class="btn btn-primary" onclick="saveDonations()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/></svg>
+                שמור ופרסם
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
+      <div class="page" id="page-settings">
+        <div class="card">
+          <div class="card-header"><div class="card-title">תוכן עמוד הבית</div></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="field span2"><label>כותרת ראשית</label><input id="s-hero-title" placeholder="העוצמה, הידע והכח"></div>
+              <div class="field span2"><label>כותרת משנה</label><input id="s-hero-accent" placeholder="להורים המתמודדים"></div>
+              <div class="field span2"><label>תיאור קצר</label><textarea id="s-hero-sub" rows="3"></textarea></div>
+              <div class="field span2"><label>טקסט "אודות"</label><textarea id="s-about" rows="4"></textarea></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">פרטי התקשרות</div></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="field"><label>טלפון</label><input type="tel" id="s-phone" placeholder="055-0000000"></div>
+              <div class="field"><label>WhatsApp (ספרות בלבד)</label><input type="text" id="s-wa" placeholder="972501234567"></div>
+              <div class="field"><label>אימייל</label><input type="email" id="s-email"></div>
+              <div class="field"><label>Formspree Endpoint</label><input type="url" id="s-form-ep" placeholder="https://formspree.io/f/xxxxxxxx"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">נתוני פעילות</div></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="field"><label>הורים קיבלו ליווי</label><input type="number" id="s-fam" min="0"></div>
+              <div class="field"><label>סדנאות</label><input type="number" id="s-ws" min="0"></div>
+              <div class="field"><label>מנחים מוסמכים</label><input type="number" id="s-fac" min="0"></div>
+              <div class="field"><label>ערים ויישובים</label><input type="number" id="s-cit" min="0"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">עדויות הורים</div>
+            <button class="btn btn-primary btn-sm" onclick="addTestimonial()">הוסף עדות +</button>
+          </div>
+          <div class="card-body" id="testimonials-list"></div>
+        </div>
+        <button class="btn btn-gold" style="font-size:1rem;padding:.75rem 2rem" onclick="saveSettings()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/></svg>
+          שמור ופרסם הכל
+        </button>
+      </div>
+
+      <!-- ── TEAM ── -->
+      <div class="page" id="page-team">
+        <div class="card" style="margin-bottom:1.25rem">
+          <div class="card-header">
+            <div class="card-title">חברי הצוות</div>
+            <button class="btn btn-primary" onclick="openUserModal()">הוסף משתמש +</button>
+          </div>
+          <div class="card-body" id="team-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">שינוי סיסמה שלי</div></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="field"><label>סיסמה נוכחית</label><input type="password" id="cp-old"></div>
+              <div class="field"><label>סיסמה חדשה</label><input type="password" id="cp-new"></div>
+              <div class="field"><label>אימות</label><input type="password" id="cp-new2"></div>
+            </div>
+            <button class="btn btn-ghost" style="margin-top:1rem" onclick="changeMyPassword()">עדכן סיסמה</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ══════════════════ MODALS ══════════════════ -->
+
+<!-- Post modal -->
+<div class="modal-overlay" id="post-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="post-modal-title">מאמר חדש</div>
+      <button class="modal-close" onclick="closeModal('post-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid" style="margin-bottom:1rem">
+        <div class="field span2"><label>כותרת</label><input id="p-title" placeholder="כותרת המאמר"></div>
+        <div class="field"><label>קטגוריה</label>
+          <select id="p-cat">
+            <option value="כללי">כללי</option>
+            <option value="חינוך">חינוך</option>
+            <option value="הדרכה">הדרכה</option>
+            <option value="עדויות">עדויות</option>
+            <option value="אחר">אחר</option>
+          </select>
+        </div>
+        <div class="field"><label>סטטוס</label>
+          <select id="p-status">
+            <option value="published">פרסם</option>
+            <option value="draft">טיוטה</option>
+          </select>
+        </div>
+        <div class="field span2"><label>תמונה ראשית (URL)</label><input type="url" id="p-img" placeholder="https://..."></div>
+        <div class="field span2"><label>תקציר (2-3 משפטים)</label><textarea id="p-summary" rows="2"></textarea></div>
+        <div class="field span2">
+          <label>תוכן המאמר</label>
+          <div class="rte-bar">
+            <button onclick="fmt('bold')" title="מודגש"><b>B</b></button>
+            <button onclick="fmt('italic')" title="נטוי"><i>I</i></button>
+            <button onclick="fmt('underline')" title="קו תחתי"><u>U</u></button>
+            <button onclick="fmtBlock('h2')" title="כותרת">H2</button>
+            <button onclick="fmtBlock('h3')" title="כותרת קטנה">H3</button>
+            <button onclick="fmt('insertUnorderedList')" title="רשימה">• רשימה</button>
+          </div>
+          <div class="rte-area" id="p-body" contenteditable="true" dir="rtl"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="save-post-btn" onclick="savePost()">שמור מאמר</button>
+      <button class="btn btn-ghost" onclick="closeModal('post-modal')">ביטול</button>
+    </div>
+  </div>
 </div>
 
-<!-- Status bar -->
-<div id="status-bar"></div>
+<!-- Event modal -->
+<div class="modal-overlay" id="event-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="event-modal-title">אירוע חדש</div>
+      <button class="modal-close" onclick="closeModal('event-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field span2"><label>שם האירוע</label><input id="ev-title" placeholder="שם האירוע"></div>
+        <div class="field"><label>תאריך</label><input type="date" id="ev-date"></div>
+        <div class="field"><label>שעה</label><input type="time" id="ev-time"></div>
+        <div class="field span2"><label>מיקום</label><input id="ev-loc" placeholder="כתובת / קישור Zoom"></div>
+        <div class="field"><label>סוג אירוע</label>
+          <select id="ev-type">
+            <option value="סדנה">סדנה</option>
+            <option value="הרצאה">הרצאה</option>
+            <option value="מפגש">מפגש</option>
+            <option value="אחר">אחר</option>
+          </select>
+        </div>
+        <div class="field"><label>סטטוס</label>
+          <select id="ev-status">
+            <option value="active">פעיל</option>
+            <option value="cancelled">בוטל</option>
+            <option value="full">מלא</option>
+          </select>
+        </div>
+        <div class="field span2"><label>תיאור</label><textarea id="ev-desc" rows="3"></textarea></div>
+        <div class="field span2"><label>קישור הרשמה (אופציונלי)</label><input type="url" id="ev-reg"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="save-event-btn" onclick="saveEvent()">שמור אירוע</button>
+      <button class="btn btn-ghost" onclick="closeModal('event-modal')">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<!-- Media modal -->
+<div class="modal-overlay" id="media-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">הוסף פריט מדיה</div>
+      <button class="modal-close" onclick="closeModal('media-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field span2"><label>שם / תיאור</label><input id="m-name" placeholder="תיאור הפריט"></div>
+        <div class="field span2">
+          <label>סוג</label>
+          <select id="m-type" onchange="toggleMediaType()">
+            <option value="image">תמונה</option>
+            <option value="video">סרטון</option>
+          </select>
+        </div>
+        <div class="field span2" id="m-url-field"><label>URL (קישור לתמונה/סרטון)</label><input type="url" id="m-url" placeholder="https://..."></div>
+        <div class="field span2"><label>תגיות (מופרדות בפסיק)</label><input id="m-tags" placeholder="סדנה, 2024"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveMedia()">הוסף</button>
+      <button class="btn btn-ghost" onclick="closeModal('media-modal')">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<!-- User modal -->
+<div class="modal-overlay" id="user-modal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title">הוסף חבר צוות</div>
+      <button class="modal-close" onclick="closeModal('user-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field"><label>שם משתמש</label><input id="nu-user" placeholder="username" dir="ltr"></div>
+        <div class="field"><label>שם מלא</label><input id="nu-name" placeholder="שם מלא"></div>
+        <div class="field"><label>תפקיד</label>
+          <select id="nu-role">
+            <option value="editor">עורך</option>
+            <option value="admin">מנהל</option>
+          </select>
+        </div>
+        <div class="field"><label>סיסמה זמנית</label><input type="password" id="nu-pass" placeholder="לפחות 6 תווים"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveNewUser()">הוסף משתמש</button>
+      <button class="btn btn-ghost" onclick="closeModal('user-modal')">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
 
 <script>
-/* ══════════════════════════════════════
-   Config
-══════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════════════ */
 var REPO_OWNER  = 'nir5177';
 var REPO_NAME   = 'Sharon';
-var REPO_BRANCH = 'gh-pages';
+var REPO_BRANCH = 'main';
 
-/* ══════════════════════════════════════
-   Crypto helpers
-══════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════ */
+var STATE = {
+  user: null,
+  users: [],
+  posts: [],
+  events: [],
+  media: [],
+  bookings: [],
+  config: {},
+  content: {},
+  donations: {}
+};
+
+var EDIT_IDX = { post: -1, event: -1 };
+
+/* ══════════════════════════════════════════════════════
+   CRYPTO
+══════════════════════════════════════════════════════ */
 async function sha256(str) {
   var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
   return Array.from(new Uint8Array(buf), function(b){ return b.toString(16).padStart(2,'0'); }).join('');
 }
 
-/* ══════════════════════════════════════
-   Auth — Login
-══════════════════════════════════════ */
-async function doLogin() {
-  var pass  = document.getElementById('login-pass').value;
-  var btn   = document.getElementById('login-btn');
-  var errEl = document.getElementById('login-error');
-  if (!pass) { showLoginError('יש להזין סיסמה'); return; }
+/* ══════════════════════════════════════════════════════
+   GITHUB API
+══════════════════════════════════════════════════════ */
+function pat() { return localStorage.getItem('shr_pat') || ''; }
 
-  btn.textContent = 'מתחבר...'; btn.disabled = true;
-  errEl.style.display = 'none';
-
-  var hash   = await sha256(pass);
-  var stored = localStorage.getItem('shoreshim_pass_hash');
-  if (hash !== stored) {
-    showLoginError('סיסמה שגויה');
-    btn.textContent = 'כניסה'; btn.disabled = false; return;
-  }
-
-  sessionStorage.setItem('shoreshim_authed', '1');
-  showAdmin();
+async function ghGet(path) {
+  var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path+'?ref='+REPO_BRANCH+'&_='+Date.now(), {
+    headers: { 'Authorization': 'token '+pat(), 'Accept': 'application/vnd.github.v3+json' }
+  });
+  if (r.status === 404) return null;
+  if (!r.ok) { var e = await r.json(); throw new Error(e.message || r.status); }
+  return r.json();
 }
 
-/* ── First-time setup ── */
+async function ghPut(path, content, msg) {
+  var existing = await ghGet(path);
+  var body = {
+    message: msg || 'Update '+path+' via admin',
+    content: btoa(unescape(encodeURIComponent(content))),
+    branch: REPO_BRANCH
+  };
+  if (existing) body.sha = existing.sha;
+  var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path, {
+    method: 'PUT',
+    headers: { 'Authorization': 'token '+pat(), 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) { var e = await r.json(); throw new Error(e.message || r.status); }
+  return r.json();
+}
+
+async function ghGetJSON(path, fallback) {
+  try {
+    var f = await ghGet(path);
+    if (!f) return fallback;
+    return JSON.parse(decodeURIComponent(escape(atob(f.content.replace(/\n/g,'')))));
+  } catch(e) { return fallback; }
+}
+
+/* ══════════════════════════════════════════════════════
+   AUTH — SETUP
+══════════════════════════════════════════════════════ */
 async function doSetup() {
-  var pass  = document.getElementById('setup-pass').value;
-  var pass2 = document.getElementById('setup-pass2').value;
-  var btn   = document.getElementById('setup-btn');
+  var username = v('su-user').trim();
+  var name     = v('su-name').trim();
+  var pass     = v('su-pass');
+  var pass2    = v('su-pass2');
+  var token    = v('su-pat').trim();
 
-  if (!pass || !pass2)  { showLoginError('יש למלא את כל השדות'); return; }
-  if (pass !== pass2)   { showLoginError('הסיסמאות אינן תואמות'); return; }
-  if (pass.length < 6)  { showLoginError('הסיסמה חייבת להכיל לפחות 6 תווים'); return; }
+  if (!username || !name || !pass || !token) return loginErr('יש למלא את כל השדות');
+  if (pass !== pass2)  return loginErr('הסיסמאות אינן תואמות');
+  if (pass.length < 6) return loginErr('הסיסמה חייבת להכיל לפחות 6 תווים');
 
-  btn.textContent = 'שומר...'; btn.disabled = true;
-  document.getElementById('login-error').style.display = 'none';
-
+  setBtnLoading('setup-btn', true, 'יוצר חשבון...');
   var hash = await sha256(pass);
-  localStorage.setItem('shoreshim_pass_hash', hash);
-  sessionStorage.setItem('shoreshim_authed', '1');
-  showAdmin();
+  localStorage.setItem('shr_pat', token);
+
+  var users = [{ username: username, name: name, role: 'admin', hash: hash }];
+  try {
+    await ghPut('admin/users.json', JSON.stringify(users, null, 2), 'Init admin users');
+    STATE.user  = users[0];
+    STATE.users = users;
+    localStorage.setItem('shr_session', JSON.stringify({ username: username, name: name, role: 'admin' }));
+    startApp();
+  } catch(e) {
+    loginErr('שגיאה: ' + e.message);
+    setBtnLoading('setup-btn', false, 'צור חשבון וכנס ←');
+  }
 }
 
-function showLoginError(msg) {
-  var el = document.getElementById('login-error');
-  el.textContent = msg; el.style.display = 'block';
+/* ══════════════════════════════════════════════════════
+   AUTH — LOGIN
+══════════════════════════════════════════════════════ */
+async function doLogin() {
+  var username = v('l-user').trim();
+  var pass     = v('l-pass');
+  if (!username || !pass) return loginErr('יש למלא שם משתמש וסיסמה');
+
+  setBtnLoading('login-btn', true, 'מתחבר...');
+  var hash = await sha256(pass);
+
+  try {
+    var users = await ghGetJSON('admin/users.json', null);
+    if (!users) { loginErr('לא נמצאו משתמשים'); setBtnLoading('login-btn', false, 'כניסה →'); return; }
+
+    var user = users.find(function(u){ return u.username === username && u.hash === hash; });
+    if (!user) { loginErr('שם משתמש או סיסמה שגויים'); setBtnLoading('login-btn', false, 'כניסה →'); return; }
+
+    STATE.user  = user;
+    STATE.users = users;
+    localStorage.setItem('shr_session', JSON.stringify({ username: user.username, name: user.name, role: user.role }));
+    startApp();
+  } catch(e) {
+    loginErr('שגיאת התחברות: ' + e.message);
+    setBtnLoading('login-btn', false, 'כניסה →');
+  }
 }
 
 function doLogout() {
-  sessionStorage.removeItem('shoreshim_authed');
-  document.getElementById('admin-screen').style.display = 'none';
+  localStorage.removeItem('shr_session');
+  STATE.user = null;
+  document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
 }
 
-/* ══════════════════════════════════════
-   Account settings
-══════════════════════════════════════ */
-async function changePassword() {
-  var oldPass = document.getElementById('chg-old').value;
-  var newPass = document.getElementById('chg-new').value;
-  var newPass2= document.getElementById('chg-new2').value;
-  var msg     = document.getElementById('chg-msg');
-
-  if (!oldPass || !newPass || !newPass2) { return showInlineMsg(msg, 'יש למלא את כל השדות', false); }
-  if (newPass !== newPass2)              { return showInlineMsg(msg, 'הסיסמאות החדשות אינן תואמות', false); }
-  if (newPass.length < 6)               { return showInlineMsg(msg, 'הסיסמה חייבת להכיל לפחות 6 תווים', false); }
-
-  var oldHash = await sha256(oldPass);
-  if (oldHash !== localStorage.getItem('shoreshim_pass_hash')) {
-    return showInlineMsg(msg, 'הסיסמה הנוכחית שגויה', false);
-  }
-  var newHash = await sha256(newPass);
-  localStorage.setItem('shoreshim_pass_hash', newHash);
-  ['chg-old','chg-new','chg-new2'].forEach(function(id){ document.getElementById(id).value=''; });
-  showInlineMsg(msg, 'הסיסמה שונתה בהצלחה ✓', true);
+function loginErr(msg) {
+  var el = document.getElementById('login-err');
+  el.textContent = msg; el.style.display = 'block';
 }
 
-function showInlineMsg(el, msg, ok) {
-  el.textContent = msg;
-  el.className   = 'inline-msg ' + (ok ? 'ok' : 'err');
-  el.style.display = 'block';
-  setTimeout(function(){ el.style.display='none'; }, 4000);
-}
-
-/* ══════════════════════════════════════
-   Show admin + load config
-══════════════════════════════════════ */
-async function showAdmin() {
+/* ══════════════════════════════════════════════════════
+   APP START
+══════════════════════════════════════════════════════ */
+async function startApp() {
   document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('admin-screen').style.display = 'block';
-  await loadConfig();
+  document.getElementById('app').style.display = 'block';
+
+  var u = STATE.user;
+  document.getElementById('av-char').textContent = (u.name || u.username).charAt(0).toUpperCase();
+  document.getElementById('av-name').textContent = u.name || u.username;
+  document.getElementById('av-role').textContent = u.role === 'admin' ? 'מנהל' : 'עורך';
+
+  await loadAllData();
+  renderDashboard();
 }
 
-async function loadConfig() {
-  var base = 'https://raw.githubusercontent.com/'+REPO_OWNER+'/'+REPO_NAME+'/'+REPO_BRANCH+'/';
-  try {
-    var r = await fetch(base + 'config.json?_=' + Date.now());
-    if (r.ok) { populateForm(await r.json()); }
-  } catch(e) { /* ignore */ }
-  try {
-    var rc = await fetch(base + 'content.json?_=' + Date.now());
-    if (rc.ok) { populateContentForm(await rc.json()); }
-  } catch(e) { /* ignore */ }
+async function loadAllData() {
+  var results = await Promise.allSettled([
+    ghGetJSON('admin/posts.json',    []),
+    ghGetJSON('admin/events.json',   []),
+    ghGetJSON('admin/media.json',    []),
+    ghGetJSON('admin/bookings.json', []),
+    ghGetJSON('config.json',         {}),
+    ghGetJSON('content.json',        {}),
+    ghGetJSON('admin/donations.json',{}),
+    ghGetJSON('admin/users.json',    [])
+  ]);
+  STATE.posts     = results[0].value || [];
+  STATE.events    = results[1].value || [];
+  STATE.media     = results[2].value || [];
+  STATE.bookings  = results[3].value || [];
+  STATE.config    = results[4].value || {};
+  STATE.content   = results[5].value || {};
+  STATE.donations = results[6].value || {};
+  STATE.users     = results[7].value || STATE.users;
+
+  populateSettingsForm();
+  populateDonationsForm();
+  updateBadge();
 }
 
-function populateForm(cfg) {
-  set('cfg-phone-in',       cfg.phone         || '');
-  set('cfg-wa-in',          cfg.whatsapp      || '');
-  set('cfg-email-in',       cfg.email         || '');
-  set('cfg-form-endpoint',  cfg.formEndpoint  || '');
-  set('cfg-families',       cfg.stats ? cfg.stats.families     : '');
-  set('cfg-workshops',      cfg.stats ? cfg.stats.workshops    : '');
-  set('cfg-facilitators',   cfg.stats ? cfg.stats.facilitators : '');
-  set('cfg-cities',         cfg.stats ? cfg.stats.cities       : '');
-  set('cfg-matara-in',      cfg.mataraUrl || '');
+/* ══════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════ */
+var PAGE_TITLES = {
+  dashboard:'דשבורד', blog:'בלוג ומאמרים', events:'אירועים',
+  media:'ספריית מדיה', bookings:'פניות והרשמות', donations:'תרומות',
+  settings:'הגדרות אתר', team:'ניהול צוות'
+};
+
+function navigate(page, el) {
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('page-title').textContent = PAGE_TITLES[page] || page;
+
+  if (page === 'blog')     renderBlog();
+  if (page === 'events')   renderEvents();
+  if (page === 'media')    renderMedia();
+  if (page === 'bookings') renderBookings();
+  if (page === 'team')     renderTeam();
+  if (page === 'settings') renderTestimonials();
 }
 
-function populateContentForm(cnt) {
-  set('cnt-hero-title',    cnt['hero.title']    || '');
-  set('cnt-hero-accent',   cnt['hero.accent']   || '');
-  set('cnt-hero-subtitle', cnt['hero.subtitle'] || '');
-  set('cnt-about-body',    cnt['about.body']    || '');
-  renderTestimonialsList(cnt.testimonials || []);
-}
-
-/* ══════════════════════════════════════
-   Testimonials editor
-══════════════════════════════════════ */
-var _testimonialIdx = 0;
-
-function renderTestimonialsList(arr) {
-  var container = document.getElementById('testimonials-editor');
-  container.innerHTML = ''; _testimonialIdx = 0;
-  arr.forEach(function(t){ addTestimonialRow(t); });
-}
-
-function addTestimonialRow(data) {
-  try {
-    var container = document.getElementById('testimonials-editor');
-    if (!container) { alert('שגיאה: לא נמצא אזור העדויות'); return; }
-    if (container.querySelectorAll('.testimonial-editor-row').length >= 8) {
-      showStatus('מקסימום 8 עדויות', 'error'); return;
-    }
-    var i = _testimonialIdx++;
-    var d = (data && typeof data === 'object') ? data : {};
-    var row = document.createElement('div');
-    row.className = 'testimonial-editor-row';
-    row.dataset.idx = i;
-    row.innerHTML =
-      '<div class="t-num">עדות 1</div>'+
-      '<button class="btn-remove" onclick="removeTestimonialRow(this)">הסר</button>'+
-      '<div class="t-grid">'+
-        '<div class="admin-field t-full"><label>ציטוט קצר</label>'+
-          '<input type="text" id="cnt-quote-'+i+'" value="'+esc(d.quote||'')+'" placeholder="ציטוט קצר..."></div>'+
-        '<div class="admin-field t-full"><label>תוכן מלא</label>'+
-          '<textarea id="cnt-body-'+i+'" rows="2" placeholder="תוכן מלא...">'+esc(d.body||'')+'</textarea></div>'+
-        '<div class="admin-field"><label>שם</label>'+
-          '<input type="text" id="cnt-author-'+i+'" value="'+esc(d.author||'')+'" placeholder="שם"></div>'+
-        '<div class="admin-field"><label>תפקיד</label>'+
-          '<input type="text" id="cnt-role-'+i+'" value="'+esc(d.role||'')+'" placeholder="הורה מתמודד"></div>'+
+/* ══════════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════════ */
+function renderDashboard() {
+  var newBk = STATE.bookings.filter(function(b){ return b.status === 'new'; }).length;
+  var stats = [
+    { label:'מאמרים פורסמו',  val: STATE.posts.filter(function(p){ return p.status==='published'; }).length, icon:'navy', svg:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'},
+    { label:'אירועים קרובים', val: STATE.events.filter(function(e){ return e.status==='active'; }).length,    icon:'gold', svg:'<rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'},
+    { label:'פניות חדשות',    val: newBk,  icon: newBk>0?'red':'green', svg:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/>'},
+    { label:'פריטי מדיה',    val: STATE.media.length, icon:'navy', svg:'<rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.8"/>'}
+  ];
+  document.getElementById('dash-stats').innerHTML = stats.map(function(s){
+    return '<div class="stat-card">'+
+      '<div class="stat-card-icon '+s.icon+'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none">'+s.svg+'</svg></div>'+
+      '<div class="stat-card-val">'+s.val+'</div>'+
+      '<div class="stat-card-label">'+s.label+'</div>'+
       '</div>';
-    container.appendChild(row);
-    renumberTestimonials();
-    row.scrollIntoView({behavior:'smooth', block:'nearest'});
-  } catch(err) {
-    alert('שגיאה בהוספת עדות: ' + err.message);
-  }
+  }).join('');
+
+  var bkEl = document.getElementById('dash-recent-bookings');
+  var recentBk = STATE.bookings.slice(0,4);
+  bkEl.innerHTML = recentBk.length ? recentBk.map(function(b){
+    return '<div style="padding:.5rem 0;border-bottom:1px solid #f0f2f7;last-child:border-none">'+
+      '<div style="font-weight:700;font-size:.88rem;color:var(--navy)">'+esc(b.name)+'</div>'+
+      '<div style="font-size:.75rem;color:var(--muted)">'+esc(b.subject||'')+'</div></div>';
+  }).join('') : '<div class="empty"><p>אין פניות</p></div>';
+
+  var psEl = document.getElementById('dash-recent-posts');
+  var recentPs = STATE.posts.slice(0,4);
+  psEl.innerHTML = recentPs.length ? recentPs.map(function(p){
+    return '<div style="padding:.5rem 0;border-bottom:1px solid #f0f2f7">'+
+      '<div style="font-weight:700;font-size:.88rem;color:var(--navy)">'+esc(p.title)+'</div>'+
+      '<div style="font-size:.75rem;color:var(--muted)">'+esc(p.category||'')+'</div></div>';
+  }).join('') : '<div class="empty"><p>אין פוסטים</p></div>';
 }
 
-function removeTestimonialRow(btn) {
-  btn.closest('.testimonial-editor-row').remove();
-  renumberTestimonials();
+function updateBadge() {
+  var n = STATE.bookings.filter(function(b){ return b.status==='new'; }).length;
+  var el = document.getElementById('badge-bookings');
+  if (n > 0) { el.textContent = n; el.style.display = 'inline-block'; } else { el.style.display = 'none'; }
 }
 
-function renumberTestimonials() {
-  document.querySelectorAll('.testimonial-editor-row').forEach(function(row, idx) {
-    var num = row.querySelector('.t-num');
-    if (num) num.textContent = 'עדות ' + (idx + 1);
+/* ══════════════════════════════════════════════════════
+   BLOG
+══════════════════════════════════════════════════════ */
+function renderBlog() {
+  var q  = v('blog-search').toLowerCase();
+  var sf = v('blog-filter');
+  var items = STATE.posts.filter(function(p){
+    return (!q || p.title.toLowerCase().includes(q)) && (!sf || p.status === sf);
   });
+  var tbody = document.getElementById('blog-tbody');
+  document.getElementById('blog-empty').style.display = items.length ? 'none' : 'block';
+  tbody.innerHTML = items.map(function(p, i){
+    var realIdx = STATE.posts.indexOf(p);
+    var statusTag = p.status === 'published'
+      ? '<span class="tag tag-green">פורסם</span>'
+      : '<span class="tag tag-gray">טיוטה</span>';
+    return '<tr>'+
+      '<td><strong>'+esc(p.title)+'</strong></td>'+
+      '<td><span class="tag tag-blue">'+esc(p.category||'כללי')+'</span></td>'+
+      '<td style="color:var(--muted);font-size:.8rem">'+fmtDate(p.date)+'</td>'+
+      '<td>'+statusTag+'</td>'+
+      '<td><div style="display:flex;gap:.4rem">'+
+        '<button class="btn btn-ghost btn-sm" onclick="editPost('+realIdx+')">עריכה</button>'+
+        '<button class="btn btn-danger btn-sm" onclick="deletePost('+realIdx+')">מחק</button>'+
+      '</div></td>'+
+    '</tr>';
+  }).join('');
 }
 
-/* ══════════════════════════════════════
-   Form helpers
-══════════════════════════════════════ */
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function openPostModal(idx) {
+  EDIT_IDX.post = (typeof idx === 'number') ? idx : -1;
+  var p = idx >= 0 ? STATE.posts[idx] : {};
+  document.getElementById('post-modal-title').textContent = idx >= 0 ? 'עריכת מאמר' : 'מאמר חדש';
+  sv('p-title',   p.title    || '');
+  sv('p-cat',     p.category || 'כללי');
+  sv('p-status',  p.status   || 'published');
+  sv('p-img',     p.image    || '');
+  sv('p-summary', p.summary  || '');
+  document.getElementById('p-body').innerHTML = p.body || '';
+  openModal('post-modal');
 }
-function set(id, val) { var el=document.getElementById(id); if(el) el.value=val; }
-function get(id)      { var el=document.getElementById(id); return el ? el.value.trim() : ''; }
 
-function getContentFromForm() {
-  var testimonials = [];
-  document.querySelectorAll('.testimonial-editor-row').forEach(function(row) {
-    var i = row.dataset.idx;
-    var q=get('cnt-quote-'+i), b=get('cnt-body-'+i), a=get('cnt-author-'+i), r=get('cnt-role-'+i);
-    if (q || b || a) testimonials.push({quote:q,body:b,author:a,role:r});
-  });
-  return {
-    'hero.title':    get('cnt-hero-title'),
-    'hero.accent':   get('cnt-hero-accent'),
-    'hero.subtitle': get('cnt-hero-subtitle'),
-    'about.body':    get('cnt-about-body'),
-    'testimonials':  testimonials
+function editPost(idx) { openPostModal(idx); }
+
+async function savePost() {
+  var title = v('p-title').trim();
+  if (!title) return toast('יש להזין כותרת', 'err');
+  setBtnLoading('save-post-btn', true, 'שומר...');
+  var post = {
+    id:       EDIT_IDX.post >= 0 ? STATE.posts[EDIT_IDX.post].id : Date.now(),
+    title:    title,
+    category: v('p-cat'),
+    status:   v('p-status'),
+    image:    v('p-img').trim(),
+    summary:  v('p-summary').trim(),
+    body:     document.getElementById('p-body').innerHTML,
+    date:     EDIT_IDX.post >= 0 ? STATE.posts[EDIT_IDX.post].date : new Date().toISOString().split('T')[0],
+    updated:  new Date().toISOString().split('T')[0],
+    author:   STATE.user.name
   };
+  if (EDIT_IDX.post >= 0) { STATE.posts[EDIT_IDX.post] = post; }
+  else { STATE.posts.unshift(post); }
+  try {
+    await ghPut('admin/posts.json', JSON.stringify(STATE.posts, null, 2), (EDIT_IDX.post >= 0 ? 'Edit' : 'Add') + ' post: ' + title);
+    closeModal('post-modal'); renderBlog(); renderDashboard();
+    toast('המאמר נשמר בהצלחה ✓', 'ok');
+  } catch(e) { toast('שגיאה: '+e.message, 'err'); }
+  setBtnLoading('save-post-btn', false, 'שמור מאמר');
 }
 
-/* ══════════════════════════════════════
-   Save
-══════════════════════════════════════ */
-async function saveChanges() {
-  var pat = localStorage.getItem('shoreshim_pat');
-  if (!pat) { showStatus('אין Token — פנה למנהל המערכת לחיבור', 'error'); return; }
-  var btn = document.getElementById('save-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner"></div> שומר...';
+async function deletePost(idx) {
+  if (!confirm('למחוק את המאמר "'+STATE.posts[idx].title+'"?')) return;
+  STATE.posts.splice(idx, 1);
+  try {
+    await ghPut('admin/posts.json', JSON.stringify(STATE.posts, null, 2), 'Delete post');
+    renderBlog(); renderDashboard(); toast('המאמר נמחק', 'ok');
+  } catch(e) { toast('שגיאה: '+e.message, 'err'); }
+}
 
-  var cfg = {
-    phone:        get('cfg-phone-in'),
-    whatsapp:     get('cfg-wa-in').replace(/\D/g,''),
-    email:        get('cfg-email-in'),
-    formEndpoint: get('cfg-form-endpoint'),
+/* ══════════════════════════════════════════════════════
+   EVENTS
+══════════════════════════════════════════════════════ */
+function renderEvents() {
+  var q = v('events-search').toLowerCase();
+  var items = STATE.events.filter(function(e){ return !q || e.title.toLowerCase().includes(q); });
+  document.getElementById('events-empty').style.display = items.length ? 'none' : 'block';
+  document.getElementById('events-tbody').innerHTML = items.map(function(e){
+    var realIdx = STATE.events.indexOf(e);
+    var tags = { active:'<span class="tag tag-green">פעיל</span>', cancelled:'<span class="tag tag-red">בוטל</span>', full:'<span class="tag tag-gold">מלא</span>' };
+    return '<tr>'+
+      '<td><strong>'+esc(e.title)+'</strong></td>'+
+      '<td style="color:var(--muted);font-size:.82rem">'+fmtDate(e.date)+(e.time?' '+e.time:'')+'</td>'+
+      '<td>'+esc(e.location||'—')+'</td>'+
+      '<td>'+(tags[e.status]||'')+'</td>'+
+      '<td><div style="display:flex;gap:.4rem">'+
+        '<button class="btn btn-ghost btn-sm" onclick="editEvent('+realIdx+')">עריכה</button>'+
+        '<button class="btn btn-danger btn-sm" onclick="deleteEvent('+realIdx+')">מחק</button>'+
+      '</div></td>'+
+    '</tr>';
+  }).join('');
+}
+
+function openEventModal(idx) {
+  EDIT_IDX.event = (typeof idx === 'number') ? idx : -1;
+  var e = idx >= 0 ? STATE.events[idx] : {};
+  document.getElementById('event-modal-title').textContent = idx >= 0 ? 'עריכת אירוע' : 'אירוע חדש';
+  sv('ev-title',  e.title    || '');
+  sv('ev-date',   e.date     || '');
+  sv('ev-time',   e.time     || '');
+  sv('ev-loc',    e.location || '');
+  sv('ev-type',   e.type     || 'סדנה');
+  sv('ev-status', e.status   || 'active');
+  sv('ev-desc',   e.desc     || '');
+  sv('ev-reg',    e.regUrl   || '');
+  openModal('event-modal');
+}
+
+function editEvent(idx) { openEventModal(idx); }
+
+async function saveEvent() {
+  var title = v('ev-title').trim();
+  if (!title) return toast('יש להזין שם אירוע', 'err');
+  setBtnLoading('save-event-btn', true, 'שומר...');
+  var ev = {
+    id:       EDIT_IDX.event >= 0 ? STATE.events[EDIT_IDX.event].id : Date.now(),
+    title:    title,
+    date:     v('ev-date'),
+    time:     v('ev-time'),
+    location: v('ev-loc').trim(),
+    type:     v('ev-type'),
+    status:   v('ev-status'),
+    desc:     v('ev-desc').trim(),
+    regUrl:   v('ev-reg').trim()
+  };
+  if (EDIT_IDX.event >= 0) { STATE.events[EDIT_IDX.event] = ev; }
+  else { STATE.events.unshift(ev); }
+  try {
+    await ghPut('admin/events.json', JSON.stringify(STATE.events, null, 2), (EDIT_IDX.event >= 0 ? 'Edit' : 'Add') + ' event: '+title);
+    closeModal('event-modal'); renderEvents(); renderDashboard();
+    toast('האירוע נשמר ✓', 'ok');
+  } catch(e) { toast('שגיאה: '+e.message, 'err'); }
+  setBtnLoading('save-event-btn', false, 'שמור אירוע');
+}
+
+async function deleteEvent(idx) {
+  if (!confirm('למחוק את האירוע "'+STATE.events[idx].title+'"?')) return;
+  STATE.events.splice(idx, 1);
+  try {
+    await ghPut('admin/events.json', JSON.stringify(STATE.events, null, 2), 'Delete event');
+    renderEvents(); renderDashboard(); toast('האירוע נמחק', 'ok');
+  } catch(e) { toast('שגיאה: '+e.message, 'err'); }
+}
+
+/* ══════════════════════════════════════════════════════
+   MEDIA
+══════════════════════════════════════════════════════ */
+function renderMedia() {
+  var q  = v('media-search').toLowerCase();
+  var tf = v('media-type-filter');
+  var items = STATE.media.filter(function(m){
+    return (!q || (m.name||'').toLowerCase().includes(q)) && (!tf || m.type === tf);
+  });
+  var grid = document.getElementById('media-grid');
+  document.getElementById('media-empty').style.display = items.length ? 'none' : 'block';
+  grid.innerHTML = items.map(function(m, i){
+    var realIdx = STATE.media.indexOf(m);
+    var thumb = m.type === 'image'
+      ? '<img src="'+esc(m.url)+'" alt="'+esc(m.name)+'" onerror="this.style.display=\'none\'">'
+      : '<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#1a2040"><svg width="36" height="36" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#D4A853"/></svg></div>';
+    return '<div class="media-thumb">'+thumb+
+      '<div class="media-type">'+m.type+'</div>'+
+      '<div class="media-overlay">'+
+        '<button class="btn btn-danger btn-sm" onclick="deleteMedia('+realIdx+')">מחק</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function openMediaModal() {
+  sv('m-name',''); sv('m-url',''); sv('m-tags',''); sv('m-type','image');
+  openModal('media-modal');
+}
+
+async function saveMedia() {
+  var url = v('m-url').trim();
+  if (!url) return toast('יש להזין URL', 'err');
+  var item = {
+    id:   Date.now(),
+    name: v('m-name').trim() || url.split('/').pop(),
+    type: v('m-type'),
+    url:  url,
+    tags: v('m-tags').split(',').map(function(t){ return t.trim(); }).filter(Boolean),
+    date: new Date().toISOString().split('T')[0]
+  };
+  STATE.media.unshift(item);
+  try {
+    await ghPut('admin/media.json', JSON.stringify(STATE.media, null, 2), 'Add media: '+item.name);
+    closeModal('media-modal'); renderMedia(); toast('הפריט נוסף ✓', 'ok');
+  } catch(e) { toast('שגיאה: '+e.message, 'err'); }
+}
+
+async function deleteMedia(idx) {
+  if (!confirm('למחוק פריט מדיה זה?')) return;
+  STATE.media.splice(idx, 1);
+  try {
+    await ghPut('admin/media.json', JSON.stringify(STATE.media, null, 2), 'Delete media');
+    renderMedia(); toast('נמחק ✓', 'ok');
+  } catch(e) { toast('שגיאה: '+e.message, 'err'); }
+}
+
+function toggleMediaType() {
+  var t = v('m-type');
+  document.getElementById('m-url-field').querySelector('label').textContent = t === 'image' ? 'URL (קישור לתמונה)' : 'URL (קישור לסרטון / YouTube)';
+}
+
+/* ══════════════════════════════════════════════════════
+   BOOKINGS
+══════════════════════════════════════════════════════ */
+function renderBookings() {
+  var q  = v('bk-search').toLowerCase();
+  var sf = v('bk-filter');
+  var items = STATE.bookings.filter(function(b){
+    return (!q || b.name.toLowerCase().includes(q) || (b.subject||'').toLowerCase().includes(q)) &&
+           (!sf || b.status === sf);
+  });
+  var el = document.getElementById('bookings-list');
+  document.getElementById('bookings-empty').style.display = items.length ? 'none' : 'block';
+  var statusLabels = { new:'חדש', handled:'טופל', archived:'ארכיון' };
+  var statusClass  = { new:'tag-red', handled:'tag-green', archived:'tag-gray' };
+  el.innerHTML = items.map(function(b){
+    var realIdx = STATE.bookings.indexOf(b);
+    return '<div class="booking-card">'+
+      '<div class="bc-info">'+
+        '<div class="bc-name">'+esc(b.name)+'</div>'+
+        '<div class="bc-meta">'+
+          '<span>'+esc(b.phone||'')+'</span>'+
+          '<span>'+esc(b.email||'')+'</span>'+
+          '<span>'+fmtDate(b.date)+'</span>'+
+          '<span class="tag '+statusClass[b.status||'new']+'">'+statusLabels[b.status||'new']+'</span>'+
+        '</div>'+
+        (b.subject ? '<div class="bc-note">נושא: '+esc(b.subject)+'</div>' : '')+
+        (b.message ? '<div class="bc-note">'+esc(b.message)+'</div>' : '')+
+      '</div>'+
+      '<div class="bc-actions">'+
+        (b.status !== 'handled' ? '<button class="btn btn-success btn-sm" onclick="setBookingStatus('+realIdx+',\'handled\')">✓ טופל</button>' : '')+
+        (b.status !== 'archived' ? '<button class="btn btn-ghost btn-sm" onclick="setBookingStatus('+realIdx+',\'archived\')">ארכיון</button>' : '')+
+        '<button class="btn btn-danger btn-sm" onclick="deleteBooking('+realIdx+')">מחק</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+async function setBookingStatus(idx, status) {
+  STATE.bookings[idx].status = status;
+  try {
+    await ghPut('admin/bookings.json', JSON.stringify(STATE.bookings, null, 2), 'Update booking status');
+    renderBookings(); renderDashboard(); updateBadge(); toast('עודכן ✓', 'ok');
+  } catch(e) { toast('שגיאה: '+e.message, 'err'); }
+}
+
+async function deleteBooking(idx) {
+  if (!confirm('למחוק פנייה זו?')) return;
+  STATE.bookings.splice(idx, 1);
+  try {
+    await ghPut('admin/bookings.json', JSON.stringify(STATE.bookings, null, 2), 'Delete booking');
+    renderBookings(); updateBadge(); toast('נמחק ✓', 'ok');
+  } catch(e) { toast('שגיאה: '+e.message, 'err'); }
+}
+
+/* ══════════════════════════════════════════════════════
+   DONATIONS
+══════════════════════════════════════════════════════ */
+function populateDonationsForm() {
+  sv('don-url',   STATE.donations.url   || '');
+  sv('don-title', STATE.donations.title || '');
+  sv('don-desc',  STATE.donations.desc  || '');
+}
+
+async function saveDonations() {
+  STATE.donations = { url: v('don-url').trim(), title: v('don-title').trim(), desc: v('don-desc').trim() };
+  try {
+    await ghPut('admin/donations.json', JSON.stringify(STATE.donations, null, 2), 'Update donations settings');
+    toast('הגדרות תרומות נשמרו ✓', 'ok');
+  } catch(e) { toast('שגיאה: '+e.message, 'err'); }
+}
+
+/* ══════════════════════════════════════════════════════
+   SETTINGS
+══════════════════════════════════════════════════════ */
+function populateSettingsForm() {
+  var cfg = STATE.config, cnt = STATE.content;
+  sv('s-hero-title', cnt['hero.title']    || '');
+  sv('s-hero-accent',cnt['hero.accent']   || '');
+  sv('s-hero-sub',   cnt['hero.subtitle'] || '');
+  sv('s-about',      cnt['about.body']    || '');
+  sv('s-phone',  cfg.phone        || '');
+  sv('s-wa',     cfg.whatsapp     || '');
+  sv('s-email',  cfg.email        || '');
+  sv('s-form-ep',cfg.formEndpoint || '');
+  sv('s-fam',  cfg.stats ? cfg.stats.families     : '');
+  sv('s-ws',   cfg.stats ? cfg.stats.workshops    : '');
+  sv('s-fac',  cfg.stats ? cfg.stats.facilitators : '');
+  sv('s-cit',  cfg.stats ? cfg.stats.cities       : '');
+}
+
+function renderTestimonials() {
+  var arr = STATE.content.testimonials || [];
+  var el  = document.getElementById('testimonials-list');
+  el.innerHTML = arr.length ? arr.map(function(t, i){
+    return '<div style="border:1.5px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:.75rem;position:relative">'+
+      '<div style="font-size:.73rem;font-weight:700;color:var(--gold);margin-bottom:.5rem">עדות '+(i+1)+'</div>'+
+      '<div class="form-grid">'+
+        '<div class="field"><label>ציטוט</label><input id="t-quote-'+i+'" value="'+esc(t.quote||'')+'"></div>'+
+        '<div class="field"><label>שם</label><input id="t-author-'+i+'" value="'+esc(t.author||'')+'"></div>'+
+        '<div class="field"><label>תפקיד</label><input id="t-role-'+i+'" value="'+esc(t.role||'')+'"></div>'+
+        '<div class="field span2"><label>תוכן</label><textarea id="t-body-'+i+'" rows="2">'+esc(t.body||'')+'</textarea></div>'+
+      '</div>'+
+      '<button onclick="removeTestimonial('+i+')" style="position:absolute;top:.6rem;left:.6rem;background:#fdecea;color:var(--red);border:none;border-radius:6px;padding:.2rem .5rem;font-size:.75rem;cursor:pointer">הסר</button>'+
+    '</div>';
+  }).join('') : '<div class="empty"><p>אין עדויות. לחץ "הוסף עדות" להתחלה.</p></div>';
+}
+
+function addTestimonial() {
+  if (!STATE.content.testimonials) STATE.content.testimonials = [];
+  STATE.content.testimonials.push({ quote:'', body:'', author:'', role:'' });
+  renderTestimonials();
+}
+
+function removeTestimonial(idx) {
+  STATE.content.testimonials.splice(idx, 1);
+  renderTestimonials();
+}
+
+function getTestimonialsFromForm() {
+  var arr = STATE.content.testimonials || [];
+  return arr.map(function(t, i){
+    return {
+      quote:  document.getElementById('t-quote-'+i)  ? document.getElementById('t-quote-'+i).value.trim()  : t.quote,
+      author: document.getElementById('t-author-'+i) ? document.getElementById('t-author-'+i).value.trim() : t.author,
+      role:   document.getElementById('t-role-'+i)   ? document.getElementById('t-role-'+i).value.trim()   : t.role,
+      body:   document.getElementById('t-body-'+i)   ? document.getElementById('t-body-'+i).value.trim()   : t.body
+    };
+  }).filter(function(t){ return t.quote || t.body || t.author; });
+}
+
+async function saveSettings() {
+  STATE.config = {
+    phone:        v('s-phone').trim(),
+    whatsapp:     v('s-wa').trim().replace(/\D/g,''),
+    email:        v('s-email').trim(),
+    formEndpoint: v('s-form-ep').trim(),
     stats: {
-      families:     parseInt(get('cfg-families'),10)    || 0,
-      workshops:    parseInt(get('cfg-workshops'),10)   || 0,
-      facilitators: parseInt(get('cfg-facilitators'),10)|| 0,
-      cities:       parseInt(get('cfg-cities'),10)      || 0
-    },
-    mataraUrl: get('cfg-matara-in')
-  };
-  var cnt = getContentFromForm();
-
-  try {
-    var tasks = [
-      commitFile('config.json',  makeConfigJson(cfg),  pat),
-      commitFile('config.js',    makeConfigJs(cfg),    pat),
-      commitFile('content.json', makeContentJson(cnt), pat),
-      commitFile('content.js',   makeContentJs(cnt),   pat)
-    ];
-    if (cfg.mataraUrl) {
-      tasks.push(
-        patchDonate(cfg.mataraUrl, pat).then(function(html){
-          if (html) return commitFile('donate.html', html, pat);
-        })
-      );
+      families:     parseInt(v('s-fam'),10)  || 0,
+      workshops:    parseInt(v('s-ws'),10)   || 0,
+      facilitators: parseInt(v('s-fac'),10)  || 0,
+      cities:       parseInt(v('s-cit'),10)  || 0
     }
-    await Promise.all(tasks);
-    showStatus('האתר עודכן ויפורסם תוך כ-2 דקות ✓', 'success');
-  } catch(e) {
-    showStatus('שגיאה בשמירה: ' + e.message, 'error');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2Z" stroke="currentColor" stroke-width="2"/><polyline points="17 21 17 13 7 13 7 21" stroke="currentColor" stroke-width="2"/><polyline points="7 3 7 8 15 8" stroke="currentColor" stroke-width="2"/></svg> שמירה ופרסום';
-  }
-}
-
-async function commitFile(path, content, pat) {
-  var sha = null;
+  };
+  STATE.content = {
+    'hero.title':    v('s-hero-title').trim(),
+    'hero.accent':   v('s-hero-accent').trim(),
+    'hero.subtitle': v('s-hero-sub').trim(),
+    'about.body':    v('s-about').trim(),
+    'testimonials':  getTestimonialsFromForm()
+  };
   try {
-    var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path+'?ref='+REPO_BRANCH, {
-      headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
-    });
-    if (r.ok) { var d = await r.json(); sha = d.sha; }
-  } catch(e) {}
-
-  var body = {message:'Update '+path+' via admin panel', content:btoa(unescape(encodeURIComponent(content))), branch:REPO_BRANCH};
-  if (sha) body.sha = sha;
-
-  var res = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/'+path, {
-    method:'PUT',
-    headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
-    body:JSON.stringify(body)
-  });
-  if (!res.ok) { var err = await res.json(); throw new Error(err.message || res.status); }
+    await Promise.all([
+      ghPut('config.json',  JSON.stringify(STATE.config,  null, 2), 'Update config via admin'),
+      ghPut('content.json', JSON.stringify(STATE.content, null, 2), 'Update content via admin'),
+      buildAndSaveConfigJs(),
+      buildAndSaveContentJs()
+    ]);
+    toast('ההגדרות נשמרו ויפורסמו תוך ~2 דקות ✓', 'ok');
+  } catch(e) { toast('שגיאה: '+e.message, 'err'); }
 }
 
-async function patchDonate(mataraUrl, pat) {
-  try { new URL(mataraUrl); } catch(e) { throw new Error('כתובת URL לא תקינה'); }
-  if (!/^https:\/\//.test(mataraUrl)) throw new Error('URL חייב להתחיל ב-https://');
-  var r = await fetch('https://api.github.com/repos/'+REPO_OWNER+'/'+REPO_NAME+'/contents/donate.html?ref='+REPO_BRANCH, {
-    headers:{'Authorization':'token '+pat,'Accept':'application/vnd.github.v3+json'}
-  });
-  if (!r.ok) return null;
-  var d    = await r.json();
-  var html = decodeURIComponent(escape(atob(d.content.replace(/\n/g,''))));
-  var safeUrl = mataraUrl.replace(/'/g,'%27');
-  html = html.replace(/var MATARA_URL\s*=\s*'[^']*'/, "var MATARA_URL = '" + safeUrl + "'");
-  return html;
-}
-
-/* ══════════════════════════════════════
-   Templates
-══════════════════════════════════════ */
-function makeConfigJson(cfg) { return JSON.stringify(cfg, null, 2) + '\n'; }
-
-function makeConfigJs(cfg) {
-  var data = { phone:cfg.phone, whatsapp:cfg.whatsapp, email:cfg.email, formEndpoint:cfg.formEndpoint||'', stats:cfg.stats };
-  return '/* שורשים — config.js  (edit via /admin/) */\n'+
-    'var SHORESHIM = '+JSON.stringify(data, null, 2)+';\n\n'+
-    "(function (cfg) {\n"+
-    "  var p = document.getElementById('cfg-phone');\n"+
-    "  if (p) p.textContent = cfg.phone;\n\n"+
-    "  var em = document.getElementById('cfg-email');\n"+
-    "  if (em) em.textContent = cfg.email;\n\n"+
-    "  ['cfg-stat-families','cfg-stat-workshops','cfg-stat-facilitators','cfg-stat-cities'].forEach(function (id, i) {\n"+
-    "    var vals = [cfg.stats.families, cfg.stats.workshops, cfg.stats.facilitators, cfg.stats.cities];\n"+
-    "    var el = document.getElementById(id);\n"+
-    "    if (el) el.setAttribute('data-target', vals[i]);\n"+
-    "  });\n\n"+
-    "  var waMsg = encodeURIComponent('שלום, הגעתי מאתר שורשים ואשמח לפרטים בדיסקרטיות');\n"+
-    "  document.querySelectorAll('a[href^=\"https://wa.me/\"]').forEach(function (a) {\n"+
-    "    var hasText = a.getAttribute('href').indexOf('?text=') !== -1;\n"+
-    "    a.href = 'https://wa.me/' + cfg.whatsapp + (hasText ? '?text=' + waMsg : '');\n"+
+function buildAndSaveConfigJs() {
+  var cfg = STATE.config;
+  var js = '/* שורשים — config.js */\nvar SHORESHIM = '+JSON.stringify(cfg, null, 2)+';\n\n'+
+    "(function(cfg){\n"+
+    "  var p=document.getElementById('cfg-phone');if(p)p.textContent=cfg.phone;\n"+
+    "  var em=document.getElementById('cfg-email');if(em)em.textContent=cfg.email;\n"+
+    "  ['cfg-stat-families','cfg-stat-workshops','cfg-stat-facilitators','cfg-stat-cities'].forEach(function(id,i){\n"+
+    "    var vals=[cfg.stats.families,cfg.stats.workshops,cfg.stats.facilitators,cfg.stats.cities];\n"+
+    "    var el=document.getElementById(id);if(el)el.setAttribute('data-target',vals[i]);\n"+
+    "  });\n"+
+    "  var waMsg=encodeURIComponent('שלום, הגעתי מאתר שורשים ואשמח לפרטים בדיסקרטיות');\n"+
+    "  document.querySelectorAll('a[href^=\"https://wa.me/\"]').forEach(function(a){\n"+
+    "    var hasText=a.getAttribute('href').indexOf('?text=')!==-1;\n"+
+    "    a.href='https://wa.me/'+cfg.whatsapp+(hasText?'?text='+waMsg:'');\n"+
     "  });\n"+
     "}(SHORESHIM));\n";
+  return ghPut('config.js', js, 'Update config.js via admin');
 }
 
-function makeContentJson(cnt) { return JSON.stringify(cnt, null, 2) + '\n'; }
-
-function makeContentJs(cnt) {
-  return '/* שורשים — content.js  (edit via /admin/) */\n'+
-    'var SHORESHIM_CONTENT = '+JSON.stringify(cnt)+';\n\n'+
-    "(function (c) {\n"+
-    "  function setText(id, val) { var el=document.getElementById(id); if(el&&val!=null) el.textContent=String(val); }\n"+
-    "  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }\n"+
-    "  setText('content-hero-title',    c['hero.title']);\n"+
-    "  setText('content-hero-accent',   c['hero.accent']);\n"+
-    "  setText('content-hero-subtitle', c['hero.subtitle']);\n"+
-    "  setText('content-mission-body',  c['about.body']);\n"+
-    "  if (Array.isArray(c.testimonials) && c.testimonials.length) {\n"+
-    "    var slider = document.getElementById('testimonials-slider');\n"+
-    "    if (slider) {\n"+
-    "      slider.innerHTML = c.testimonials.map(function (t, i) {\n"+
-    "        return '<div class=\"testimonial-slide'+(i===0?' active':'')+'\">'+\n"+
-    "          '<blockquote class=\"testimonial-quote\">\\u201c'+esc(t.quote)+'\\u201d</blockquote>'+\n"+
-    "          '<p class=\"testimonial-body\">'+esc(t.body)+'</p>'+\n"+
-    "          '<div class=\"testimonial-author\">'+\n"+
-    "          '<div class=\"testimonial-avatar\">'+esc((t.author||'?').charAt(0))+'</div>'+\n"+
-    "          '<div><strong>'+esc(t.author)+'</strong><span>'+esc(t.role)+'</span></div>'+\n"+
-    "          '</div></div>';\n"+
-    "      }).join('');\n"+
-    "    }\n"+
+function buildAndSaveContentJs() {
+  var cnt = STATE.content;
+  var js = '/* שורשים — content.js */\nvar SHORESHIM_CONTENT='+JSON.stringify(cnt)+';\n\n'+
+    "(function(c){\n"+
+    "  function setText(id,val){var el=document.getElementById(id);if(el&&val!=null)el.textContent=String(val);}\n"+
+    "  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}\n"+
+    "  setText('content-hero-title',c['hero.title']);\n"+
+    "  setText('content-hero-accent',c['hero.accent']);\n"+
+    "  setText('content-hero-subtitle',c['hero.subtitle']);\n"+
+    "  setText('content-mission-body',c['about.body']);\n"+
+    "  if(Array.isArray(c.testimonials)&&c.testimonials.length){\n"+
+    "    var slider=document.getElementById('testimonials-slider');\n"+
+    "    if(slider){slider.innerHTML=c.testimonials.map(function(t,i){\n"+
+    "      return '<div class=\"testimonial-slide'+(i===0?' active':'')+'\">'+\n"+
+    "        '<blockquote class=\"testimonial-quote\">\\u201c'+esc(t.quote)+'\\u201d</blockquote>'+\n"+
+    "        '<p class=\"testimonial-body\">'+esc(t.body)+'</p>'+\n"+
+    "        '<div class=\"testimonial-author\">'+\n"+
+    "        '<div class=\"testimonial-avatar\">'+esc((t.author||'?').charAt(0))+'</div>'+\n"+
+    "        '<div><strong>'+esc(t.author)+'</strong><span>'+esc(t.role)+'</span></div>'+\n"+
+    "        '</div></div>';\n"+
+    "    }).join('');}\n"+
     "  }\n"+
     "}(SHORESHIM_CONTENT));\n";
+  return ghPut('content.js', js, 'Update content.js via admin');
 }
 
-/* ══════════════════════════════════════
-   Status
-══════════════════════════════════════ */
-var _statusTimer;
-function showStatus(msg, type) {
-  var bar = document.getElementById('status-bar');
-  bar.textContent = msg;
-  bar.className   = 'visible ' + (type || '');
-  clearTimeout(_statusTimer);
-  _statusTimer = setTimeout(function(){ bar.className = ''; }, 4000);
+/* ══════════════════════════════════════════════════════
+   TEAM
+══════════════════════════════════════════════════════ */
+function renderTeam() {
+  var el = document.getElementById('team-list');
+  var roleLabel = { admin:'מנהל', editor:'עורך' };
+  el.innerHTML = STATE.users.map(function(u, i){
+    var isMe = u.username === STATE.user.username;
+    return '<div class="user-row">'+
+      '<div class="ur-avatar">'+esc((u.name||u.username).charAt(0).toUpperCase())+'</div>'+
+      '<div class="ur-info">'+
+        '<div class="ur-name">'+esc(u.name||u.username)+' '+(isMe?'<span style="font-size:.7rem;color:var(--muted)">(אתה)</span>':'')+'</div>'+
+        '<div class="ur-meta">@'+esc(u.username)+' · '+esc(roleLabel[u.role]||u.role)+'</div>'+
+      '</div>'+
+      (!isMe && STATE.user.role === 'admin' ? '<button class="btn btn-danger btn-sm" onclick="removeUser('+i+')">הסר</button>' : '')+
+    '</div>';
+  }).join('');
 }
 
-/* ══════════════════════════════════════
-   Boot
-══════════════════════════════════════ */
-(function() {
-  /* Capture token from URL param ?token=ghp_xxx (one-time setup) */
-  var urlToken = new URLSearchParams(location.search).get('token');
-  if (urlToken) {
-    localStorage.setItem('shoreshim_pat', urlToken);
-    history.replaceState(null, '', location.pathname);
+function openUserModal() {
+  sv('nu-user',''); sv('nu-name',''); sv('nu-pass',''); sv('nu-role','editor');
+  openModal('user-modal');
+}
+
+async function saveNewUser() {
+  var username = v('nu-user').trim();
+  var name     = v('nu-name').trim();
+  var pass     = v('nu-pass');
+  var role     = v('nu-role');
+  if (!username || !name || !pass) return toast('יש למלא את כל השדות', 'err');
+  if (pass.length < 6)             return toast('הסיסמה חייבת להכיל לפחות 6 תווים', 'err');
+  if (STATE.users.find(function(u){ return u.username === username; })) return toast('שם משתמש כבר קיים', 'err');
+
+  var hash = await sha256(pass);
+  STATE.users.push({ username: username, name: name, role: role, hash: hash });
+  try {
+    await ghPut('admin/users.json', JSON.stringify(STATE.users, null, 2), 'Add user: '+username);
+    closeModal('user-modal'); renderTeam(); toast('המשתמש נוסף ✓', 'ok');
+  } catch(e) { toast('שגיאה: '+e.message, 'err'); STATE.users.pop(); }
+}
+
+async function removeUser(idx) {
+  var u = STATE.users[idx];
+  if (!confirm('להסיר את המשתמש "'+u.name+'"?')) return;
+  STATE.users.splice(idx, 1);
+  try {
+    await ghPut('admin/users.json', JSON.stringify(STATE.users, null, 2), 'Remove user: '+u.username);
+    renderTeam(); toast('המשתמש הוסר ✓', 'ok');
+  } catch(e) { toast('שגיאה: '+e.message, 'err'); STATE.users.splice(idx, 0, u); }
+}
+
+async function changeMyPassword() {
+  var oldP = document.getElementById('cp-old').value;
+  var newP = document.getElementById('cp-new').value;
+  var newP2= document.getElementById('cp-new2').value;
+  if (!oldP || !newP || !newP2) return toast('יש למלא את כל השדות', 'err');
+  if (newP !== newP2)  return toast('הסיסמאות אינן תואמות', 'err');
+  if (newP.length < 6) return toast('הסיסמה חייבת להכיל לפחות 6 תווים', 'err');
+
+  var oldHash = await sha256(oldP);
+  var me = STATE.users.findIndex(function(u){ return u.username === STATE.user.username; });
+  if (me < 0 || STATE.users[me].hash !== oldHash) return toast('הסיסמה הנוכחית שגויה', 'err');
+
+  STATE.users[me].hash = await sha256(newP);
+  try {
+    await ghPut('admin/users.json', JSON.stringify(STATE.users, null, 2), 'Change password for '+STATE.user.username);
+    ['cp-old','cp-new','cp-new2'].forEach(function(id){ document.getElementById(id).value=''; });
+    toast('הסיסמה שונתה ✓', 'ok');
+  } catch(e) { toast('שגיאה: '+e.message, 'err'); }
+}
+
+/* ══════════════════════════════════════════════════════
+   RICH TEXT EDITOR
+══════════════════════════════════════════════════════ */
+function fmt(cmd) { document.execCommand(cmd, false, null); document.getElementById('p-body').focus(); }
+function fmtBlock(tag) { document.execCommand('formatBlock', false, tag); document.getElementById('p-body').focus(); }
+
+/* ══════════════════════════════════════════════════════
+   MODAL HELPERS
+══════════════════════════════════════════════════════ */
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(function(o){
+  o.addEventListener('click', function(e){ if(e.target === o) o.classList.remove('open'); });
+});
+
+/* ══════════════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════════════ */
+var _toastTimer;
+function toast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type ? ' '+type : '');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function(){ el.className = ''; }, 3500);
+}
+
+/* ══════════════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════════════ */
+function v(id)      { var el=document.getElementById(id); return el ? el.value : ''; }
+function sv(id,val) { var el=document.getElementById(id); if(el) el.value=val; }
+function esc(s)     { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(d) { if(!d) return '—'; try { return new Date(d).toLocaleDateString('he-IL'); } catch(e){ return d; } }
+
+function setBtnLoading(id, on, txt) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.disabled = on;
+  el.textContent = txt;
+}
+
+/* ══════════════════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════════════════ */
+(async function init() {
+  /* Check for existing session */
+  var sess = localStorage.getItem('shr_session');
+  if (sess && pat()) {
+    try {
+      var s = JSON.parse(sess);
+      var users = await ghGetJSON('admin/users.json', null);
+      if (users) {
+        var u = users.find(function(u){ return u.username === s.username; });
+        if (u) {
+          STATE.user  = u;
+          STATE.users = users;
+          startApp(); return;
+        }
+      }
+    } catch(e) { /* fall through to login */ }
   }
 
-  if (sessionStorage.getItem('shoreshim_authed') === '1') { showAdmin(); return; }
+  /* Check if first time (no users.json) */
+  var existing;
+  try { existing = await ghGetJSON('admin/users.json', null); } catch(e) { existing = null; }
 
-  var hasPass = !!localStorage.getItem('shoreshim_pass_hash');
-
-  if (!hasPass) {
-    document.getElementById('setup-form').style.display = 'block';
-    ['setup-pass','setup-pass2'].forEach(function(id){
-      document.getElementById(id).addEventListener('keydown', function(e){ if(e.key==='Enter') doSetup(); });
-    });
+  if (!existing || existing.length === 0) {
+    document.getElementById('setup-panel').style.display = 'block';
   } else {
-    document.getElementById('login-form').style.display = 'block';
-    document.getElementById('login-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+    document.getElementById('login-panel').style.display = 'block';
   }
+
+  /* Enter key listeners */
+  document.getElementById('l-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+  document.getElementById('su-pass2').addEventListener('keydown', function(e){ if(e.key==='Enter') doSetup(); });
 })();
 </script>
 </body>
