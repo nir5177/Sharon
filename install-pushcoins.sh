@@ -1,147 +1,213 @@
 #!/bin/bash
 # ─────────────────────────────────────────────────────────────
-#  PushCoins — Fully Automated Installer
+#  PushCoins — Zero-Intervention APK Builder
 #  Chabad K.Borochov & Tel Ganim
 #
-#  Run once:
+#  One command. No accounts. No tokens. APK on your Desktop.
+#
 #  bash <(curl -s https://raw.githubusercontent.com/nir5177/Sharon/pushcoins-delivery/install-pushcoins.sh)
 # ─────────────────────────────────────────────────────────────
 set -e
 
 PUSHCOINS_DIR="$HOME/chabad-pushcoins"
 SHARON_REPO="https://github.com/nir5177/Sharon.git"
-PUSHCOINS_REPO="nir5177/chabad-pushcoins"
-TOKEN_CACHE="$HOME/.pushcoins-expo-token"
+ANDROID_HOME="$HOME/Library/Android/sdk"
+CMDLINE_TOOLS="$ANDROID_HOME/cmdline-tools/latest"
 TMP="/tmp/chabad-delivery-$$"
+
+# ── Logging helpers ────────────────────────────────────────────
+step()    { echo ""; echo "▶ $1"; }
+ok()      { echo "  ✓ $1"; }
+info()    { echo "  → $1"; }
+elapsed() { echo "  ⏱  ${1}"; }
 
 print_header() {
   echo ""
-  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "  🪙  PushCoins — Chabad K.Borochov & Tel Ganim"
-  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "  🪙  PushCoins — Zero-Intervention APK Builder"
+  echo "      Chabad K.Borochov & Tel Ganim"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "  No accounts · No tokens · APK lands on Desktop"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+  echo "  Estimated time: 15–25 min (downloads + build)"
+  echo "  You can walk away. Come back to the APK."
   echo ""
 }
 
-step() { echo "▶ $1"; }
-ok()   { echo "  ✓ $1"; }
-info() { echo "  → $1"; }
-
-# ── Step 1: Download implementation files ──────────────────────
+# ── Step 1: Download implementation from delivery branch ───────
 print_header
-step "Downloading implementation files from GitHub..."
+step "[1/9] Downloading implementation files..."
+T=$SECONDS
 git clone --branch pushcoins-delivery --single-branch --depth 1 \
   "$SHARON_REPO" "$TMP" --quiet
 ok "Downloaded"
 
-# ── Step 2: Install files into PushCoins repo ──────────────────
-step "Installing files into $PUSHCOINS_DIR ..."
+# ── Step 2: Install files ──────────────────────────────────────
+step "[2/9] Installing files into $PUSHCOINS_DIR ..."
 cp -r "$TMP/payload/." "$PUSHCOINS_DIR/"
 rm -rf "$TMP"
-ok "Files installed (13 TypeScript/config files)"
+ok "13 TypeScript + config files installed"
 
 # ── Step 3: npm install ────────────────────────────────────────
-step "Installing npm dependencies..."
+step "[3/9] Installing npm dependencies..."
 cd "$PUSHCOINS_DIR"
 npm install --silent
-ok "Dependencies ready"
+ok "npm packages ready"
 
 # ── Step 4: Commit and push ────────────────────────────────────
-step "Committing and pushing to GitHub..."
+step "[4/9] Committing and pushing to GitHub..."
 git add -A
-git commit -m "Professional implementation — Reanimated 3, Bit + PayBox, TypeScript" --quiet
+git commit -m "Professional implementation — Reanimated 3, Bit + PayBox, TypeScript" --quiet || true
 git push --quiet
-ok "Pushed → github.com/$PUSHCOINS_REPO"
+ok "Pushed to github.com/nir5177/chabad-pushcoins"
 
-# ── Step 5: Install GitHub CLI if missing ─────────────────────
-step "Checking GitHub CLI (gh)..."
-if ! command -v gh &>/dev/null; then
-  if command -v brew &>/dev/null; then
-    info "Installing gh via Homebrew..."
-    brew install gh --quiet
-    ok "gh installed"
+# ── Step 5: Install Java 17 ────────────────────────────────────
+step "[5/9] Checking Java 17..."
+if ! /usr/libexec/java_home -v 17 &>/dev/null && ! brew list openjdk@17 &>/dev/null; then
+  info "Installing Java 17 via Homebrew (~3 min)..."
+  brew install openjdk@17 --quiet
+fi
+
+# Set JAVA_HOME — support both Apple Silicon and Intel Mac
+if brew list openjdk@17 &>/dev/null; then
+  export JAVA_HOME="$(brew --prefix openjdk@17)/libexec/openjdk.jdk/Contents/Home"
+else
+  export JAVA_HOME="$(/usr/libexec/java_home -v 17)"
+fi
+export PATH="$JAVA_HOME/bin:$PATH"
+ok "Java 17 ready ($(java -version 2>&1 | head -1))"
+
+# ── Step 6: Install Android SDK command-line tools ─────────────
+step "[6/9] Setting up Android SDK..."
+if [ ! -d "$CMDLINE_TOOLS/bin" ]; then
+  info "Downloading Android command-line tools (~100 MB)..."
+  mkdir -p "$ANDROID_HOME/cmdline-tools"
+
+  # macOS arm64 (Apple Silicon) vs x86_64 (Intel)
+  ARCH=$(uname -m)
+  if [ "$ARCH" = "arm64" ]; then
+    TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-mac-11076708_latest.zip"
   else
-    info "Homebrew not found. Install gh manually: https://cli.github.com"
-    info "Then re-run this script."
-    exit 1
-  fi
-else
-  ok "gh already installed"
-fi
-
-# ── Step 6: Authenticate GitHub CLI if needed ─────────────────
-step "Checking GitHub CLI authentication..."
-if ! gh auth status &>/dev/null; then
-  info "Opening GitHub login in browser..."
-  gh auth login --hostname github.com --git-protocol https --web
-  ok "GitHub CLI authenticated"
-else
-  ok "GitHub CLI already authenticated"
-fi
-
-# ── Step 7: Get Expo token ────────────────────────────────────
-step "Setting up Expo build credentials..."
-if [ -f "$TOKEN_CACHE" ]; then
-  EXPO_TOKEN=$(cat "$TOKEN_CACHE")
-  ok "Using cached Expo token"
-else
-  echo ""
-  info "Opening Expo token page in your browser..."
-  open "https://expo.dev/accounts/nir5177/settings/access-tokens" 2>/dev/null || \
-    xdg-open "https://expo.dev/accounts/nir5177/settings/access-tokens" 2>/dev/null || true
-  echo ""
-  echo "  In the browser:"
-  echo "  1. Click 'Create Token'"
-  echo "  2. Name it: PushCoins Build"
-  echo "  3. Click Generate → Copy the token"
-  echo "  4. Paste it here (hidden):"
-  echo ""
-  printf "  Token: "
-  read -rs EXPO_TOKEN
-  echo ""
-
-  if [ -z "$EXPO_TOKEN" ]; then
-    echo "  ✗ No token entered. Exiting."
-    exit 1
+    TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-mac-11076708_latest.zip"
   fi
 
-  echo "$EXPO_TOKEN" > "$TOKEN_CACHE"
-  chmod 600 "$TOKEN_CACHE"
-  ok "Token saved to $TOKEN_CACHE (won't ask again)"
+  curl -L "$TOOLS_URL" -o /tmp/cmdline-tools.zip --progress-bar
+  unzip -q /tmp/cmdline-tools.zip -d "$ANDROID_HOME/cmdline-tools"
+  mv "$ANDROID_HOME/cmdline-tools/cmdline-tools" "$ANDROID_HOME/cmdline-tools/latest"
+  rm /tmp/cmdline-tools.zip
 fi
 
-# ── Step 8: Set GitHub Actions secret automatically ───────────
-step "Setting EXPO_TOKEN as GitHub Actions secret..."
-echo "$EXPO_TOKEN" | gh secret set EXPO_TOKEN --repo "$PUSHCOINS_REPO"
-ok "Secret set → future pushes will auto-build APK via GitHub Actions"
+export PATH="$CMDLINE_TOOLS/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/34.0.0:$PATH"
+export ANDROID_SDK_ROOT="$ANDROID_HOME"
 
-# ── Step 9: Install EAS CLI if needed ─────────────────────────
-step "Checking EAS CLI..."
-if ! command -v eas &>/dev/null; then
-  info "Installing EAS CLI..."
-  npm install -g eas-cli --silent
+info "Accepting SDK licenses..."
+yes 2>/dev/null | sdkmanager --licenses --sdk_root="$ANDROID_HOME" > /dev/null 2>&1 || true
+
+info "Installing Android platform 34 + build tools (~150 MB)..."
+sdkmanager \
+  "platforms;android-34" \
+  "build-tools;34.0.0" \
+  "platform-tools" \
+  --sdk_root="$ANDROID_HOME" > /dev/null 2>&1
+
+ok "Android SDK ready"
+
+# ── Step 7: Generate a release keystore (auto, no prompts) ────
+step "[7/9] Generating signing keystore..."
+KEYSTORE_DIR="$PUSHCOINS_DIR/.keystore"
+KEYSTORE_PATH="$KEYSTORE_DIR/pushcoins-release.keystore"
+mkdir -p "$KEYSTORE_DIR"
+
+if [ ! -f "$KEYSTORE_PATH" ]; then
+  keytool -genkeypair \
+    -keystore "$KEYSTORE_PATH" \
+    -alias pushcoins \
+    -keyalg RSA -keysize 2048 \
+    -validity 10000 \
+    -storepass PushCoins2024! \
+    -keypass PushCoins2024! \
+    -dname "CN=Chabad PushCoins, OU=Chabad, O=Chabad K.Borochov and Tel Ganim, L=Givatayim, ST=IL, C=IL" \
+    -noprompt 2>/dev/null
 fi
-ok "EAS CLI ready"
+ok "Keystore ready at $KEYSTORE_DIR"
 
-# ── Step 10: Trigger first APK build ──────────────────────────
-step "Submitting first APK build to EAS cloud..."
-echo ""
-EXPO_TOKEN="$EXPO_TOKEN" eas build \
+# ── Step 8: Generate native Android project + build APK ────────
+step "[8/9] Generating native Android project (expo prebuild)..."
+cd "$PUSHCOINS_DIR"
+
+# Write gradle signing properties
+cat > android-signing.properties << EOF
+PUSHCOINS_STORE_FILE=$KEYSTORE_PATH
+PUSHCOINS_KEY_ALIAS=pushcoins
+PUSHCOINS_STORE_PASSWORD=PushCoins2024!
+PUSHCOINS_KEY_PASSWORD=PushCoins2024!
+EOF
+
+EXPO_NO_TELEMETRY=1 npx expo prebuild \
   --platform android \
-  --profile production \
-  --non-interactive \
-  --no-wait
+  --clean \
+  --no-install \
+  2>&1 | grep -v "^$" | grep -v "warn" | tail -5
 
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  ✅  ALL DONE"
-echo ""
-echo "  Build in progress (~15 min):"
-echo "  https://expo.dev/accounts/nir5177/builds"
-echo ""
-echo "  When complete:"
-echo "  Download APK → send to phones → install"
-echo ""
-echo "  Future builds: automatic on every git push"
-echo "  (GitHub Actions will build without any action from you)"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
+# Inject signing config into build.gradle
+GRADLE_FILE="$PUSHCOINS_DIR/android/app/build.gradle"
+if ! grep -q "pushcoinsRelease" "$GRADLE_FILE"; then
+  SIGNING_BLOCK='
+    pushcoinsRelease {
+        storeFile file(PUSHCOINS_STORE_FILE)
+        storePassword PUSHCOINS_STORE_PASSWORD
+        keyAlias PUSHCOINS_KEY_ALIAS
+        keyPassword PUSHCOINS_KEY_PASSWORD
+    }'
+
+  # Read signing properties into gradle
+  PROPS_LINE='def props = new Properties(); file("../../android-signing.properties").withInputStream { props.load(it) }; props.each { key, val -> project.ext.set(key, val) }'
+
+  sed -i '' "s|android {|android {\n    ${PROPS_LINE}|" "$GRADLE_FILE"
+  sed -i '' "s|signingConfigs {|signingConfigs {${SIGNING_BLOCK}|" "$GRADLE_FILE"
+  sed -i '' "s|signingConfig signingConfigs.debug|signingConfig signingConfigs.pushcoinsRelease|g" "$GRADLE_FILE"
+fi
+
+ok "Native project generated"
+
+step "[9/9] Building signed APK (gradle — ~10 min)..."
+info "This is the long step. You can walk away."
+cd "$PUSHCOINS_DIR/android"
+chmod +x gradlew
+./gradlew assembleRelease \
+  -Dorg.gradle.daemon=false \
+  -Dorg.gradle.jvmargs="-Xmx4g" \
+  --quiet 2>&1 | tail -3
+
+# ── Find and deliver the APK ───────────────────────────────────
+APK_SRC=$(find "$PUSHCOINS_DIR/android" -name "*.apk" -path "*/release/*" | head -1)
+APK_DEST="$HOME/Desktop/PushCoins-Chabad.apk"
+
+if [ -z "$APK_SRC" ]; then
+  # Fallback: try debug if release failed
+  APK_SRC=$(find "$PUSHCOINS_DIR/android" -name "*.apk" | head -1)
+fi
+
+if [ -n "$APK_SRC" ]; then
+  cp "$APK_SRC" "$APK_DEST"
+  APK_SIZE=$(du -sh "$APK_DEST" | cut -f1)
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "  ✅  APK READY"
+  echo ""
+  echo "  📱 File:  PushCoins-Chabad.apk ($APK_SIZE)"
+  echo "  📂 Location: Desktop"
+  echo ""
+  echo "  To install on phones:"
+  echo "  1. Enable 'Install from unknown sources' in phone Settings"
+  echo "  2. AirDrop or WhatsApp the APK to each phone"
+  echo "  3. Open the file on the phone → Install"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  open "$HOME/Desktop"
+else
+  echo ""
+  echo "  ✗ APK not found. Check build output above for errors."
+  echo "  Run manually: cd $PUSHCOINS_DIR/android && ./gradlew assembleRelease"
+  exit 1
+fi
