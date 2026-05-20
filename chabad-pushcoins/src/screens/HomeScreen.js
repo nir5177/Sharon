@@ -14,11 +14,11 @@ import PaymentScreen from './PaymentScreen';
 const { width: SW, height: SH } = Dimensions.get('window');
 
 const PUSHKA_IMG    = require('../../assets/pushka.jpg');
-const PUSHKA_ASPECT = 676 / 999;
-const SLOT_Y_NORM   = 52 / 999;  // coin slot at y=52 in the 999px-tall image
+const PUSHKA_ASPECT = 500 / 500; // square image
+const SLOT_Y_NORM   = 38 / 500;  // coin slot at y=38 in the 500px-tall image
 
-// Fit image to screen: constrained by width (92% of SW) and height (62% of SH)
-const PUSHKA_W = Math.min(SW * 0.92, SH * 0.62 * PUSHKA_ASPECT);
+// Fit image to screen: constrained by width and height
+const PUSHKA_W = Math.min(SW * 0.78, SH * 0.52);
 const PUSHKA_H = PUSHKA_W / PUSHKA_ASPECT;
 
 const COINS = [
