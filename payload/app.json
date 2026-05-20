@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "פושקוין",
+    "slug": "chabad-pushcoins",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/pushka.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#f5f0e8"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#f5f0e8"
+      },
+      "package": "org.chabad.kborochov.pushcoin",
+      "versionCode": 1,
+      "compileSdkVersion": 34,
+      "targetSdkVersion": 34,
+      "permissions": ["INTERNET"]
+    },
+    "plugins": [
+      "./withAndroidQueries",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#f5f0e8",
+          "image": "./assets/pushka.png",
+          "imageWidth": 300
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "chabad-kborochov-pushcoin"
+      }
+    }
+  }
+}
