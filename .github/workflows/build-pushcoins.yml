@@ -141,12 +141,11 @@ jobs:
           "
           npx expo prebuild --platform android --clean --no-install 2>&1 | tail -10
 
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses > /dev/null 2>&1 || true
-
-      - name: Install required SDK components
-        run: |
-          sdkmanager "platforms;android-34" "build-tools;34.0.0" --sdk_root="$ANDROID_SDK_ROOT"
+      - name: Setup Android SDK (handles licenses + packages)
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-34 build-tools;34.0.0'
+          accept-android-sdk-licenses: true
 
       - name: Generate signing keystore
         run: |
